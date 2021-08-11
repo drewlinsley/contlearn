@@ -35,7 +35,7 @@ class MyModel(pl.LightningModule):
         elif self.name == "resnet18":
             self.net = resnet18(pretrained=False)
         elif self.name == "int_circ":
-            self.net = FFhGRU(32, timesteps=8, kernel_size=15, nl=F.softplus)
+            self.net = FFhGRU(48, timesteps=8, kernel_size=15, nl=F.relu)
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
@@ -54,6 +54,7 @@ class MyModel(pl.LightningModule):
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x, y = batch
+        # print(y)
         out = self.step(x, y)
 
         return out
