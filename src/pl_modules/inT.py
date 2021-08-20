@@ -105,14 +105,17 @@ class hConvGRUCell(nn.Module):
         self.w = nn.Parameter(torch.empty((hidden_size, 1, 1)))
 
         self.bn = nn.ModuleList([nn.BatchNorm2d(hidden_size, eps=1e-03, affine=True, track_running_stats=False) for i in range(2)])
+        # self.bn = nn.ModuleList([nn.GroupNorm(5, hidden_size, affine=True) for i in range(2)])
+        self.gbn = nn.ModuleList([nn.GroupNorm(1, hidden_size, affine=True) for i in range(3)]) #  nn.BatchNorm2d(hidden_size, eps=1e-03, affine=True, track_running_stats=False) for i in range(2)])
 
         init.orthogonal_(self.i_w_gate.weight)
         init.orthogonal_(self.i_u_gate.weight)
         init.orthogonal_(self.e_w_gate.weight)
         init.orthogonal_(self.e_u_gate.weight)
         
-        for bn in self.bn:
+        for bn, gbn in zip(self.bn, self.gbn):
             init.constant_(bn.weight, 0.1)
+            init.constant_(gbn.weight, 0.1)
 
         if not no_inh:
             init.constant_(self.alpha, 1.)
@@ -155,37 +158,38 @@ class hConvGRUCell(nn.Module):
             inhibition = self.inh_init(input_)
         if excitation is None:
             excitation = self.exc_init(input_)
-        if self.use_attention:
+        if 1:  #  FORCING DEFAULTS FOR DEBUG  self.use_attention:
             # att_gate = torch.sigmoid(self.a_w_gate(inhibition) + self.a_u_gate(excitation))  # Attention Spotlight -- MOST RECENT WORKING
-            att_gate = self.att_nl(self.a_w_gate(input_) + self.a_u_gate(excitation))  # Attention Spotlight -- MOST RECENT WORKING
+            att_gate = self.att_nl(self.gbn[0](self.a_w_gate(input_) + self.a_u_gate(excitation)))  # Attention Spotlight -- MOST RECENT WORKING
         elif not self.use_attention and testmode:
             att_gate = torch.zeros_like(input_)
 
         # Gate E/I with attention immediately
-        if self.use_attention:
+        if 1:  # self.use_attention:
             gated_input = input_  # * att_gate  # In activ range
-            gated_excitation = att_gate * excitation
-            gated_inhibition = att_gate  # * inhibition
+            gated_excitation = att_gate * excitation  # att_gate * excitation
+            gated_inhibition = inhibition
             # gated_inhibition = inhibition
         else:
             gated_input = input_
             gated_excitation = excitation
             gated_inhibition = inhibition
 
-        if not self.no_inh:
+        if 1:  # not self.no_inh:
             # Compute inhibition
             inh_intx = self.bn[0](F.conv2d(gated_excitation, self.w_inh, padding=self.h_padding))  # in activ range
-            inhibition_hat = activ(input_ - activ(inh_intx * (self.alpha * gated_inhibition + self.mu)))
+            inhibition_hat = activ(input_ - inh_intx * (self.alpha * gated_inhibition + self.mu))
+            # inhibition_hat = activ(input_ - activ(inh_intx * (self.alpha * gated_inhibition + self.mu)))
 
             # Integrate inhibition
-            inh_gate = torch.sigmoid(self.i_w_gate(gated_input) + self.i_u_gate(gated_inhibition))
+            inh_gate = torch.sigmoid(self.gbn[1](self.i_w_gate(gated_input) + self.i_u_gate(gated_inhibition)))
             inhibition = (1 - inh_gate) * inhibition + inh_gate * inhibition_hat  # In activ range
         else:
             inhibition, gated_inhibition = gated_excitation, excitation
 
         # Pass to excitatory neurons
         # exc_gate = torch.sigmoid(self.e_w_gate(inhibition) + self.e_u_gate(excitation))
-        exc_gate = torch.sigmoid(self.e_w_gate(gated_inhibition) + self.e_u_gate(gated_excitation))
+        exc_gate = torch.sigmoid(self.gbn[2](self.e_w_gate(gated_inhibition) + self.e_u_gate(gated_excitation)))
         exc_intx = self.bn[1](F.conv2d(inhibition, self.w_exc, padding=self.h_padding))  # In activ range
         # exc_intx = activ(exc_intx)
         # excitation_hat = activ(self.kappa * inhibition + self.gamma * exc_intx + self.w * inhibition * exc_intx)  # Skip connection OR add OR add by self-sim
@@ -204,11 +208,12 @@ class FFhGRU(nn.Module):
         '''
         '''
         super(FFhGRU, self).__init__()
+        input_size = 1
         self.timesteps = timesteps
         self.jacobian_penalty = jacobian_penalty
         self.grad_method = grad_method
         self.hgru_size = dimensions
-        self.preproc = nn.Conv2d(input_size, dimensions, kernel_size=5, padding=1 // 2)
+        self.preproc = nn.Conv2d(input_size, dimensions, kernel_size=5, stride=1, padding=5 // 2)
         self.unit1 = hConvGRUCell(
             input_size=input_size,
             hidden_size=self.hgru_size,
@@ -220,9 +225,11 @@ class FFhGRU(nn.Module):
             lesion_gamma=lesion_gamma,
             lesion_kappa=lesion_kappa,
             timesteps=timesteps)
+        # self.bn = nn.BatchNorm2d(self.hgru_size, eps=1e-03, affine=False, track_running_stats=True)
         self.readout_bn = nn.BatchNorm2d(self.hgru_size, eps=1e-03, affine=True, track_running_stats=True)
-        self.readout_conv = nn.Conv2d(dimensions, 2, 1)
-        self.readout_dense = nn.Linear(2, 2)
+        # self.readout_conv = nn.Conv2d(dimensions, 2, 1)
+        # self.readout_dense = nn.Linear(2, 2)
+        self.readout_dense = nn.Linear(self.hgru_size, 2)
         self.nl = nl
 
     def forward(self, x, testmode=False):
@@ -253,8 +260,11 @@ class FFhGRU(nn.Module):
             else:
                 inhibition, excitation = out
 
-        output = self.readout_bn(excitation)
-        output = self.readout_conv(output)
+        # output = self.readout_bn(excitation)
+        # output = self.readout_conv(output)
+        # output = self.readout_conv(excitation)
+        output = excitation
+        # output = self.readout_bn(excitation)
         output = F.avg_pool2d(output, kernel_size=output.size()[2:])
         output = output.reshape(x_shape[0], -1)
         output = self.readout_dense(output)

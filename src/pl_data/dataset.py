@@ -126,10 +126,20 @@ class PFClassColour(Dataset):
         file_name = self.file_list[index]
         img = load_image(file_name)
         img = self.transform(img)
-        if torch.rand(1).item() < self.rand_color_invert_p:
-            img = colour(img, ch=1)
-        else:
-            img = colour(img, ch=0)
+        # img = torch.cat((img, img, img), 0)
+        # if torch.rand(1).item() < self.rand_color_invert_p:
+        #     img = colour(img, ch=1)
+        # else:
+        #     img = colour(img, ch=0)
+        rnd = torch.rand(1).item()
+        # if rnd < 0.5:  # rnd < 0.33:
+        #     img = colour(img, ch=0)
+        # elif rnd >= 0.5:  # rnd > 0.33 and rnd < 0.66:
+        #     img = colour(img, ch=1)
+        # else:
+        #     raise NotImplementedError
+        # else:
+        #     img = colour(img, ch=2)
         img = self.norma(img)
         label = int(file_name[-5])
         return img, label

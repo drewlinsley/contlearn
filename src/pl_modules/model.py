@@ -31,11 +31,11 @@ class MyModel(pl.LightningModule):
         if self.name == "baseline_paper":
             self.net = BasePaperNet()
         elif self.name == "hgru":
-            self.net = hConvGRU(timesteps=6, filt_size=15)
+            self.net = hConvGRU(timesteps=8, filt_size=15)
         elif self.name == "resnet18":
             self.net = resnet18(pretrained=False)
-        elif self.name == "int_circ":
-            self.net = FFhGRU(48, timesteps=8, kernel_size=15, nl=F.relu)
+        elif self.name == "int":
+            self.net = FFhGRU(25, timesteps=8, kernel_size=13, nl=F.relu)  # softplus
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
@@ -137,6 +137,9 @@ class MyModel(pl.LightningModule):
         integrated_gradients = IntegratedGradients(self.forward)
         noise_tunnel = NoiseTunnel(integrated_gradients)
         
+        self.logger.experiment.log({"Test Images": images}, step=self.global_step)
+        return  # Don't need this stuff below vvvv
+
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):

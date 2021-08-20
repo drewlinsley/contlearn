@@ -104,7 +104,7 @@ class hConvGRUCell(nn.Module):
         self.softpl.register_backward_hook(lambda module, grad_i, grad_o: print(len(grad_i)))
 
     def forward(self, input_, prev_state2, timestep=0):
-        activ = F.relu
+        activ = F.softplus  # relu
         #activ = torch.sigmoid
         #activ = torch.tanh
         g1_t = torch.sigmoid((self.u1_gate(prev_state2)))
@@ -132,9 +132,9 @@ class hConvGRU(nn.Module):
         self.exp_name = exp_name
         self.jacobian_penalty = jacobian_penalty
         self.grad_method = grad_method
-        self.hidden_size = 16
+        self.hidden_size = 48
         
-        self.conv0 = nn.Conv2d(3, self.hidden_size, kernel_size=7, padding=3)
+        self.conv0 = nn.Conv2d(1, self.hidden_size, kernel_size=5, padding=5 // 2)
         # part1 = np.load('utils/gabor_serre.npy')
         # self.conv0.weight.data = torch.FloatTensor(part1)
         init.xavier_normal_(self.conv0.weight)
@@ -153,7 +153,7 @@ class hConvGRU(nn.Module):
 
     def forward(self, x, testmode=False):
         x = self.conv0(x)
-        x = torch.pow(x, 2)
+        x = F.softplus(x)  # torch.pow(x, 2)
         internal_state = torch.zeros_like(x, requires_grad=False)
         states = []
         if self.grad_method == 'rbp':
@@ -178,12 +178,10 @@ class hConvGRU(nn.Module):
         #internal_state = torch.tanh(internal_state)
         out = self.bn(internal_state)
         out = F.leaky_relu(self.conv6(out))
-        # print(out.shape)
-        # out = self.avgpool1(out)
-        out = self.maxpool(out)
-        out = self.bn2(out)
+        # out = self.maxpool(out)
+        out = F.avg_pool2d(out, kernel_size=out.size()[2:])
+        # out = self.bn2(out)
         out = out.view(out.size(0), -1)
-
         out = self.dense1(out)
 
         pen_type = 'l1'

@@ -32,7 +32,12 @@ class MyDataModule(pl.LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         # transforms
         transform = transforms.Compose(
-            [transforms.Resize((150, 150)), transforms.ToTensor()]
+            [
+                transforms.Resize((100, 100)),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomVerticalFlip(p=0.5),
+                transforms.ToTensor(),
+            ]
         )
 
         # split dataset
