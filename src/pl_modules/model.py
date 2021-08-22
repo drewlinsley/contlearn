@@ -28,6 +28,11 @@ class MyModel(pl.LightningModule):
         self.save_hyperparameters(cfg)
         self.name = name
 
+        if cfg.data.datamodule.datasets.PF14.train.rand_color_invert_p > 0:
+            input_size = 2
+        else:
+            input_size = 1
+
         if self.name == "baseline_paper":
             self.net = BasePaperNet()
         elif self.name == "hgru":
@@ -35,7 +40,7 @@ class MyModel(pl.LightningModule):
         elif self.name == "resnet18":
             self.net = resnet18(pretrained=False)
         elif self.name == "int":
-            self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus)  # softplus
+            self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
@@ -119,6 +124,8 @@ class MyModel(pl.LightningModule):
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
             rendered_image = render_images(output_element["image"], autoshow=False)
+            if rendered_image.shape[-1] > 1:
+                rendered_image = rendered_image.sum(-1)[..., None]
             caption = f"y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
             images.append(
                 wandb.Image(
@@ -134,8 +141,8 @@ class MyModel(pl.LightningModule):
         images = []
         images_feat_viz = []
 
-        integrated_gradients = IntegratedGradients(self.forward)
-        noise_tunnel = NoiseTunnel(integrated_gradients)
+        # integrated_gradients = IntegratedGradients(self.forward)
+        # noise_tunnel = NoiseTunnel(integrated_gradients)
         
         self.logger.experiment.log({"Test Images": images}, step=self.global_step)
         return  # Don't need this stuff below vvvv

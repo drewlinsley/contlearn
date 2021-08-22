@@ -208,7 +208,6 @@ class FFhGRU(nn.Module):
         '''
         '''
         super(FFhGRU, self).__init__()
-        input_size = 1
         self.timesteps = timesteps
         self.jacobian_penalty = jacobian_penalty
         self.grad_method = grad_method
@@ -225,7 +224,7 @@ class FFhGRU(nn.Module):
             lesion_gamma=lesion_gamma,
             lesion_kappa=lesion_kappa,
             timesteps=timesteps)
-        # self.bn = nn.BatchNorm2d(self.hgru_size, eps=1e-03, affine=False, track_running_stats=True)
+        self.bn = nn.BatchNorm2d(self.hgru_size, eps=1e-03, affine=False, track_running_stats=True)
         self.readout_bn = nn.BatchNorm2d(self.hgru_size, eps=1e-03, affine=True, track_running_stats=True)
         # self.readout_conv = nn.Conv2d(dimensions, 2, 1)
         # self.readout_dense = nn.Linear(2, 2)
@@ -235,7 +234,7 @@ class FFhGRU(nn.Module):
     def forward(self, x, testmode=False):
         # First step: replicate x over the channel dim self.hgru_size times
         xbn = self.preproc(x)
-        # xbn = self.bn(xbn)  # This might be hurting me...
+        xbn = self.bn(xbn)  # This might be hurting me...
         xbn = self.nl(xbn)  # TEST TO SEE IF THE NL STABLIZES
 
         # Now run RNN

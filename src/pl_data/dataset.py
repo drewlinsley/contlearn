@@ -21,9 +21,9 @@ def invert(img):
     return bound - img
 
 
-def colour(img, ch=0):
+def colour(img, ch=0, num_ch=3):
 
-    colimg = [torch.zeros_like(img)] * 3
+    colimg = [torch.zeros_like(img)] * num_ch
     colimg[ch] = img
     return torch.cat(colimg)
 
@@ -126,20 +126,12 @@ class PFClassColour(Dataset):
         file_name = self.file_list[index]
         img = load_image(file_name)
         img = self.transform(img)
-        # img = torch.cat((img, img, img), 0)
-        # if torch.rand(1).item() < self.rand_color_invert_p:
-        #     img = colour(img, ch=1)
-        # else:
-        #     img = colour(img, ch=0)
-        rnd = torch.rand(1).item()
-        # if rnd < 0.5:  # rnd < 0.33:
-        #     img = colour(img, ch=0)
-        # elif rnd >= 0.5:  # rnd > 0.33 and rnd < 0.66:
-        #     img = colour(img, ch=1)
-        # else:
-        #     raise NotImplementedError
-        # else:
-        #     img = colour(img, ch=2)
+        if self.rand_color_invert_p > 0:
+            rnd = torch.rand(1).item()
+            if rnd < 0.5:  # rnd < 0.33:
+                img = colour(img, ch=0, num_ch=2)
+            elif rnd >= 0.5:  # rnd > 0.33 and rnd < 0.66:
+                img = colour(img, ch=1, num_ch=2)
         # img = self.norma(img)
         label = int(file_name[-5])
         return img, label
