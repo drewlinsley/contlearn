@@ -140,7 +140,7 @@ class PFClassColour(Dataset):
         #     raise NotImplementedError
         # else:
         #     img = colour(img, ch=2)
-        img = self.norma(img)
+        # img = self.norma(img)
         label = int(file_name[-5])
         return img, label
 

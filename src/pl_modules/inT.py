@@ -213,7 +213,7 @@ class FFhGRU(nn.Module):
         self.jacobian_penalty = jacobian_penalty
         self.grad_method = grad_method
         self.hgru_size = dimensions
-        self.preproc = nn.Conv2d(input_size, dimensions, kernel_size=5, stride=1, padding=5 // 2)
+        self.preproc = nn.Conv2d(input_size, dimensions, kernel_size=7, stride=1, padding=7 // 2)
         self.unit1 = hConvGRUCell(
             input_size=input_size,
             hidden_size=self.hgru_size,
@@ -264,7 +264,7 @@ class FFhGRU(nn.Module):
         # output = self.readout_conv(output)
         # output = self.readout_conv(excitation)
         output = excitation
-        # output = self.readout_bn(excitation)
+        output = self.readout_bn(excitation)
         output = F.avg_pool2d(output, kernel_size=output.size()[2:])
         output = output.reshape(x_shape[0], -1)
         output = self.readout_dense(output)

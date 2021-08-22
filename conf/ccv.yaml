@@ -27,21 +27,21 @@ data:
         train:
           _target_: src.pl_data.dataset.PFClassColour
           train: True
-          rand_color_invert_p: 0.5
-          path: /media/data_cifs_lrs/curvy_2snakes/curv_contour_length_14_full/train.txt
+          rand_color_invert_p: 0.
+          path: /cifs/data/tserre/CLPS_Serre_Lab/curvy_2snakes/curv_contour_length_14_full/oscar_train.txt
         test:
           - _target_: src.pl_data.dataset.PFClassColour
             train: False
-            rand_color_invert_p: 0.5
-            path: /media/data_cifs_lrs/curvy_2snakes/curv_contour_length_14_full/val.txt
+            rand_color_invert_p: 0.
+            path: /cifs/data/tserre/CLPS_Serre_Lab/curvy_2snakes/curv_contour_length_14_full/oscar_val.txt
 
     num_workers:
-      train: 16
+      train: 14
       val: 8
       test: 8
 
     batch_size:
-      train: 600  # 240  # 128
+      train: 600  # 600  # 240  # 128
       val: 300 # 240  # 128
       test: 300  # 128
 hydra:

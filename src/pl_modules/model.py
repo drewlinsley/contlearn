@@ -35,7 +35,7 @@ class MyModel(pl.LightningModule):
         elif self.name == "resnet18":
             self.net = resnet18(pretrained=False)
         elif self.name == "int":
-            self.net = FFhGRU(25, timesteps=8, kernel_size=13, nl=F.relu)  # softplus
+            self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus)  # softplus
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
