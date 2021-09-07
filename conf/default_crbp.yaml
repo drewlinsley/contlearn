@@ -41,9 +41,9 @@ data:
       test: 8
 
     batch_size:
-      train: 600  # 240  # 128
-      val: 600 # 240  # 128
-      test: 600  # 128
+      train: 1800  # 240  # 128
+      val: 1800 # 240  # 128
+      test: 1800  # 128
 hydra:
   run:
     dir: ./experiments/${now:%Y-%m-%d}/${now:%H-%M-%S}

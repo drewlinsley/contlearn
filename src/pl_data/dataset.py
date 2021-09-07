@@ -24,7 +24,17 @@ def invert(img):
 def colour(img, ch=0, num_ch=3):
 
     colimg = [torch.zeros_like(img)] * num_ch
-    colimg[ch] = img
+    # colimg[ch] = img
+    # Use beta distribution to push the mixture to ch 1 or ch 2
+    if ch == 0:
+        rand = torch.distributions.beta.Beta(0.5, 1.)
+    elif ch == 1:
+        rand = torch.distributions.beta.Beta(1., 0.5) 
+    else:
+        raise NotImplementedError("Only 2 channel images supported now.")
+    rand = rand.sample()
+    colimg[0] = img * rand
+    colimg[1] = img * (1 - rand)
     return torch.cat(colimg)
 
 
@@ -126,14 +136,15 @@ class PFClassColour(Dataset):
         file_name = self.file_list[index]
         img = load_image(file_name)
         img = self.transform(img)
+        label = int(file_name[-5])
         if self.rand_color_invert_p > 0:
             rnd = torch.rand(1).item()
             if rnd < 0.5:  # rnd < 0.33:
                 img = colour(img, ch=0, num_ch=2)
             elif rnd >= 0.5:  # rnd > 0.33 and rnd < 0.66:
                 img = colour(img, ch=1, num_ch=2)
-        # img = self.norma(img)
-        label = int(file_name[-5])
+                # if label == 1:
+                #     label += 1  # Add 2 positive outputs
         return img, label
 
     def __repr__(self) -> str:

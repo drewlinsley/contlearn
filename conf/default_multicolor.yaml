@@ -27,12 +27,12 @@ data:
         train:
           _target_: src.pl_data.dataset.PFClassColour
           train: True
-          rand_color_invert_p: 0.  # 5
+          rand_color_invert_p: 0.5
           path: /media/data_cifs_lrs/curvy_2snakes/curv_contour_length_14_full/train.txt
         test:
           - _target_: src.pl_data.dataset.PFClassColour
             train: False
-            rand_color_invert_p: 0.  # 5
+            rand_color_invert_p: 0.5
             path: /media/data_cifs_lrs/curvy_2snakes/curv_contour_length_14_full/val.txt
 
     num_workers:
@@ -110,7 +110,7 @@ train:
     fast_dev_run: False # Enable this for debug purposes
     gpus: 6
     precision: 32
-    max_steps: 30000
+    max_steps: 60000  # 30000
     accumulate_grad_batches: 1
     num_sanity_val_steps: 2
     gradient_clip_val: 10000000.0  # 10.

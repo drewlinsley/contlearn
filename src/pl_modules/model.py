@@ -27,11 +27,14 @@ class MyModel(pl.LightningModule):
         self.cfg = cfg
         self.save_hyperparameters(cfg)
         self.name = name
+        # self.automatic_optimization = False
 
         if cfg.data.datamodule.datasets.PF14.train.rand_color_invert_p > 0:
             input_size = 2
+            output_size = 2
         else:
             input_size = 1
+            output_size = 2
 
         if self.name == "baseline_paper":
             self.net = BasePaperNet()
@@ -40,7 +43,11 @@ class MyModel(pl.LightningModule):
         elif self.name == "resnet18":
             self.net = resnet18(pretrained=False)
         elif self.name == "int":
-            self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
+            # self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
+            self.net = FFhGRU(32, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size, output_size=output_size, l1=0.)  # softplus
+        elif self.name == "int_crbp":
+            # self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
+            self.net = FFhGRU(32, timesteps=20, kernel_size=11, LCP=0.9, nl=F.softplus, input_size=input_size, output_size=output_size, grad_method="rbp")  # softplus
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
@@ -54,14 +61,22 @@ class MyModel(pl.LightningModule):
 
     def step(self, x, y) -> Dict[str, torch.Tensor]:
         logits = self(x)
-        loss = F.cross_entropy(logits, y)
+        if isinstance(logits, dict):
+            penalty = logits["penalty"]
+            logits = logits["logits"]
+            loss = F.cross_entropy(logits, y)
+            loss = loss + penalty
+        else:
+            loss = F.cross_entropy(logits, y)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x, y = batch
-        # print(y)
         out = self.step(x, y)
-
+        # opt = self.optimizers()
+        # opt.zero_grad()
+        # self.manual_backward(out["loss"])
+        # opt.step()
         return out
 
     def training_step_end(self, out):
@@ -125,6 +140,7 @@ class MyModel(pl.LightningModule):
         ):
             rendered_image = render_images(output_element["image"], autoshow=False)
             if rendered_image.shape[-1] > 1:
+                rendered_image[..., -1] -= 0.5
                 rendered_image = rendered_image.sum(-1)[..., None]
             caption = f"y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
             images.append(
