@@ -1,93 +1,187 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from src.pl_modules.buildingblocks.unetbuildingblocks import DoubleConv, ExtResNetBlock, create_encoders, \
+    create_decoders
 
 
+def number_of_features_per_level(init_channel_number, num_levels):
+    return [init_channel_number * 2 ** k for k in range(num_levels)]
 
-class Unet(nn.Module):
-    """Simple U-Net without training logic"""
-    def __init__(self, hparams: dict):
-        """
-        Args:
-            hparams: the hyperparameters needed to construct the network.
-                Specifically these are:
-                * start_filts (int)
-                * depth (int)
-                * in_channels (int)
-                * num_classes (int)
-        """
-        super().__init__()
-        # 4 downsample layers
-        out_filts = hparams.get('start_filts', 16)
-        depth = hparams.get('depth', 3)
-        in_filts = hparams.get('in_channels', 1)
-        num_classes = hparams.get('num_classes', 2)
 
-        for idx in range(depth):
-            down_block = torch.nn.Sequential(
-                torch.nn.Conv3d(in_filts, out_filts, kernel_size=3, padding=1),
-                torch.nn.ReLU(inplace=True),
-                torch.nn.Conv3d(out_filts, out_filts, kernel_size=3, padding=1),
-                torch.nn.ReLU(inplace=True)
-            )
-            in_filts = out_filts
-            out_filts *= 2
+class Abstract3DUNet(nn.Module):
+    """
+    Base class for standard and residual UNet.
+    Args:
+        in_channels (int): number of input channels
+        out_channels (int): number of output segmentation masks;
+            Note that that the of out_channels might correspond to either
+            different semantic classes or to different binary segmentation mask.
+            It's up to the user of the class to interpret the out_channels and
+            use the proper loss criterion during training (i.e. CrossEntropyLoss (multi-class)
+            or BCEWithLogitsLoss (two-class) respectively)
+        f_maps (int, tuple): number of feature maps at each level of the encoder; if it's an integer the number
+            of feature maps is given by the geometric progression: f_maps ^ k, k=1,2,3,4
+        final_sigmoid (bool): if True apply element-wise nn.Sigmoid after the
+            final 1x1 convolution, otherwise apply nn.Softmax. MUST be True if nn.BCELoss (two-class) is used
+            to train the model. MUST be False if nn.CrossEntropyLoss (multi-class) is used to train the model.
+        basic_module: basic model for the encoder/decoder (DoubleConv, ExtResNetBlock, ....)
+        layer_order (string): determines the order of layers
+            in `SingleConv` module. e.g. 'crg' stands for Conv3d+ReLU+GroupNorm3d.
+            See `SingleConv` for more info
+        num_groups (int): number of groups for the GroupNorm
+        num_levels (int): number of levels in the encoder/decoder path (applied only if f_maps is an int)
+        is_segmentation (bool): if True (semantic segmentation problem) Sigmoid/Softmax normalization is applied
+            after the final convolution; if False (regression problem) the normalization layer is skipped at the end
+        testing (bool): if True (testing mode) the `final_activation` (if present, i.e. `is_segmentation=true`)
+            will be applied as the last operation during the forward pass; if False the model is in training mode
+            and the `final_activation` (even if present) won't be applied; default: False
+        conv_kernel_size (int or tuple): size of the convolving kernel in the basic_module
+        pool_kernel_size (int or tuple): the size of the window
+        conv_padding (int or tuple): add zero-padding added to all three sides of the input
+    """
 
-            setattr(self, 'down_block_%d' % idx, down_block)
+    def __init__(self, in_channels, out_channels, final_sigmoid, basic_module, f_maps=64, layer_order='gcr',
+                 num_groups=8, num_levels=4, is_segmentation=True, testing=False,
+                 conv_kernel_size=3, pool_kernel_size=2, conv_padding=1, **kwargs):
+        super(Abstract3DUNet, self).__init__()
 
-        out_filts = out_filts // 2
-        in_filts = in_filts // 2
-        out_filts, in_filts = in_filts, out_filts
+        self.testing = testing
 
-        for idx in range(depth-1):
-            up_block = torch.nn.Sequential(
-                torch.nn.Conv3d(in_filts + out_filts, out_filts, kernel_size=3, padding=1),
-                torch.nn.ReLU(inplace=True),
-                torch.nn.Conv3d(out_filts, out_filts, kernel_size=3, padding=1),
-                torch.nn.ReLU(inplace=True)
-            )
+        if isinstance(f_maps, int):
+            f_maps = number_of_features_per_level(f_maps, num_levels=num_levels)
 
-            in_filts = out_filts
-            out_filts = out_filts // 2
+        assert isinstance(f_maps, list) or isinstance(f_maps, tuple)
+        assert len(f_maps) > 1, "Required at least 2 levels in the U-Net"
 
-            setattr(self, 'up_block_%d' % idx, up_block)
+        # create encoder path
+        self.encoders = create_encoders(in_channels, f_maps, basic_module, conv_kernel_size, conv_padding, layer_order,
+                                        num_groups, pool_kernel_size)
 
-        self.final_conv = torch.nn.Conv3d(in_filts, num_classes, kernel_size=1)
-        self.max_pool = torch.nn.MaxPool3d(2, stride=2)
-        self.up_sample = torch.nn.Upsample(scale_factor=2)
-        self._hparams = hparams
+        # create decoder path
+        self.decoders = create_decoders(f_maps, basic_module, conv_kernel_size, conv_padding, layer_order, num_groups,
+                                        upsample=True)
 
-    def forward(self, input_tensor: torch.Tensor) -> torch.Tensor:
-        """
-        Forwards the :attr`input_tensor` through the network to obtain a prediction
+        # in the last layer a 1×1 convolution reduces the number of output
+        # channels to the number of labels
+        self.final_conv = nn.Conv3d(f_maps[0], out_channels, 1)
 
-        Args:
-            input_tensor: the network's input
-
-        Returns:
-            torch.Tensor: the networks output given the :attr`input_tensor`
-        """
-        depth = self._hparams.get('depth', 3)
-
-        intermediate_outputs = []
-
-        # Compute all the encoder blocks' outputs
-        for idx in range(depth):
-            intermed = getattr(self, 'down_block_%d' % idx)(input_tensor)
-            if idx < depth - 1:
-                # store intermediate values for usage in decoder
-                intermediate_outputs.append(intermed)
-                input_tensor = getattr(self, 'max_pool')(intermed)
+        if is_segmentation:
+            # semantic segmentation problem
+            if final_sigmoid:
+                self.final_activation = nn.Sigmoid()
             else:
-                input_tensor = intermed
+                self.final_activation = nn.Softmax(dim=1)
+        else:
+            # regression problem
+            self.final_activation = None
 
-        # Compute all the decoder blocks' outputs
-        for idx in range(depth-1):
-            input_tensor = getattr(self, 'up_sample')(input_tensor)
+    def forward(self, x):
+        # encoder part
+        encoders_features = []
+        for encoder in self.encoders:
+            x = encoder(x)
+            # reverse the encoder outputs to be aligned with the decoder
+            encoders_features.insert(0, x)
 
-            # use intermediate values from encoder
-            from_down = intermediate_outputs.pop(-1)
-            intermed = torch.cat([input_tensor, from_down], dim=1)
-            input_tensor = getattr(self, 'up_block_%d' % idx)(intermed)
+        # remove the last encoder's output from the list
+        # !!remember: it's the 1st in the list
+        encoders_features = encoders_features[1:]
 
-        return getattr(self, 'final_conv')(input_tensor)
+        # decoder part
+        for decoder, encoder_features in zip(self.decoders, encoders_features):
+            # pass the output from the corresponding encoder and the output
+            # of the previous decoder
+            x = decoder(encoder_features, x)
+
+        x = self.final_conv(x)
+
+        # apply final_activation (i.e. Sigmoid or Softmax) only during prediction. During training the network outputs
+        # logits and it's up to the user to normalize it before visualising with tensorboard or computing validation metric
+        if self.testing and self.final_activation is not None:
+            x = self.final_activation(x)
+
+        return x
+
+
+class UNet3D(Abstract3DUNet):
+    """
+    3DUnet model from
+    `"3D U-Net: Learning Dense Volumetric Segmentation from Sparse Annotation"
+        <https://arxiv.org/pdf/1606.06650.pdf>`.
+    Uses `DoubleConv` as a basic_module and nearest neighbor upsampling in the decoder
+    """
+
+    def __init__(self, in_channels, out_channels, final_sigmoid=True, f_maps=64, layer_order='gcr',
+                 num_groups=8, num_levels=4, is_segmentation=True, conv_padding=1, **kwargs):
+        super(UNet3D, self).__init__(in_channels=in_channels,
+                                     out_channels=out_channels,
+                                     final_sigmoid=final_sigmoid,
+                                     basic_module=DoubleConv,
+                                     f_maps=f_maps,
+                                     layer_order=layer_order,
+                                     num_groups=num_groups,
+                                     num_levels=num_levels,
+                                     is_segmentation=is_segmentation,
+                                     conv_padding=conv_padding,
+                                     **kwargs)
+
+
+class ResidualUNet3D(Abstract3DUNet):
+    """
+    Residual 3DUnet model implementation based on https://arxiv.org/pdf/1706.00120.pdf.
+    Uses ExtResNetBlock as a basic building block, summation joining instead
+    of concatenation joining and transposed convolutions for upsampling (watch out for block artifacts).
+    Since the model effectively becomes a residual net, in theory it allows for deeper UNet.
+    """
+
+    def __init__(self, in_channels, out_channels, final_sigmoid=True, f_maps=64, layer_order='gcr',
+                 num_groups=8, num_levels=5, is_segmentation=True, conv_padding=1, **kwargs):
+        super(ResidualUNet3D, self).__init__(in_channels=in_channels,
+                                             out_channels=out_channels,
+                                             final_sigmoid=final_sigmoid,
+                                             basic_module=ExtResNetBlock,
+                                             f_maps=f_maps,
+                                             layer_order=layer_order,
+                                             num_groups=num_groups,
+                                             num_levels=num_levels,
+                                             is_segmentation=is_segmentation,
+                                             conv_padding=conv_padding,
+                                             **kwargs)
+
+
+class UNet2D(Abstract3DUNet):
+    """
+    Just a standard 2D Unet. Arises naturally by specifying conv_kernel_size=(1, 3, 3), pool_kernel_size=(1, 2, 2).
+    """
+
+    def __init__(self, in_channels, out_channels, final_sigmoid=True, f_maps=64, layer_order='gcr',
+                 num_groups=8, num_levels=4, is_segmentation=True, conv_padding=1, **kwargs):
+        if conv_padding == 1:
+            conv_padding = (0, 1, 1)
+        super(UNet2D, self).__init__(in_channels=in_channels,
+                                     out_channels=out_channels,
+                                     final_sigmoid=final_sigmoid,
+                                     basic_module=DoubleConv,
+                                     f_maps=f_maps,
+                                     layer_order=layer_order,
+                                     num_groups=num_groups,
+                                     num_levels=num_levels,
+                                     is_segmentation=is_segmentation,
+                                     conv_kernel_size=(1, 3, 3),
+                                     pool_kernel_size=(1, 2, 2),
+                                     conv_padding=conv_padding,
+                                     **kwargs)
+
+
+def get_model(model_config):
+    def _model_class(class_name):
+        modules = ['pytorch3dunet.unet3d.model']
+        for module in modules:
+            m = importlib.import_module(module)
+            clazz = getattr(m, class_name, None)
+            if clazz is not None:
+                return clazz
+
+    model_class = _model_class(model_config['name'])
+    return model_class(**model_config)

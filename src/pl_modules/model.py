@@ -29,8 +29,8 @@ class MyModel(pl.LightningModule):
         self.name = name
         # self.automatic_optimization = False
 
-        if self.name == "baseline_paper":
-            self.net = UNet3D()
+        if self.name == "UNet3D":
+            self.net = UNet3D.ResidualUNet3D(in_channels=2, out_channels=6)  # Replace this with cfg
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 

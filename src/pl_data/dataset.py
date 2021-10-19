@@ -38,42 +38,6 @@ def colour(img, ch=0, num_ch=3):
     return torch.cat(colimg)
 
 
-class DeadRect(Dataset):
-    def __init__(
-        self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
-    ):
-        super().__init__()
-        self.cfg = cfg
-        self.path = path
-        self.train = train
-        self.transform = transform
-
-        if self.train:
-            csv_path = join(self.path, "train.csv")
-            self.path = join(self.path, "train")
-        else:
-            csv_path = join(self.path, "test.csv")
-            self.path = join(self.path, "test")
-
-        with open(csv_path, 'r') as fob:
-            self.file_list = csv.DictReader(fob)
-            self.file_list = list(self.file_list)
-            print(len(self.file_list), self.train, self.path)
-
-    def __len__(self) -> int:
-        return len(self.file_list)
-
-    def __getitem__(self, index: int):
-        file_name = self.file_list[index]['fname']
-        img = load_image(join(self.path, file_name))
-        img = self.transform(img)
-        label = int(self.file_list[index]['same'] == 'True')
-        return img, label
-
-    def __repr__(self) -> str:
-        return f"MyDataset({self.name}, {self.path})"
-
-
 class Volumetric(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
@@ -88,6 +52,8 @@ class Volumetric(Dataset):
         self.shuffle = True  # Push to CFG
         self.vol_size = [64, 128, 128, 2]
         self.label_size = [64, 128, 128, 6]
+        self.vol_transpose = (3, 0, 1, 2)
+        self.label_transpose = (3, 0, 1, 2)
         self.shuffle_buffer = 128
         self.batch_size = 1
 
@@ -120,6 +86,8 @@ class Volumetric(Dataset):
         label = data["label"]
         volume = volume.reshape(self.vol_size)
         label = label.reshape(self.label_size)
+        volume = volume.transpose(self.vol_transpose)
+        label = label.transpose(self.label_transpose)
         return volume, label
 
     def __repr__(self) -> str:

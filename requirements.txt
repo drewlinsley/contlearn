@@ -6,5 +6,7 @@ python-dotenv
 tensorflow_datasets
 rising
 pytorch-lightning
+captum
+matplotlib
 
 # hydra-joblib-launcher
