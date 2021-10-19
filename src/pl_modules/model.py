@@ -18,7 +18,7 @@ from captum.attr import visualization as viz
 
 from src.common.utils import iterate_elements_in_batches, render_images
 
-from . import BasePaperNet, hConvGRU, resnet18, FFhGRU
+from . import UNet3D
 
 
 class MyModel(pl.LightningModule):
@@ -29,25 +29,8 @@ class MyModel(pl.LightningModule):
         self.name = name
         # self.automatic_optimization = False
 
-        if cfg.data.datamodule.datasets.PF14.train.rand_color_invert_p > 0:
-            input_size = 2
-            output_size = 2
-        else:
-            input_size = 1
-            output_size = 2
-
         if self.name == "baseline_paper":
-            self.net = BasePaperNet()
-        elif self.name == "hgru":
-            self.net = hConvGRU(timesteps=8, filt_size=15)
-        elif self.name == "resnet18":
-            self.net = resnet18(pretrained=False)
-        elif self.name == "int":
-            # self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
-            self.net = FFhGRU(32, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size, output_size=output_size, l1=0.)  # softplus
-        elif self.name == "int_crbp":
-            # self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
-            self.net = FFhGRU(32, timesteps=20, kernel_size=11, LCP=0.9, nl=F.softplus, input_size=input_size, output_size=output_size, grad_method="rbp")  # softplus
+            self.net = UNet3D()
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
@@ -61,6 +44,8 @@ class MyModel(pl.LightningModule):
 
     def step(self, x, y) -> Dict[str, torch.Tensor]:
         logits = self(x)
+
+        # Eventually insert Dice loss here
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
@@ -96,7 +81,7 @@ class MyModel(pl.LightningModule):
         out = self.step(x, y)
 
         return out
-    
+
     def validation_step_end(self, out):
         self.val_accuracy(torch.softmax(out["logits"], dim=-1), out["y"])
         self.log_dict(

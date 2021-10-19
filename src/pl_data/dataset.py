@@ -74,6 +74,58 @@ class DeadRect(Dataset):
         return f"MyDataset({self.name}, {self.path})"
 
 
+class Volumetric(Dataset):
+    def __init__(
+        self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
+    ):
+        super().__init__()
+        self.cfg = cfg
+        self.path = path
+        self.train = train
+        self.transform = transform
+        self.cache = True  # Push to CFG
+        self.repeat = True  # Push to CFG
+        self.shuffle = True  # Push to CFG
+        self.vol_size = [64, 128, 128, 2]
+        self.label_size = [64, 128, 128, 6]
+        self.shuffle_buffer = 128
+        self.batch_size = 1
+
+        ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
+        if self.cache:
+            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
+            ds = ds.cache()
+
+        if self.repeat:
+            ds = ds.repeat()
+
+        if self.shuffle:
+            ds = ds.shuffle(self.shuffle_buffer)
+            opt = tf.data.Options()
+            opt.experimental_deterministic = False
+            ds = ds.with_options(opt)
+
+        ds = ds.map(read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds = ds.batch(self.batch_size)
+        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
+        self.ds = tfds.as_numpy(ds)
+
+    def __len__(self) -> int:
+        return len(self.file_list)
+
+    def __getitem__(self, index: int):
+        data = next(iter(self.ds))
+        volume = data["volume"]
+        volume = self.norma(volume)
+        label = data["label"]
+        volume = volume.reshape(self.vol_size)
+        label = label.reshape(self.label_size)
+        return volume, label
+
+    def __repr__(self) -> str:
+        return f"MyDataset({self.name}, {self.path})"
+
+
 class PFClass(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, rand_color_invert_p: float, cfg: DictConfig, transform, **kwargs

@@ -3,4 +3,8 @@ hydra-core
 wandb
 dvc
 python-dotenv
+tensorflow_datasets
+rising
+pytorch-lightning
+
 # hydra-joblib-launcher
