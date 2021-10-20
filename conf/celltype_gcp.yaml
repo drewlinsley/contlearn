@@ -29,9 +29,9 @@ data:
       test: 8
 
     batch_size:
-      train: 16  # 240  # 128
-      val: 16 # 240  # 128
-      test: 16  # 128
+      train: 1  # 240  # 128
+      val: 1 # 240  # 128
+      test: 1  # 128
 hydra:
   run:
     dir: ./experiments/${now:%Y-%m-%d}/${now:%H-%M-%S}
@@ -89,7 +89,7 @@ optim:
 
 train:
   # reproducibility
-  deterministic: False
+  # deterministic: False
   random_seed: 42
 
   # training
@@ -97,10 +97,10 @@ train:
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
     # gpus: 8
-    tpu_cores: 8
+    tpu_cores: 1
     precision: 32
     max_steps: 60000  # 30000
-    accumulate_grad_batches: 1
+    # accumulate_grad_batches: 1
     num_sanity_val_steps: 2
     gradient_clip_val: 10000000.0  # 10.
 
