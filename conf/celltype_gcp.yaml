@@ -89,7 +89,7 @@ optim:
 
 train:
   # reproducibility
-  # deterministic: False
+  deterministic: False
   random_seed: 42
 
   # training
