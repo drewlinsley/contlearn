@@ -35,9 +35,9 @@ class MyModel(pl.LightningModule):
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
         metric = torchmetrics.Accuracy()
-        self.train_accuracy = metric.clone().cuda()
-        self.val_accuracy = metric.clone().cuda()
-        self.test_accuracy = metric.clone().cuda()
+        self.train_accuracy = metric.clone().to(self.device)()
+        self.val_accuracy = metric.clone().to(self.device)()
+        self.test_accuracy = metric.clone().to(self.device)()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)

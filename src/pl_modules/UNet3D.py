@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.pl_modules.buildingblocks.unetbuildingblocks import DoubleConv, ExtResNetBlock, create_encoders, \
+from src.pl_modules.buildingblocks.unet_buildingblocks import DoubleConv, ExtResNetBlock, create_encoders, \
     create_decoders
 
 

@@ -6,6 +6,8 @@ from os.path import isfile, join
 from PIL import Image
 import csv
 from torchvision import transforms
+import tensorflow as tf  # for reading TFRecord Dataset
+import tensorflow_datasets as tfds  # for making tf.data.Dataset to return numpy arrays
 
 
 def load_image(directory):
@@ -38,6 +40,22 @@ def colour(img, ch=0, num_ch=3):
     return torch.cat(colimg)
 
 
+def read_labeled_tfrecord(example):
+    tfrec_format = {
+        "volume": tf.io.FixedLenFeature([], tf.string),
+        "label": tf.io.FixedLenFeature([], tf.string)
+    }
+    example = tf.io.parse_single_example(example, tfrec_format)
+
+    volume = tf.reshape(example["volume"], shape=[])
+    label = tf.reshape(example["label"], shape=[])
+    volume = tf.io.decode_raw(volume, tf.float32)
+    label = tf.io.decode_raw(label, tf.float32)
+    volume = tf.reshape(volume, [64, 128, 128, 2])
+    label = tf.reshape(label, [64, 128, 128, 6])
+    return {"volume": volume, "label": label}
+
+
 class Volumetric(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
@@ -56,6 +74,7 @@ class Volumetric(Dataset):
         self.label_transpose = (3, 0, 1, 2)
         self.shuffle_buffer = 128
         self.batch_size = 1
+        self.reader_name = "default"
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
         if self.cache:
@@ -71,13 +90,19 @@ class Volumetric(Dataset):
             opt.experimental_deterministic = False
             ds = ds.with_options(opt)
 
-        ds = ds.map(read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        if self.reader_name == "default":
+            reader = read_labeled_tfrecord
+        else:
+            raise NotImplementedError("{} is not implemented".format(self.reader_name))
+
+        ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(self.batch_size)
         ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
+        self.len = ds.cardinality.numpy()
         self.ds = tfds.as_numpy(ds)
 
     def __len__(self) -> int:
-        return len(self.file_list)
+        return self.len
 
     def __getitem__(self, index: int):
         data = next(iter(self.ds))
