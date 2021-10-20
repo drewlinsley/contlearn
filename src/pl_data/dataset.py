@@ -115,6 +115,8 @@ class Volumetric(Dataset):
         label = label.reshape(self.label_size)
         volume = volume.transpose(self.vol_transpose)
         label = label.transpose(self.label_transpose)
+        volume = volume[:32, :32, :32]
+        label = label[:32, :32, :32]
         return volume, label
 
     def __repr__(self) -> str:
