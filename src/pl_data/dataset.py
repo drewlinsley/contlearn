@@ -75,6 +75,7 @@ class Volumetric(Dataset):
         self.shuffle_buffer = 128
         self.batch_size = 1
         self.reader_name = "default"
+        self.len = 97
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
         if self.cache:
@@ -97,9 +98,10 @@ class Volumetric(Dataset):
 
         ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(self.batch_size)
-        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
-        self.len = ds.cardinality.numpy()
+        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)            
         self.ds = tfds.as_numpy(ds)
+        if self.len is None:
+            self.len = len([idx for idx, _ in enumerate(self.ds)])
 
     def __len__(self) -> int:
         return self.len
