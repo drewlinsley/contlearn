@@ -27,6 +27,8 @@ class MyModel(pl.LightningModule):
         self.cfg = cfg
         self.save_hyperparameters(cfg)
         self.name = name
+        import pdb;pdb.set_trace()
+        self.loss = self.cfg._target_
         # self.automatic_optimization = False
 
         if self.name == "UNet3D":
@@ -49,10 +51,10 @@ class MyModel(pl.LightningModule):
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = F.cross_entropy(logits, y)
+            loss = self.loss(logits, y)
             loss = loss + penalty
         else:
-            loss = F.cross_entropy(logits, y)
+            loss = self.loss(logits, y)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
