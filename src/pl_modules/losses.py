@@ -1,9 +1,11 @@
+import torch
 from torch import nn
 
 
 def cce(input, target):
     """Categorical crossentropy loss. Assumes input is logits."""
     loss = nn.CrossEntropyLoss()
+    target = torch.argmax(target, -1)
     output = loss(input, target)
     return output
 
@@ -11,6 +13,7 @@ def cce(input, target):
 def bce(input, target):
     """Binary crossentropy loss. Assumes input is logits."""
     loss = nn.BCEWithLogitsLoss()
+    target = torch.argmax(target, -1)
     output = loss(input, target)
     return output
 
