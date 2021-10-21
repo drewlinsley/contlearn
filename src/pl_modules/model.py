@@ -28,7 +28,6 @@ class MyModel(pl.LightningModule):
         self.cfg = cfg
         self.save_hyperparameters(cfg)
         self.name = name
-        import pdb;pdb.set_trace()
         p, m = self.cfg.loss._target_.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)
