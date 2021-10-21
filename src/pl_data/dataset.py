@@ -110,7 +110,7 @@ class Volumetric(Dataset):
         data = next(iter(self.ds))
         volume = data["volume"]
         # volume = self.norma(volume)
-        label = data["label"]
+        label = data["label"].int()
         volume = volume.reshape(self.vol_size)
         label = label.reshape(self.label_size)
         volume = volume.transpose(self.vol_transpose)
