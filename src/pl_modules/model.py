@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import wandb
 from omegaconf import DictConfig
 from torch.optim import Optimizer
+from importlib import import_module
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +19,7 @@ from captum.attr import visualization as viz
 
 from src.common.utils import iterate_elements_in_batches, render_images
 
-from . import UNet3D
+from src.pl_modules import UNet3D
 
 
 class MyModel(pl.LightningModule):
@@ -28,7 +29,9 @@ class MyModel(pl.LightningModule):
         self.save_hyperparameters(cfg)
         self.name = name
         import pdb;pdb.set_trace()
-        self.loss = __import__(self.cfg.loss._target_)
+        p, m = self.cfg.loss._target_.rsplit('.', 1)
+        mod = import_module(p)
+        self.loss = getattr(mod, m)
         # self.automatic_optimization = False
 
         if self.name == "UNet3D":
