@@ -28,7 +28,7 @@ class MyModel(pl.LightningModule):
         self.save_hyperparameters(cfg)
         self.name = name
         import pdb;pdb.set_trace()
-        self.loss = self.cfg._target_
+        self.loss = __import__(self.cfg.loss._target_)
         # self.automatic_optimization = False
 
         if self.name == "UNet3D":
