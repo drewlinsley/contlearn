@@ -10,16 +10,13 @@ def cce(input, target):
 
 def bce(input, target):
     """Binary crossentropy loss. Assumes input is logits."""
-    loss = nn.BCELoss()
-    m = nn.Sigmoid()
-    output = loss(m(input), target)
+    loss = nn.BCEWithLogitsLoss()
+    output = loss(input, target)
     return output
 
 
-def dice_loss(input, target):
+def dice_loss(input, target, smooth=1.):
     """Dice loss. Assumes input is logits."""
-    smooth = 1.
-
     iflat = input.view(-1)
     tflat = target.view(-1)
     intersection = (iflat * tflat).sum()
