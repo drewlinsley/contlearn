@@ -3,7 +3,7 @@ from torch import nn
 
 def cce(input, target):
     """Categorical crossentropy loss. Assumes input is logits."""
-    loss = nn.c()
+    loss = nn.CrossEntropyLoss()
     output = loss(input, target)
     return output
 
