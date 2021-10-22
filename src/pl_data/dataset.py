@@ -8,7 +8,6 @@ import csv
 from torchvision import transforms
 import tensorflow as tf  # for reading TFRecord Dataset
 import tensorflow_datasets as tfds  # for making tf.data.Dataset to return numpy arrays
-from glob import glob
 
 
 def load_image(directory):
@@ -130,7 +129,10 @@ class VolumetricNPZ(Dataset):
         self.cfg = cfg
         self.path = path
         self.train = train
-        self.files = glob(self.path)
+        self.files = []
+        with open(self.path, 'r') as fob:
+            self.files = fob.read().splitlines()
+            self.files = list(self.files)
         self.len = len(self.files)
 
     def __len__(self) -> int:

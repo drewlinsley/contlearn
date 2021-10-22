@@ -18,11 +18,11 @@ data:
           _target_: src.pl_data.dataset.VolumetricNPZ
           train: True
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
-          path: gs://serrelab/connectomics/npzs/celltype/train/*.npz
+          path: src/pl_data/csvs/celltype_train.csv
         test:
           - _target_: src.pl_data.dataset.VolumetricNPZ
             train: False
-            path: gs://serrelab/connectomics/npzs/celltype/val/*.npz
+            path: src/pl_data/csvs/celltype_val.csv
             # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
 
     num_workers:
