@@ -33,7 +33,7 @@ class MyDataModule(pl.LightningDataModule):
 
     def setup(self, stage: Optional[str] = None):
         # transforms
-        transform = transforms.Compose(
+        transform = transforms_image.Compose(
             [
                 # transforms.Resize((100, 100)),
                 transforms_image.RandomHorizontalFlip(p=0.5),
