@@ -140,7 +140,7 @@ class VolumetricNPZ(Dataset):
         return self.len
 
     def __getitem__(self, index: int):
-        file_name = self.file_list[index]
+        file_name = self.files[index]
         volume, label = load_npz(file_name)
         # img = self.transform(img)
         return volume, label
