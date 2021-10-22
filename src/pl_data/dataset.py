@@ -8,6 +8,7 @@ import csv
 from torchvision import transforms
 import tensorflow as tf  # for reading TFRecord Dataset
 import tensorflow_datasets as tfds  # for making tf.data.Dataset to return numpy arrays
+import numpy as np
 
 
 def load_image(directory):
