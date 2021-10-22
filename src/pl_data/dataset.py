@@ -146,7 +146,7 @@ class VolumetricNPZ(Dataset):
         file_name = self.files[index]
         volume, label = load_npz(file_name)
         # img = self.transform(img)
-        return volume, label
+        return volume, label.astype(int)
 
     def __repr__(self) -> str:
         return f"MyDataset({self.name}, {self.path})"
