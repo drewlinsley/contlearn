@@ -9,6 +9,7 @@ from torchvision import transforms
 import tensorflow as tf  # for reading TFRecord Dataset
 import tensorflow_datasets as tfds  # for making tf.data.Dataset to return numpy arrays
 import numpy as np
+from tensorflow.python.lib.io import file_io
 
 
 def load_image(directory):
@@ -152,6 +153,7 @@ class VolumetricNPZ(Dataset):
 
 def load_npz(f):
     """Load from npz and then close file."""
+    f = BytesIO(file_io.read_file_to_string(f, binary_mode=True))
     d = np.load(f)
     volume = d["volume"]
     label = d["label"]
