@@ -26,7 +26,10 @@ class MyModel(pl.LightningModule):
     def __init__(self, cfg: DictConfig, name, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cfg = cfg
-        self.save_hyperparameters(cfg)
+        if hasattr(self.cfg.train.pl_trainer, "gpus"):
+            self.save_hyperparameters(cfg)
+        else:
+            self.save_hyperparameters()
         self.name = name
         p, m = self.cfg.loss._target_.rsplit('.', 1)
         mod = import_module(p)
@@ -127,12 +130,17 @@ class MyModel(pl.LightningModule):
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
-            rendered_image = render_images(output_element["image"], autoshow=False)
-            if rendered_image.shape[-1] > 1:
-                # rendered_image[..., -1] -= 0.5
-                # rendered_image = rendered_image.sum(-1)[..., None]
-                rendered_image = np.concatenate((rendered_image, np.zeros_like(rendered_image)[..., 0][..., None]), -1)
-            caption = f"y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
+            mid = output_element["image"].shape[-1] // 2
+            rendered_image = render_images(output_element["image"][0, ..., mid], autoshow=False)
+            caption = f"Image"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
+            images.append(
+                wandb.Image(
+                    rendered_image,
+                    caption=caption,
+                )
+            )
+            rendered_image = render_images(output_element["image"][1, ..., mid], autoshow=False)
+            caption = f"Membrane"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
             images.append(
                 wandb.Image(
                     rendered_image,
@@ -142,15 +150,15 @@ class MyModel(pl.LightningModule):
         self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
-        batch_size = self.cfg.data.datamodule.batch_size.test
+        # batch_size = self.cfg.data.datamodule.batch_size.test
 
-        images = []
-        images_feat_viz = []
+        # images = []
+        # images_feat_viz = []
 
         # integrated_gradients = IntegratedGradients(self.forward)
         # noise_tunnel = NoiseTunnel(integrated_gradients)
         
-        self.logger.experiment.log({"Test Images": images}, step=self.global_step)
+        # self.logger.experiment.log({"Test Images": images}, step=self.global_step)
         return  # Don't need this stuff below vvvv
 
         for output_element in iterate_elements_in_batches(

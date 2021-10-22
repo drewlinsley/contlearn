@@ -8,5 +8,6 @@ rising
 pytorch-lightning
 captum
 matplotlib
+pytorchvideo
 
 # hydra-joblib-launcher
