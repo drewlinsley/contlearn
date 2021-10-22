@@ -1,7 +1,7 @@
 from omegaconf import DictConfig, ValueNode
 import torch
 from torch.utils.data import Dataset
-from os import listdir
+import os
 from os.path import isfile, join
 from PIL import Image
 import csv
@@ -130,6 +130,7 @@ class VolumetricNPZ(Dataset):
         self.path = path
         self.train = train
         self.files = []
+        self.path = os.path.join(os.path.dirname(__file__), self.path)
         with open(self.path, 'r') as fob:
             self.files = fob.read().splitlines()
             self.files = list(self.files)
