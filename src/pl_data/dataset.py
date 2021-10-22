@@ -10,6 +10,7 @@ import tensorflow as tf  # for reading TFRecord Dataset
 import tensorflow_datasets as tfds  # for making tf.data.Dataset to return numpy arrays
 import numpy as np
 from tensorflow.python.lib.io import file_io
+from io import BytesIO
 
 
 def load_image(directory):
