@@ -15,13 +15,15 @@ data:
     datasets:
       Celltype_Prediction:
         train:
-          _target_: src.pl_data.dataset.Volumetric
+          _target_: src.pl_data.dataset.VolumetricNPZ
           train: True
-          path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
+          # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
+          path: gs://serrelab/connectomics/npzs/celltype/train/*.npz
         test:
-          - _target_: src.pl_data.dataset.Volumetric
+          - _target_: src.pl_data.dataset.VolumetricNPZ
             train: False
-            path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
+            path: gs://serrelab/connectomics/npzs/celltype/val/*.npz
+            # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
 
     num_workers:
       train: 8

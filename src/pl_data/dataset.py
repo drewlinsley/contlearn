@@ -56,7 +56,7 @@ def read_labeled_tfrecord(example):
     return {"volume": volume, "label": label}
 
 
-class Volumetric(Dataset):
+class VolumetricTF(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
     ):
@@ -98,7 +98,7 @@ class Volumetric(Dataset):
 
         ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(self.batch_size)
-        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)            
+        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:
             self.len = len([idx for idx, _ in enumerate(self.ds)])
@@ -119,3 +119,37 @@ class Volumetric(Dataset):
 
     def __repr__(self) -> str:
         return f"MyDataset({self.name}, {self.path})"
+
+
+class VolumetricNPZ(Dataset):
+    def __init__(
+        self, path: ValueNode, train: bool, cfg: DictConfig, **kwargs
+    ):
+        super().__init__()
+        self.cfg = cfg
+        self.path = path
+        self.train = train
+        self.files = glob(self.path)
+        self.len = len(self.files)
+
+    def __len__(self) -> int:
+        return self.len
+
+    def __getitem__(self, index: int):
+        file_name = self.file_list[index]
+        volume, label = load_npz(file_name)
+        # img = self.transform(img)
+        return volume, label
+
+    def __repr__(self) -> str:
+        return f"MyDataset({self.name}, {self.path})"
+
+
+def load_npz(f):
+    """Load from npz and then close file."""
+    d = np.load(f)
+    volume = d["volume"]
+    label = d["label"]
+    del d.f
+    d.close()
+    return volume, label

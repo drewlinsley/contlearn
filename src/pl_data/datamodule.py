@@ -4,8 +4,10 @@ import hydra
 import pytorch_lightning as pl
 from omegaconf import DictConfig, ValueNode
 from torch.utils.data import DataLoader, Dataset, random_split
-from torchvision import transforms
+from torchvision import transforms as transforms_image
+from pytorchvideo import transforms as transforms_video
 from PIL import Image
+
 
 class MyDataModule(pl.LightningDataModule):
     def __init__(
@@ -33,10 +35,11 @@ class MyDataModule(pl.LightningDataModule):
         # transforms
         transform = transforms.Compose(
             [
-                transforms.Resize((100, 100)),
-                transforms.RandomHorizontalFlip(p=0.5),
-                transforms.RandomVerticalFlip(p=0.5),
-                transforms.ToTensor(),
+                # transforms.Resize((100, 100)),
+                transforms_image.RandomHorizontalFlip(p=0.5),
+                transforms_image.RandomVerticalFlip(p=0.5),
+                transforms_video.Div255(),
+                transforms_image.ToTensor(),
             ]
         )
 
