@@ -7,7 +7,6 @@ from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms as transforms_image
 from pytorchvideo import transforms as transforms_video
 from PIL import Image
-from glob import glob
 
 
 class MyDataModule(pl.LightningDataModule):
