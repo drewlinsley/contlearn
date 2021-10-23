@@ -68,7 +68,7 @@ class MyDataModule(pl.LightningDataModule):
               transform=Compose(
                   [
                     Lambda(lambda x: x / 255.0),
-                    RandomCrop(self.cfg.data.input_size),
+                    RandomCrop(self.cfg.input_size.train),
                     RandomHorizontalFlip(p=0.5),
                     RandomVerticalFlip(p=0.5),
                     transforms_image.ToTensor(),
@@ -84,7 +84,7 @@ class MyDataModule(pl.LightningDataModule):
               transform=Compose(
                   [
                     Lambda(lambda x: x / 255.0),
-                    # CenterCrop(self.cfg.data.input_size),
+                    # CenterCrop(self.cfg.input_size.test),
                     transforms_image.ToTensor(),
                   ]
                 ),
