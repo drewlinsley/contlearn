@@ -7,6 +7,22 @@ from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms as transforms_image
 from pytorchvideo import transforms as transforms_video
 from PIL import Image
+from pytorchvideo.transforms import (
+    ApplyTransformToKey,
+    Normalize,
+    RandomShortSideScale,
+    RemoveKey,
+    ShortSideScale,
+    UniformTemporalSubsample
+)
+
+from torchvision.transforms import (
+    Compose,
+    Lambda,
+    RandomCrop,
+    RandomHorizontalFlip,
+    RandomVerticalFlip,
+)
 
 
 class MyDataModule(pl.LightningDataModule):
@@ -33,13 +49,46 @@ class MyDataModule(pl.LightningDataModule):
 
     def setup(self, stage: Optional[str] = None):
         # transforms
-        transform = transforms_image.Compose(
+        # transform = transforms_image.Compose(
+        #     [
+        #         # transforms.Resize((100, 100)),
+        #         transforms_image.RandomHorizontalFlip(p=0.5),
+        #         transforms_image.RandomVerticalFlip(p=0.5),
+        #         transforms_volume.crop.RandomCrop(size=self.cfg.data.input_size),  #noqa
+        #         transforms_video.Div255(),
+        #         transforms_image.ToTensor(),
+        #     ]
+        # )
+
+
+        train_transform = Compose(
             [
-                # transforms.Resize((100, 100)),
-                transforms_image.RandomHorizontalFlip(p=0.5),
-                transforms_image.RandomVerticalFlip(p=0.5),
-                transforms_video.Div255(),
-                transforms_image.ToTensor(),
+            ApplyTransformToKey(
+              key="volume",
+              transform=Compose(
+                  [
+                    Lambda(lambda x: x / 255.0),
+                    RandomCrop(self.cfg.data.input_size),
+                    RandomHorizontalFlip(p=0.5),
+                    RandomVerticalFlip(p=0.5),
+                    transforms_image.ToTensor(),
+                  ]
+                ),
+              ),
+            ]
+        )
+        test_transform = Compose(
+            [
+            ApplyTransformToKey(
+              key="volume",
+              transform=Compose(
+                  [
+                    Lambda(lambda x: x / 255.0),
+                    # CenterCrop(self.cfg.data.input_size),
+                    transforms_image.ToTensor(),
+                  ]
+                ),
+              ),
             ]
         )
 
