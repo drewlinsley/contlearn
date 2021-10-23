@@ -96,7 +96,7 @@ class MyDataModule(pl.LightningDataModule):
 
         if stage is None or stage == "fit":
             plank_train = hydra.utils.instantiate(
-                self.datasets[self.use_train_dataset].train, cfg=self.cfg, transform=transform,
+                self.datasets[self.use_train_dataset].train, cfg=self.cfg, transform=train_transform,
                 _recursive_=False
             )
             train_length = int(len(plank_train) * (1 - self.val_percentage))
@@ -106,7 +106,7 @@ class MyDataModule(pl.LightningDataModule):
             )
         if stage is None or stage == "test":
             self.test_datasets = [
-                hydra.utils.instantiate(x, cfg=self.cfg, transform=transform, _recursive_=False)
+                hydra.utils.instantiate(x, cfg=self.cfg, transform=test_transform, _recursive_=False)
                 for x in self.datasets[self.use_train_dataset].test
             ]
 
