@@ -19,12 +19,12 @@ data:
     datasets:
       Celltype_Prediction:
         train:
-          _target_: src.pl_data.dataset.VolumetricNPZ
+          _target_: src.pl_data.dataset.VolumetricTF
           train: True
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
           path: csvs/celltype_train.csv
         test:
-          - _target_: src.pl_data.dataset.VolumetricNPZ
+          - _target_: src.pl_data.dataset.VolumetricTF
             train: False
             path: csvs/celltype_val.csv
             # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
