@@ -4,8 +4,9 @@ import hydra
 import pytorch_lightning as pl
 from omegaconf import DictConfig, ValueNode
 from torch.utils.data import DataLoader, Dataset, random_split
-from torchvision import transforms as transforms_image
-from pytorchvideo import transforms as transforms_video
+# from torchvision import transforms as transforms_image
+# from pytorchvideo import transforms as transforms_video
+from torchvision import transforms
 from PIL import Image
 from pytorchvideo.transforms import (
     ApplyTransformToKey,
