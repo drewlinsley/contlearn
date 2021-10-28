@@ -109,6 +109,26 @@ class VolumetricTF(Dataset):
     def __len__(self) -> int:
         return self.len
 
+    def _transforms(self, volume, label):
+        """Apply transforms to volume and label."""
+        # Random crop
+        import pdb;pdb.set_trace()
+        i, j, h, w = transforms.RandomCrop.get_params(
+            image, output_size=(512, 512))
+        volume = TF.crop(volume, i, j, h, w)
+        label = TF.crop(label, i, j, h, w)
+
+        # Random horizontal flipping
+        if random.random() > 0.5:
+            volume = TF.hflip(volume)
+            label = TF.hflip(label)
+
+        # Random vertical flipping
+        if random.random() > 0.5:
+            volume = TF.vflip(volume)
+            label = TF.vflip(label)
+        return volume, label
+
     def __getitem__(self, index: int):
         data = next(iter(self.ds))
         volume = data["volume"]
@@ -118,6 +138,8 @@ class VolumetricTF(Dataset):
         label = label.reshape(self.label_size)
         volume = volume.transpose(self.vol_transpose)
         label = label.transpose(self.label_transpose)
+        volume, label = self._transforms(volume, label)
+        volume = volume / 255.
         return volume, label
 
     def __repr__(self) -> str:

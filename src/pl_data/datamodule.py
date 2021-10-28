@@ -48,55 +48,20 @@ class MyDataModule(pl.LightningDataModule):
         self.test_datasets: Optional[Sequence[Dataset]] = None
 
     def setup(self, stage: Optional[str] = None):
-        # transforms
-        # transform = transforms_image.Compose(
-        #     [
-        #         # transforms.Resize((100, 100)),
-        #         transforms_image.RandomHorizontalFlip(p=0.5),
-        #         transforms_image.RandomVerticalFlip(p=0.5),
-        #         transforms_volume.crop.RandomCrop(size=self.cfg.data.input_size),  #noqa
-        #         transforms_video.Div255(),
-        #         transforms_image.ToTensor(),
-        #     ]
-        # )
 
-
-        train_transform = Compose(
+        transform = transforms.Compose(
             [
-            ApplyTransformToKey(
-              key="volume",
-              transform=Compose(
-                  [
-                    Lambda(lambda x: x / 255.0),
-                    RandomCrop(self.cfg.input_size.train),
-                    RandomHorizontalFlip(p=0.5),
-                    RandomVerticalFlip(p=0.5),
-                    transforms_image.ToTensor(),
-                  ]
-                ),
-              ),
-            ]
-        )
-        test_transform = Compose(
-            [
-            ApplyTransformToKey(
-              key="volume",
-              transform=Compose(
-                  [
-                    Lambda(lambda x: x / 255.0),
-                    # CenterCrop(self.cfg.input_size.test),
-                    transforms_image.ToTensor(),
-                  ]
-                ),
-              ),
+                # transforms.Resize((100, 100)),
+                # transforms.RandomHorizontalFlip(p=0.5),
+                # transforms.RandomVerticalFlip(p=0.5),
+                transforms.ToTensor(),
             ]
         )
 
         # split dataset
-
         if stage is None or stage == "fit":
             plank_train = hydra.utils.instantiate(
-                self.datasets[self.use_train_dataset].train, cfg=self.cfg, transform=train_transform,
+                self.datasets[self.use_train_dataset].train, cfg=self.cfg, transform=transform,
                 _recursive_=False
             )
             train_length = int(len(plank_train) * (1 - self.val_percentage))
@@ -106,7 +71,7 @@ class MyDataModule(pl.LightningDataModule):
             )
         if stage is None or stage == "test":
             self.test_datasets = [
-                hydra.utils.instantiate(x, cfg=self.cfg, transform=test_transform, _recursive_=False)
+                hydra.utils.instantiate(x, cfg=self.cfg, transform=transform, _recursive_=False)
                 for x in self.datasets[self.use_train_dataset].test
             ]
 
