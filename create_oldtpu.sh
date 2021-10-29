@@ -7,10 +7,8 @@ TPU=v3-8
 
 
 ###### DELETE
-gcloud compute instances delete $TPUNAME \
---zone=$ZONE  \
-gcloud compute tpus delete $TPUNAME \
---zone=$ZONE \
+gcloud compute tpus execution-groups delete $TPUNAME \
+--zone=$ZONE
 
 ##### CREATE
 gcloud compute instances create $TPUNAME \
@@ -28,6 +26,6 @@ gcloud compute tpus create $TPUNAME \
 
 ##### CONNECT
 gcloud compute ssh $TPUNAME --zone=$ZONE \
-  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && pip install -r requirements.txt && git checkout gcp && cp netrc ../.netrc"
-gcloud compute ssh $TPUNAME --zone=$ZONE
+  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn  && git checkout gcp && conda create --name gcp -y && conda activate gcp && cp netrc ../.netrc && pip install -r requirements.txt"
+# gcloud compute ssh $TPUNAME --zone=$ZONE
 
