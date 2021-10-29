@@ -77,6 +77,8 @@ class Volumetric(Dataset):
         self.reader_name = "default"
         self.len = 97
 
+        self.shape = [32, 32, 32]
+
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
         if self.cache:
             # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
@@ -113,6 +115,10 @@ class Volumetric(Dataset):
         label = data["label"].astype(int)
         volume = volume.reshape(self.vol_size)
         label = label.reshape(self.label_size)
+
+        # Add augs here
+        volume = volume[:self.shape[0], :self.shape[1], :self.shape[2]]
+
         volume = volume.transpose(self.vol_transpose)
         label = label.transpose(self.label_transpose)
         return volume, label
