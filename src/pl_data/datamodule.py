@@ -33,9 +33,9 @@ class MyDataModule(pl.LightningDataModule):
         # transforms
         transform = transforms.Compose(
             [
-                transforms.Resize((100, 100)),
-                transforms.RandomHorizontalFlip(p=0.5),
-                transforms.RandomVerticalFlip(p=0.5),
+                # transforms.Resize((100, 100)),
+                # transforms.RandomHorizontalFlip(p=0.5),
+                # transforms.RandomVerticalFlip(p=0.5),
                 transforms.ToTensor(),
             ]
         )
@@ -47,11 +47,17 @@ class MyDataModule(pl.LightningDataModule):
                 self.datasets[self.use_train_dataset].train, cfg=self.cfg, transform=transform,
                 _recursive_=False
             )
-            train_length = int(len(plank_train) * (1 - self.val_percentage))
-            val_length = len(plank_train) - train_length
-            self.train_dataset, self.val_dataset = random_split(
-                plank_train, [train_length, val_length]
-            )
+            if self.val_percentage  == 0:
+                plank_train = hydra.utils.instantiate(
+                    self.datasets[self.use_val_dataset].train, cfg=self.cfg, transform=transform,
+                    _recursive_=False
+                )
+            else:
+                train_length = int(len(plank_train) * (1 - self.val_percentage))
+                val_length = len(plank_train) - train_length
+                self.train_dataset, self.val_dataset = random_split(
+                    plank_train, [train_length, val_length]
+                )
         if stage is None or stage == "test":
             self.test_datasets = [
                 hydra.utils.instantiate(x, cfg=self.cfg, transform=transform, _recursive_=False)

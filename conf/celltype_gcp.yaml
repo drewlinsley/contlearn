@@ -10,18 +10,23 @@ core:
 data:
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
-    val_percentage: 0.15
+    val_percentage: 0.
     use_train_dataset: Celltype_Prediction
+    use_val_dataset: Celltype_Prediction
     datasets:
       Celltype_Prediction:
         train:
           _target_: src.pl_data.dataset.Volumetric
           train: True
           path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
+        val:
+          - _target_: src.pl_data.dataset.Volumetric
+            train: False
+            path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
         test:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
-            path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
+            path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
 
     num_workers:
       train: 8
@@ -49,7 +54,7 @@ hydra:
   #   batch_size: auto
 
 logging:
-  n_elements_to_log: 32
+  n_elements_to_log: 16
 
   # log frequency
   val_check_interval: 1.0

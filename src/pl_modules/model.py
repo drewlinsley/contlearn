@@ -130,17 +130,14 @@ class MyModel(pl.LightningModule):
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
-            mid = output_element["image"].shape[-1] // 2
-            rendered_image = render_images(output_element["image"][0, ..., mid], autoshow=False)
-            caption = f"Image"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
-            images.append(
-                wandb.Image(
-                    rendered_image,
-                    caption=caption,
-                )
-            )
-            rendered_image = render_images(output_element["image"][1, ..., mid], autoshow=False)
-            caption = f"Membrane"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
+            mid = output_element["image"].shape[-3] // 2
+            input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
+            input_seg = output_element["image"][1, mid, ...].unsqueeze(dim=0)
+            gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
+            output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
+
+            rendered_image = render_images([input_img, input_seg, gt, output_seg], autoshow=False, nrow=4)
+            caption = f"image____seg____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
             images.append(
                 wandb.Image(
                     rendered_image,
