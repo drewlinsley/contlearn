@@ -24,9 +24,16 @@ gcloud compute tpus create $TPUNAME \
 --version=pytorch-1.10 \
 --accelerator-type=$TPU
 
+##### GET TPU IP
+TPUIP=$(gcloud compute tpus list | grep "$TPUNAME")
+TPUIP=$(echo $TPUIP | cut -d "/" -f 1)
+TPUIP=$(echo $TPUIP | cut -d " " -f 5)
+
 ##### CONNECT
 gcloud compute ssh $TPUNAME --zone=$ZONE \
   --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn  && git checkout gcp"
+gcloud compute ssh $TPUNAME --zone=$ZONE \
+  --command "echo $TPUIP >> tpuip.txt"
 gcloud compute ssh $TPUNAME --zone=$ZONE \
   --command "sudo ln -s /anaconda3/etc/profile.d/conda.sh /etc/profile.d/conda.sh && conda activate"
 gcloud compute ssh $TPUNAME --zone=$ZONE \
