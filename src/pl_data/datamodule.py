@@ -16,6 +16,7 @@ class MyDataModule(pl.LightningDataModule):
         val_percentage: float,
         cfg: DictConfig,
         use_train_dataset: str,
+        use_val_dataset: str,
     ):
         super().__init__()
         self.cfg = cfg
@@ -24,6 +25,7 @@ class MyDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.val_percentage = val_percentage
         self.use_train_dataset = use_train_dataset
+        self.use_val_dataset = use_train_dataset
 
         self.train_dataset: Optional[Dataset] = None
         self.val_dataset: Optional[Dataset] = None
@@ -48,10 +50,12 @@ class MyDataModule(pl.LightningDataModule):
                 _recursive_=False
             )
             if self.val_percentage  == 0:
-                plank_train = hydra.utils.instantiate(
+                plank_val = hydra.utils.instantiate(
                     self.datasets[self.use_val_dataset].train, cfg=self.cfg, transform=transform,
                     _recursive_=False
                 )
+                self.train_dataset = plank_train
+                self.val_dataset = plank_val
             else:
                 train_length = int(len(plank_train) * (1 - self.val_percentage))
                 val_length = len(plank_train) - train_length
