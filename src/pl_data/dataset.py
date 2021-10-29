@@ -100,7 +100,7 @@ class Volumetric(Dataset):
 
         ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(self.batch_size)
-        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)            
+        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:
             self.len = len([idx for idx, _ in enumerate(self.ds)])
@@ -118,6 +118,7 @@ class Volumetric(Dataset):
 
         # Add augs here
         volume = volume[:self.shape[0], :self.shape[1], :self.shape[2]]
+        label = label[:self.shape[0], :self.shape[1], :self.shape[2]]
 
         volume = volume.transpose(self.vol_transpose)
         label = label.transpose(self.label_transpose)
