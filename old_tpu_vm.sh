@@ -1,7 +1,8 @@
-
+. /anaconda3/etc/profile.d/conda.sh
+conda update -n base conda -y
 conda create --name gcp -y
 conda activate gcp
-conda install pathlib
+conda install pathlib -y
 cp netrc ../.netrc
 pip install -r requirements.txt
 

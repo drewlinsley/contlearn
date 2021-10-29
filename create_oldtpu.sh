@@ -7,11 +7,11 @@ TPU=v3-8
 
 
 ###### DELETE
-gcloud compute tpus execution-groups delete $TPUNAME \
+gcloud compute tpus execution-groups delete $VMNAME \
 --zone=$ZONE
 
 ##### CREATE
-gcloud compute instances create $TPUNAME \
+gcloud compute instances create $VMNAME \
 --zone=$ZONE  \
 --machine-type=n1-standard-16  \
 --image-family=torch-xla \
@@ -33,10 +33,10 @@ TPUIP=$(echo $TPUIP | cut -d " " -f 5)
 gcloud compute ssh $TPUNAME --zone=$ZONE \
   --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn  && git checkout gcp"
 gcloud compute ssh $TPUNAME --zone=$ZONE \
-  --command "echo $TPUIP >> tpuip.txt"
+  --command "echo $TPUIP >> contlearn/tpuip.txt"
 gcloud compute ssh $TPUNAME --zone=$ZONE \
   --command "sudo ln -s /anaconda3/etc/profile.d/conda.sh /etc/profile.d/conda.sh && conda activate"
 gcloud compute ssh $TPUNAME --zone=$ZONE \
-  --command "cd contlearn && conda create --name gcp -y && conda activate gcp && conda install pathlib && cp netrc ../.netrc && pip install -r requirements.txt"
+  --command "cd contlearn && "
 gcloud compute ssh $TPUNAME --zone=$ZONE
 
