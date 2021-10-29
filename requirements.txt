@@ -1,3 +1,6 @@
+pathlib
+Pillow
+git-deps
 pytorch-lightning
 hydra-core
 wandb
@@ -5,9 +8,8 @@ dvc
 python-dotenv
 tensorflow_datasets
 rising
-pytorch-lightning
 captum
 matplotlib
 pytorchvideo
-
+torchvision
 # hydra-joblib-launcher

@@ -21,11 +21,15 @@ gcloud compute instances create $TPUNAME \
 gcloud compute tpus create $TPUNAME \
 --zone=$ZONE \
 --network=default \
---version=pytorch-1.9 \
+--version=pytorch-1.10 \
 --accelerator-type=$TPU
 
 ##### CONNECT
 gcloud compute ssh $TPUNAME --zone=$ZONE \
-  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn  && git checkout gcp && conda create --name gcp -y && conda activate gcp && cp netrc ../.netrc && pip install -r requirements.txt"
-# gcloud compute ssh $TPUNAME --zone=$ZONE
+  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn  && git checkout gcp"
+gcloud compute ssh $TPUNAME --zone=$ZONE \
+  --command "sudo ln -s /anaconda3/etc/profile.d/conda.sh /etc/profile.d/conda.sh && conda activate"
+gcloud compute ssh $TPUNAME --zone=$ZONE \
+  --command "cd contlearn && conda create --name gcp -y && conda activate gcp && conda install pathlib && cp netrc ../.netrc && pip install -r requirements.txt"
+gcloud compute ssh $TPUNAME --zone=$ZONE
 

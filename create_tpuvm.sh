@@ -16,5 +16,5 @@ gcloud alpha compute tpus tpu-vm create $TPUNAME \
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
 #   --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && pip3 -r install requirements.txt && bash tpu_vm.sh"
 gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
-  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && pip install -r requirements.txt && git checkout gcp && cp netrc ../.netrc"
+  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && git checkout gcp && cp netrc ../.netrc && pip install -r requirements.txt"
 gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE
