@@ -9,6 +9,7 @@ TPU=v3-8
 ###### DELETE
 gcloud compute tpus execution-groups delete $VMNAME \
 --zone=$ZONE
+gcloud compute tpus delete $TPUNAME --zone=$ZONE --quiet
 
 ##### CREATE
 gcloud compute instances create $VMNAME \
