@@ -25,18 +25,14 @@ gcloud compute tpus create $TPUNAME \
 --accelerator-type=$TPU
 
 ##### GET TPU IP
-TPUIP=$(gcloud compute tpus list | grep "$TPUNAME")
-TPUIP=$(echo $TPUIP | cut -d "/" -f 1)
-TPUIP=$(echo $TPUIP | cut -d " " -f 5)
+TPUIP=$(gcloud compute tpus describe $TPUNAME --zone=$ZONE | grep "\- ipAddress: ")
+TPUIP=$(echo $TPUIP | cut -d ":" -f 2 | xargs)
 
 ##### CONNECT
-gcloud compute ssh $TPUNAME --zone=$ZONE \
+gcloud compute ssh $VMNAME --zone=$ZONE \
   --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn  && git checkout gcp"
-gcloud compute ssh $TPUNAME --zone=$ZONE \
+gcloud compute ssh $VMNAME --zone=$ZONE \
   --command "echo $TPUIP >> contlearn/tpuip.txt"
-gcloud compute ssh $TPUNAME --zone=$ZONE \
-  --command "sudo ln -s /anaconda3/etc/profile.d/conda.sh /etc/profile.d/conda.sh && conda activate"
-gcloud compute ssh $TPUNAME --zone=$ZONE \
-  --command "cd contlearn && "
-gcloud compute ssh $TPUNAME --zone=$ZONE
-
+# gcloud compute ssh $TPUNAME --zone=$ZONE \
+#   --command "cd contlearn && "
+gcloud compute ssh $VMNAME --zone=$ZONE

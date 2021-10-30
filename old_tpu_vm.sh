@@ -1,8 +1,6 @@
 . /anaconda3/etc/profile.d/conda.sh
 conda update -n base conda -y
-conda create --name gcp -y
-conda activate gcp
-conda install pathlib -y
+conda activate torch-xla-1.10
 cp netrc ../.netrc
 pip install -r requirements.txt
 
