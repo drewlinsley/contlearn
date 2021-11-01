@@ -66,16 +66,16 @@ class Volumetric(Dataset):
         self.train = train
         self.transform = transform
         self.cache = True  # Push to CFG
-        self.repeat = True  # Push to CFG
-        self.shuffle = True  # Push to CFG
+        self.repeat = False  # Push to CFG
+        self.shuffle = False  # Push to CFG
         self.vol_size = [64, 128, 128, 2]
         self.label_size = [64, 128, 128, 6]
         self.vol_transpose = (3, 0, 1, 2)
         self.label_transpose = (3, 0, 1, 2)
-        self.shuffle_buffer = 128
-        self.batch_size = 1
+        # self.batch_size = 1
         self.reader_name = "default"
         self.len = 97
+        self.shuffle_buffer = min(64, self.len)
 
         self.shape = [32, 32, 32]
 
