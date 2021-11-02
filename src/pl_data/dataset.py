@@ -55,7 +55,6 @@ def full_read_labeled_tfrecord(example):
     label = tf.reshape(label, [64, 128, 128, 6])
     return {"volume": volume, "label": label}
 
-
 def cheap_read_labeled_tfrecord(example):
     tfrec_format = {
         "volume": tf.io.FixedLenFeature([], tf.string),
@@ -118,10 +117,7 @@ class Volumetric(Dataset):
             opt.experimental_deterministic = False
             ds = ds.with_options(opt)
 
-        if self.reader_name == "default":
-            reader = read_labeled_tfrecord
-        else:
-            raise NotImplementedError("{} is not implemented".format(self.reader_name))
+        reader = full_read_labeled_tfrecord
 
         ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(self.batch_size)
