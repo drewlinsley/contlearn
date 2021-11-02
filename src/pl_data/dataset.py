@@ -108,7 +108,7 @@ class Volumetric(Dataset):
             # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
             ds = ds.cache()
 
-        if self.repeat:
+        if self.repeat and self.len is not None:
             ds = ds.repeat()
 
         if self.shuffle:
@@ -126,6 +126,7 @@ class Volumetric(Dataset):
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
+            print("Found length of {}".format(self.lens))
 
 
         # # TEST
