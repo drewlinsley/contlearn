@@ -93,16 +93,18 @@ class Volumetric(Dataset):
         self.vol_transpose = (3, 0, 1, 2)
         self.label_transpose = (3, 0, 1, 2)
         # self.batch_size = 1
-        self.len = 97
+        tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])
+        train = "train" if self.train else "val"
+        self.len = getattr(tag, train).len
+
+        # getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0]).train.len
+        self.shuffle_buffer = min(32, self.len)
         self.shuffle_buffer = min(64, self.len)
+        self.len = None  # TESTING AUTO-COUNT
 
         self.shape = [32, 32, 32]
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
-        # ds = ds.interleave  # Use for sharded tfrecords
-        ds = ds.batch(1)
-        # ds = ds.map(cheap_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         if self.cache:
             # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
             ds = ds.cache()
@@ -115,12 +117,45 @@ class Volumetric(Dataset):
             opt = tf.data.Options()
             opt.experimental_deterministic = False
             ds = ds.with_options(opt)
-        # ds = ds.map(expensive_tfrecord_transform, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
+        if self.reader_name == "default":
+            reader = read_labeled_tfrecord
+        else:
+            raise NotImplementedError("{} is not implemented".format(self.reader_name))
+
+        ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds = ds.batch(self.batch_size)
         ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:
+            print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
+
+
+        # # TEST
+        # ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
+        # # ds = ds.interleave  # Use for sharded tfrecords
+        # ds = ds.batch(1)
+        # # ds = ds.map(cheap_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        # ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        # if self.cache:
+        #     # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
+        #     ds = ds.cache()
+
+        # if self.repeat:
+        #     ds = ds.repeat()
+
+        # if self.shuffle:
+        #     ds = ds.shuffle(self.shuffle_buffer)
+        #     opt = tf.data.Options()
+        #     opt.experimental_deterministic = False
+        #     ds = ds.with_options(opt)
+
+        # ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
+        # self.ds = tfds.as_numpy(ds)
+        # if self.len is None:
+        #     self.len = len([idx for idx, _ in enumerate(self.ds)])
+
 
     def __len__(self) -> int:
         return self.len
