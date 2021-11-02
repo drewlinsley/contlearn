@@ -1,4 +1,5 @@
 # quickrun_old.sh
+. /anaconda3/etc/profile.d/conda.sh
 conda activate torch-xla-1.10
 
 export TPU_IP_ADDRESS=$(cat tpuip.txt)  # You could get the IP Address in the GCP TPUs section
