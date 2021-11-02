@@ -75,6 +75,15 @@ def expensive_tfrecord_transform(example):
     return {"volume": volume, "label": label}
 
 
+def decode_data(features):
+    """Process volume/label using tfrecord-pytorch framework."""
+    features["volume"] = tf.io.decode_raw(features["volume"], tf.float32)
+    features["label"] = tf.io.decode_raw(features["label"], tf.float32)
+    features["volume"] = tf.reshape(features["volume"], [64, 128, 128, 2])
+    features["label"] = tf.reshape(features["label"], [64, 128, 128, 6])
+    return features
+
+
 class Volumetric(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
@@ -100,33 +109,43 @@ class Volumetric(Dataset):
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
-
         self.shape = [32, 32, 32]
 
-        ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
-        if self.cache:
-            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
-            ds = ds.cache()
+        description = {
+            "volume": bytes,
+            "label": bytes,
+        }
+        self.ds = tfrecord.torch.TFRecordDataset(
+            self.path
+            index_path=None,
+            description=description,
+            transform=decode_data)
 
-        if self.repeat and self.len is not None:
-            ds = ds.repeat()
+        # Previous version
+        # ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
+        # if self.cache:
+        #     # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
+        #     ds = ds.cache()
 
-        if self.shuffle:
-            ds = ds.shuffle(self.shuffle_buffer)
-            opt = tf.data.Options()
-            opt.experimental_deterministic = False
-            ds = ds.with_options(opt)
+        # if self.repeat and self.len is not None:
+        #     ds = ds.repeat()
 
-        reader = full_read_labeled_tfrecord
+        # if self.shuffle:
+        #     ds = ds.shuffle(self.shuffle_buffer)
+        #     opt = tf.data.Options()
+        #     opt.experimental_deterministic = False
+        #     ds = ds.with_options(opt)
 
-        ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds = ds.batch(1)
-        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
-        self.ds = tfds.as_numpy(ds)
-        if self.len is None:
-            print("Counting length of {}".format(train))
-            self.len = len([idx for idx, _ in enumerate(self.ds)])
-            print("Found length of {}".format(self.len))
+        # reader = full_read_labeled_tfrecord
+
+        # ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        # ds = ds.batch(1)
+        # ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
+        # self.ds = tfds.as_numpy(ds)
+        # if self.len is None:
+        #     print("Counting length of {}".format(train))
+        #     self.len = len([idx for idx, _ in enumerate(self.ds)])
+        #     print("Found length of {}".format(self.len))
 
 
         # # TEST
@@ -150,8 +169,9 @@ class Volumetric(Dataset):
 
         # ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         # self.ds = tfds.as_numpy(ds)
-        # if self.len is None:
-        #     self.len = len([idx for idx, _ in enumerate(self.ds)])
+
+        if self.len is None:
+            self.len = len([idx for idx, _ in enumerate(self.ds)])
 
 
     def __len__(self) -> int:
