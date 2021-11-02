@@ -24,12 +24,12 @@ data:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
-            len: 32
+            len: 11
         test:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
-            len: 32
+            len: 11
 
     num_workers:
       train: 8
