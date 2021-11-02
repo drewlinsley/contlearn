@@ -13,4 +13,5 @@ captum
 matplotlib
 pytorchvideo
 torchvision
+tfrecord
 # hydra-joblib-launcher
