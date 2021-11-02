@@ -53,7 +53,7 @@ hydra:
   #     WANDB_START_METHOD: thread
 
 logging:
-  n_elements_to_log: 0  # Set to 16 if tpu=1
+  n_elements_to_log: 16  # Set to 16 if tpu=1
 
   # log frequency
   val_check_interval: 1.0
@@ -103,7 +103,7 @@ train:
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
     # gpus: 8
-    tpu_cores: 8
+    tpu_cores: 1
     precision: 16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
