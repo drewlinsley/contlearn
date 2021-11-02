@@ -126,7 +126,7 @@ class Volumetric(Dataset):
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
-            print("Found length of {}".format(self.lens))
+            print("Found length of {}".format(self.len))
 
 
         # # TEST
