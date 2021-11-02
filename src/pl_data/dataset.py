@@ -117,7 +117,7 @@ class Volumetric(Dataset):
             "label": bytes,
         }
         self.ds = tfrecord.torch.TFRecordDataset(
-            self.path
+            self.path,
             index_path=None,
             description=description,
             transform=decode_data)
