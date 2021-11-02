@@ -19,14 +19,17 @@ data:
           _target_: src.pl_data.dataset.Volumetric
           train: True
           path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
+          len: 97
         val:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
+            len: 32
         test:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
+            len: 32
 
     num_workers:
       train: 8
@@ -50,7 +53,7 @@ hydra:
   #     WANDB_START_METHOD: thread
 
 logging:
-  n_elements_to_log: 16
+  n_elements_to_log: 2
 
   # log frequency
   val_check_interval: 1.0
