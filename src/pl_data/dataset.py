@@ -120,7 +120,7 @@ class Volumetric(Dataset):
         reader = full_read_labeled_tfrecord
 
         ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds = ds.batch(self.batch_size)
+        ds = ds.batch(1)
         ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:
