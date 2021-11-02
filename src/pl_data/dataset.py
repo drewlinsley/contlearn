@@ -98,8 +98,8 @@ class Volumetric(Dataset):
 
         # getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0]).train.len
         self.shuffle_buffer = min(32, self.len)
-        self.shuffle_buffer = min(64, self.len)
-        self.len = None  # TESTING AUTO-COUNT
+        # self.shuffle_buffer = min(64, self.len)
+        # self.len = None  # TESTING AUTO-COUNT
 
         self.shape = [32, 32, 32]
 
