@@ -40,7 +40,7 @@ def colour(img, ch=0, num_ch=3):
     return torch.cat(colimg)
 
 
-def read_labeled_tfrecord(example):
+def cheap_read_labeled_tfrecord(example):
     tfrec_format = {
         "volume": tf.io.FixedLenFeature([], tf.string),
         "label": tf.io.FixedLenFeature([], tf.string)
@@ -49,8 +49,12 @@ def read_labeled_tfrecord(example):
 
     volume = tf.reshape(example["volume"], shape=[])
     label = tf.reshape(example["label"], shape=[])
-    volume = tf.io.decode_raw(volume, tf.float32)
-    label = tf.io.decode_raw(label, tf.float32)
+    return {"volume": volume, "label": label}
+
+
+def expensive_tfrecord_transform(example):
+    volume = tf.io.decode_raw(example["volume"], tf.float32)
+    label = tf.io.decode_raw(example["label"], tf.float32)
     volume = tf.reshape(volume, [64, 128, 128, 2])
     label = tf.reshape(label, [64, 128, 128, 6])
     return {"volume": volume, "label": label}
@@ -66,20 +70,22 @@ class Volumetric(Dataset):
         self.train = train
         self.transform = transform
         self.cache = True  # Push to CFG
-        self.repeat = False  # Push to CFG
+        self.repeat = True  # Push to CFG
         self.shuffle = False  # Push to CFG
         self.vol_size = [64, 128, 128, 2]
         self.label_size = [64, 128, 128, 6]
         self.vol_transpose = (3, 0, 1, 2)
         self.label_transpose = (3, 0, 1, 2)
         # self.batch_size = 1
-        self.reader_name = "default"
         self.len = 97
         self.shuffle_buffer = min(64, self.len)
 
         self.shape = [32, 32, 32]
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
+        # ds = ds.interleave  # Use for sharded tfrecords
+        ds = ds.batch(1)
+        ds = ds.map(cheap_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         if self.cache:
             # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
             ds = ds.cache()
@@ -92,14 +98,8 @@ class Volumetric(Dataset):
             opt = tf.data.Options()
             opt.experimental_deterministic = False
             ds = ds.with_options(opt)
+        ds = ds.map(expensive_tfrecord_transform, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-        if self.reader_name == "default":
-            reader = read_labeled_tfrecord
-        else:
-            raise NotImplementedError("{} is not implemented".format(self.reader_name))
-
-        ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds = ds.batch(1)
         ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:

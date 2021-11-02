@@ -48,9 +48,9 @@ hydra:
     dir: ./experiments/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}/
     subdir: ${hydra.job.num}_${hydra.job.id}
 
-  # job:
-  #   env_set:
-  #     WANDB_START_METHOD: thread
+  job:
+    env_set:
+      WANDB_START_METHOD: thread
 
 logging:
   n_elements_to_log: 0  # Set to 16 if tpu=1
@@ -59,13 +59,13 @@ logging:
   val_check_interval: 1.0
   progress_bar_refresh_rate: 20
 
-  # wandb:
-  #   project: cont-learn
-  #   entity: serrelab
+  wandb:
+    project: cont-learn
+    entity: serrelab
 
-  #   watch:
-  #     log: 'all'
-  #     log_freq: 10
+    watch:
+      log: 'all'
+      log_freq: 10
 
   lr_monitor:
     logging_interval: "step"
