@@ -75,7 +75,7 @@ def expensive_tfrecord_transform(example):
     return {"volume": volume, "label": label}
 
 
-class Volumetric(Dataset):
+class OldVolumetric(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
     ):
@@ -171,6 +171,132 @@ class Volumetric(Dataset):
         volume = volume.transpose(self.vol_transpose)
         label = label.transpose(self.label_transpose)
         return volume, label
+
+    def __repr__(self) -> str:
+        return f"MyDataset({self.name}, {self.path})"
+
+
+from torch_xla.utils.tf_record_reader import TfRecordReader
+import multiprocessing
+import random
+from collections import deque
+
+
+class Volumetric(Dataset):
+    def __init__(
+        self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
+    ):
+        super().__init__()
+        self.cfg = cfg
+        self.path = path
+        self.train = train
+        self.transform = transform
+        self.cache = True  # Push to CFG
+        self.repeat = True  # Push to CFG
+        self.shuffle = False  # Push to CFG
+        self.vol_size = [64, 128, 128, 2]
+        self.label_size = [64, 128, 128, 6]
+        self.vol_transpose = (3, 0, 1, 2)
+        self.label_transpose = (3, 0, 1, 2)
+        self.drop_remainder = True  # drop_remainder
+        self.batch_size = 1
+        self.transforms = {"volume": str, "label": str}
+
+        pool = multiprocessing.Pool(multiprocessing.cpu_count())
+        num_samples = pool.map(self.samples_in_file, self.files)
+        pool.close()
+        pool.join()
+        self.total_samples = sum(num_samples)
+        self.len = self.total_samples // (self.batch_size)
+        self.num_prefetch_batches = prefetch
+        self.prefetch_buffer = deque()
+        if self.len < 1:
+            raise ValueError(f"""Batch size {self.batch_size} larger than
+                                number of samples in the TFRecord files {self.total_samples}.""")
+
+        if self.len < self.num_prefetch_batches:
+            raise ValueError(f"""Not enough samples to prefetch: (length = {self.len},
+                            num_to_prefech = {self.num_prefetch_batches}),
+                            lower the number of prefetch batches.""")
+        self.samples_per_file = {f: n for (f, n) in
+                                 zip(self.files, num_samples)}
+        self.data = None
+        self.counter = 0
+
+    def samples_in_file(self, filename):
+        import pdb;pdb.set_trace()
+        ds = TfRecordReader(self.path, transforms=self.transforms)
+        reader = ds
+        count = 0
+        while reader.read_example():
+            count += 1
+        return count
+
+    def __len__(self) -> int:
+        return self.len
+
+    def __iter__(self):
+        self.file_index = 0
+        self.data_index = 0
+        self.counter = 0
+        self.data = None
+        self.fill_buffer(self.num_prefetch_batches)
+        return self
+
+    def __next__(self):
+        if self.drop_remainder:
+            if self.counter == self.len:
+                raise StopIteration
+
+        if len(self.prefetch_buffer) == 0:
+            raise StopIteration
+
+        result = self.prefetch_buffer.popleft()
+        self.counter += 1
+        self.fill_buffer(1)
+        return result
+
+    def fill_buffer(self, num_batches):
+        if self.data is None:
+            self.load_data()
+        for _ in range(num_batches):
+            curr_batch = []
+            still_required = self.batch_size
+            while still_required > 0:
+                data = self.data[self.data_index:
+                                 self.data_index + still_required]
+                self.data_index += len(data)
+                curr_batch += data
+                still_required = self.batch_size - len(curr_batch)
+                if still_required > 0:
+                    if self.file_index < len(self.files):
+                        self.load_data()
+                    else:
+                        break
+            if len(curr_batch) == self.batch_size:
+                result = {}
+                for k in KEYS:
+                    result[k] = np.vstack([item[k] for item in curr_batch])
+                self.prefetch_buffer.append(self.post_process(result))
+
+    def load_data(self):
+        if self.file_index >= len(self.files):
+            raise ValueError('No more files to load.')
+        # self.data = self.load_file(self.files[self.file_index])
+        self.data = self.load_file(self.path)
+        self.file_index += 1
+        self.data_index = 0
+        if self.shuffle:
+            np.random.shuffle(self.data)
+
+    def load_file(self, filename):
+        reader = TfRecordReader(filename, transforms=self.transforms)
+        data = []
+        ex = reader.read_example()
+        while ex:
+            data.append(ex)
+            ex = reader.read_example()
+        return data
 
     def __repr__(self) -> str:
         return f"MyDataset({self.name}, {self.path})"
