@@ -189,6 +189,8 @@ class Volumetric(Dataset):
         super().__init__()
         self.cfg = cfg
         self.path = path
+        if not isinstance(self.path, list):
+            self.path = [self.path]
         self.train = train
         self.transform = transform
         self.cache = True  # Push to CFG
@@ -203,10 +205,7 @@ class Volumetric(Dataset):
         self.transforms = {"volume": str, "label": str}
 
         num_samples = self.samples_in_file(self.path)
-        if isinstance(self.path, list):
-            self.total_samples = sum(num_samples)
-        else:
-            self.total_samples = num_samples
+        self.total_samples = sum(num_samples)
         self.len = self.total_samples // (self.batch_size)
         self.num_prefetch_batches = 1  # prefetch
         self.prefetch_buffer = deque()
@@ -219,7 +218,7 @@ class Volumetric(Dataset):
                             num_to_prefech = {self.num_prefetch_batches}),
                             lower the number of prefetch batches.""")
         self.samples_per_file = {f: n for (f, n) in
-                                 zip(self.files, num_samples)}
+                                 zip(self.path, num_samples)}
         self.data = None
         self.counter = 0
 
