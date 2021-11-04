@@ -202,10 +202,7 @@ class Volumetric(Dataset):
         self.batch_size = 1
         self.transforms = {"volume": str, "label": str}
 
-        pool = multiprocessing.Pool(multiprocessing.cpu_count())
-        num_samples = pool.map(self.samples_in_file, self.files)
-        pool.close()
-        pool.join()
+        num_samples = self.samples_in_file(self.files)
         self.total_samples = sum(num_samples)
         self.len = self.total_samples // (self.batch_size)
         self.num_prefetch_batches = prefetch
@@ -223,7 +220,7 @@ class Volumetric(Dataset):
         self.data = None
         self.counter = 0
 
-    def samples_in_file(self, filename):
+    def _samples_in_file(self, filename):
         import pdb;pdb.set_trace()
         ds = TfRecordReader(self.path, transforms=self.transforms)
         reader = ds
@@ -257,6 +254,7 @@ class Volumetric(Dataset):
         return result
 
     def fill_buffer(self, num_batches):
+        import pdb;pdb.set_trace()
         if self.data is None:
             self.load_data()
         for _ in range(num_batches):
