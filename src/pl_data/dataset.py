@@ -106,7 +106,7 @@ class Volumetric(Dataset):
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
         ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds = ds.batch(1)
+        ds = ds.batch(1, drop_remainder=True)
 
         if self.cache:
             raise RuntimeError("Cache fails if TPU > 1.")
