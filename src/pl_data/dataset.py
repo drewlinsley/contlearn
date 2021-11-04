@@ -223,7 +223,7 @@ class Volumetric(Dataset):
         self.counter = 0
 
     def samples_in_file(self, filename):
-        ds = TfRecordReader(self.path, transforms=self.transforms)
+        ds = TfRecordReader(filename, transforms=self.transforms)
         reader = ds
         count = 0
         while reader.read_example():
