@@ -107,23 +107,6 @@ class Volumetric(Dataset):
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
         ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(1)
-
-        if self.cache:
-            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
-            ds = ds.cache()
-
-        if self.repeat and self.len is not None:
-            ds = ds.repeat()
-
-        if self.shuffle:
-            ds = ds.shuffle(self.shuffle_buffer)
-            opt = tf.data.Options()
-            opt.experimental_deterministic = False
-            ds = ds.with_options(opt)
-
-        reader = full_read_labeled_tfrecord
-
-        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:
             print("Counting length of {}".format(train))
