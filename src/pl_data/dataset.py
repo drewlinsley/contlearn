@@ -85,7 +85,7 @@ class Volumetric(Dataset):
         self.path = path
         self.train = train
         self.transform = transform
-        self.cache = False  # Push to CFG
+        self.cache = True  # Push to CFG
         self.repeat = True  # Push to CFG
         self.shuffle = True  # Push to CFG
         self.vol_size = [64, 128, 128, 2]
@@ -109,8 +109,8 @@ class Volumetric(Dataset):
         ds = ds.batch(1)
 
         if self.cache:
-            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
-            ds = ds.cache()
+            # raise RuntimeError("Cache fails if TPU > 1.")
+            ds = ds.cache("~/cache")
 
         # if self.repeat and self.len is not None:
         #     ds = ds.repeat()
