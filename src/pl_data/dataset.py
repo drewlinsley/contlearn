@@ -121,11 +121,7 @@ class Volumetric(Dataset):
             opt.experimental_deterministic = False
             ds = ds.with_options(opt)
 
-        # reader = full_read_labeled_tfrecord
-
-        # ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
-
-
+        ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:
             print("Counting length of {}".format(train))
