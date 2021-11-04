@@ -202,7 +202,7 @@ class Volumetric(Dataset):
         self.batch_size = 1
         self.transforms = {"volume": str, "label": str}
 
-        num_samples = self._samples_in_file(self.files)
+        num_samples = self.samples_in_file(self.files)
         self.total_samples = sum(num_samples)
         self.len = self.total_samples // (self.batch_size)
         self.num_prefetch_batches = 1  # prefetch
@@ -220,8 +220,7 @@ class Volumetric(Dataset):
         self.data = None
         self.counter = 0
 
-    def _samples_in_file(self, filename):
-        import pdb;pdb.set_trace()
+    def samples_in_file(self, filename):
         ds = TfRecordReader(self.path, transforms=self.transforms)
         reader = ds
         count = 0
