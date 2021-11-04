@@ -75,7 +75,7 @@ def expensive_tfrecord_transform(example):
     return {"volume": volume, "label": label}
 
 
-class OldVolumetric(Dataset):
+class Volumetric(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
     ):
@@ -104,6 +104,9 @@ class OldVolumetric(Dataset):
         self.shape = [32, 32, 32]
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
+        ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds = ds.batch(1)
+
         if self.cache:
             # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
             ds = ds.cache()
@@ -119,8 +122,6 @@ class OldVolumetric(Dataset):
 
         reader = full_read_labeled_tfrecord
 
-        ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds = ds.batch(1)
         ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
         self.ds = tfds.as_numpy(ds)
         if self.len is None:
@@ -182,7 +183,7 @@ import random
 from collections import deque
 
 
-class Volumetric(Dataset):
+class TestVolumetric(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
     ):
