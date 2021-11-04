@@ -85,9 +85,9 @@ class Volumetric(Dataset):
         self.path = path
         self.train = train
         self.transform = transform
-        self.cache = True  # Push to CFG
+        self.cache = False  # Push to CFG
         self.repeat = True  # Push to CFG
-        self.shuffle = False  # Push to CFG
+        self.shuffle = True  # Push to CFG
         self.vol_size = [64, 128, 128, 2]
         self.label_size = [64, 128, 128, 6]
         self.vol_transpose = (3, 0, 1, 2)
@@ -108,15 +108,18 @@ class Volumetric(Dataset):
         ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(1)
 
+        if self.cache:
+            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
+            ds = ds.cache()
 
         # if self.repeat and self.len is not None:
         #     ds = ds.repeat()
 
-        # if self.shuffle:
-        #     ds = ds.shuffle(self.shuffle_buffer)
-        #     opt = tf.data.Options()
-        #     opt.experimental_deterministic = False
-        #     ds = ds.with_options(opt)
+        if self.shuffle:
+            ds = ds.shuffle(self.shuffle_buffer)
+            opt = tf.data.Options()
+            opt.experimental_deterministic = False
+            ds = ds.with_options(opt)
 
         # reader = full_read_labeled_tfrecord
 
@@ -124,9 +127,6 @@ class Volumetric(Dataset):
 
 
         self.ds = tfds.as_numpy(ds)
-        if self.cache:
-            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
-            self.ds = self.ds.cache()
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
