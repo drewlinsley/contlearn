@@ -202,8 +202,11 @@ class Volumetric(Dataset):
         self.batch_size = 1
         self.transforms = {"volume": str, "label": str}
 
-        num_samples = self.samples_in_file(self.files)
-        self.total_samples = sum(num_samples)
+        num_samples = self.samples_in_file(self.path)
+        if isinstance(self.path, list):
+            self.total_samples = sum(num_samples)
+        else:
+            self.total_samples = num_samples
         self.len = self.total_samples // (self.batch_size)
         self.num_prefetch_batches = 1  # prefetch
         self.prefetch_buffer = deque()
