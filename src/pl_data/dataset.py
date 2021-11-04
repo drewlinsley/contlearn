@@ -202,10 +202,10 @@ class Volumetric(Dataset):
         self.batch_size = 1
         self.transforms = {"volume": str, "label": str}
 
-        num_samples = self.samples_in_file(self.files)
+        num_samples = self._samples_in_file(self.files)
         self.total_samples = sum(num_samples)
         self.len = self.total_samples // (self.batch_size)
-        self.num_prefetch_batches = prefetch
+        self.num_prefetch_batches = 1  # prefetch
         self.prefetch_buffer = deque()
         if self.len < 1:
             raise ValueError(f"""Batch size {self.batch_size} larger than
