@@ -241,7 +241,22 @@ class Volumetric(Dataset):
         self.fill_buffer(self.num_prefetch_batches)
         return self
 
-    def __next__(self):
+    def __getitem__(self, index: int):
+        # data = next(iter(self.ds))
+        # volume = data["volume"]
+        # # volume = self.norma(volume)
+        # label = data["label"].astype(int)
+        # volume = volume.reshape(self.vol_size)
+        # label = label.reshape(self.label_size)
+
+        # # Add augs here
+        # volume = volume[:self.shape[0], :self.shape[1], :self.shape[2]]
+        # label = label[:self.shape[0], :self.shape[1], :self.shape[2]]
+
+        # volume = volume.transpose(self.vol_transpose)
+        # label = label.transpose(self.label_transpose)
+        # return volume, label
+
         if self.drop_remainder:
             if self.counter == self.len:
                 raise StopIteration
