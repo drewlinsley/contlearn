@@ -55,6 +55,7 @@ def full_read_labeled_tfrecord(example):
     label = tf.reshape(label, [64, 128, 128, 6])
     return {"volume": volume, "label": label}
 
+
 def cheap_read_labeled_tfrecord(example):
     tfrec_format = {
         "volume": tf.io.FixedLenFeature([], tf.string),
@@ -104,7 +105,7 @@ class Volumetric(Dataset):
         self.shape = [32, 32, 32]
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
-        ds = ds.map(reader, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds = ds.map(full_read_labeled_tfrecords, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(1)
 
         if self.cache:
