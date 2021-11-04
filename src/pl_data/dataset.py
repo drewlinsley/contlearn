@@ -105,7 +105,7 @@ class Volumetric(Dataset):
         self.shape = [32, 32, 32]
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
-        ds = ds.map(full_read_labeled_tfrecords, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(1)
 
         if self.cache:
