@@ -105,9 +105,6 @@ class Volumetric(Dataset):
         self.shape = [32, 32, 32]
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
-        if self.cache:
-            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
-            ds = ds.cache()
         ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(1)
 
@@ -127,6 +124,9 @@ class Volumetric(Dataset):
 
 
         self.ds = tfds.as_numpy(ds)
+        if self.cache:
+            # You'll need around 15GB RAM if you'd like to cache val dataset, and 50~60GB RAM for train dataset.
+            self.ds = self.ds.cache()
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
