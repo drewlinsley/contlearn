@@ -71,7 +71,7 @@ def randomflip(volume, label, params):
     return volume, label
 
 
-def normalize_volue(volume, label, params):
+def normalize_volume(volume, label, params):
     """Apply normalization to volume."""
     min_val, max_val = params
     volume = (volume - min_val) / (max_val - min_val)

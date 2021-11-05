@@ -9,6 +9,7 @@ from torchvision import transforms
 import tensorflow as tf  # for reading TFRecord Dataset
 import tensorflow_datasets as tfds  # for making tf.data.Dataset to return numpy arrays
 from src.pl_data import augmentation_functions as af
+from inspect import getmembers, isfunction
 
 
 def load_image(directory):
@@ -79,8 +80,10 @@ def expensive_tfrecord_transform(example):
 
 def augment3d(volume, label, augmentations):
     """Apply 3d augmentations to volume, label, or both."""
+    functions_list = getmembers(af, isfunction)
+    functions_dict = {k: v for k, v in functions_list}
     for aug, params in augmentations.items():
-        aug_fun = getattr(af, aug)
+        aug_fun = functions_dict[aug]
         volume, label = aug_fun(volume, label, params)
     return volume, label
 
