@@ -86,7 +86,7 @@ class Volumetric(Dataset):
         self.train = train
         self.transform = transform
         self.cache = False  # Push to CFG
-        self.repeat = False  # Push to CFG
+        self.repeat = True  # Push to CFG
         self.shuffle = True  # Push to CFG
         self.vol_size = [64, 128, 128, 2]
         self.label_size = [64, 128, 128, 6]
@@ -104,7 +104,7 @@ class Volumetric(Dataset):
 
         self.shape = [32, 32, 32]
 
-        ds = tf.data.TFRecordDataset(path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
+        ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # , compression_type="GZIP")
         ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds = ds.batch(1, drop_remainder=True)
 
@@ -122,7 +122,7 @@ class Volumetric(Dataset):
             ds = ds.with_options(opt)
 
         ds = ds.prefetch(tf.data.experimental.AUTOTUNE)
-        self.ds = iter(ds)  # tfds.as_numpy(ds)
+        self.ds = tfds.as_numpy(ds)
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
@@ -158,9 +158,9 @@ class Volumetric(Dataset):
 
     def __getitem__(self, index: int):
         data = next(iter(self.ds))
-        volume = data["volume"].numpy()
+        volume = data["volume"]
         # volume = self.norma(volume)
-        label = data["label"].numpy().astype(int)
+        label = data["label"].astype(int)
         volume = volume.reshape(self.vol_size)
         label = label.reshape(self.label_size)
 
