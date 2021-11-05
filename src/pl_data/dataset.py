@@ -108,12 +108,12 @@ class Volumetric(Dataset):
         self.vol_transpose = (3, 0, 1, 2)
         self.label_transpose = (3, 0, 1, 2)
         self.shape = [32, 32, 32]
-        self.augmentations = [
-            {"randomcrop": self.shape},
-            {"randomrotate": [0, 1, 2]},  # Axes to rotate
-            {"randomflip": [0, 1, 2]},  # Axes to rotate
-            {"normalize_volume": [0, 255]},  # Min/max
-        ]
+        self.augmentations = {
+            "randomcrop": self.shape,
+            "randomrotate": [0, 1, 2],  # Axes to rotate
+            "randomflip": [0, 1, 2],  # Axes to rotate
+            "normalize_volume": [0, 255],  # Min/max
+        }
         # self.batch_size = 1
         tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
         train = "train" if self.train else "val"
