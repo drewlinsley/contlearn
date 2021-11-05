@@ -128,7 +128,7 @@ def run(cfg: DictConfig) -> None:
         #callbacks=callbacks,
         # deterministic=cfg.train.deterministic,
         val_check_interval=cfg.logging.val_check_interval,
-        log_every_n_steps=cfg.logging.log_every_n_stepss,
+        log_every_n_steps=cfg.logging.log_every_n_steps,
         # progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
         #auto_select_gpus=True,
         # benchmark=True,
