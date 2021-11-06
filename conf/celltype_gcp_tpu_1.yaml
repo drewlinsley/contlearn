@@ -20,21 +20,24 @@ data:
           train: True
           path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
           len: 97
+          shape: [64, 64, 64]
         val:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
             len: 11
+            shape: [64, 64, 64]
         test:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
             len: 11
+            shape: [64, 64, 64]
 
     num_workers:
-      train: 1
-      val: 1
-      test: 1
+      train: 32
+      val: 32
+      test: 32
 
     batch_size:
       train: 2  # 240  # 128
@@ -53,16 +56,17 @@ hydra:
       WANDB_START_METHOD: thread
 
 logging:
-  n_elements_to_log: 1  # Set to 16 if tpu=1
-  log_every_n_steps: 11
+  n_elements_to_log: 2  # Set to 16 if tpu=1
+  log_every_n_steps: 10
 
   # log frequency
-  val_check_interval: 1
+  val_check_interval: 1.
   # progress_bar_refresh_rate: 20
 
   wandb:
     project: cont-learn
     entity: serrelab
+
 
     watch:
       log: 'all'
@@ -75,7 +79,7 @@ model:
   _target_: src.pl_modules.model.MyModel
   name: UNet3D
 loss:
-  _target_: src.pl_modules.losses.cce
+  _target_: src.pl_modules.losses.dice_loss  # cce
 optim:
   optimizer:
     #  Adam-oriented deep learning

@@ -82,7 +82,9 @@ def augment3d(volume, label, augmentations):
     """Apply 3d augmentations to volume, label, or both."""
     functions_list = getmembers(af, isfunction)
     functions_dict = {k: v for k, v in functions_list}
-    for aug, params in augmentations.items():
+    for augmentation in augmentations:
+        kv = [x for x in augmentation.items()]
+        aug, params = kv[0]
         aug_fun = functions_dict[aug]
         volume, label = aug_fun(volume, label, params)
     return volume, label
@@ -97,27 +99,28 @@ class Volumetric(Dataset):
         self.path = path
         self.train = train
         self.transform = transform
-        if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores == 1:  # noqa
-            self.cache = True  # Push to CFG
-        else:
-            self.cache = False  # Push to CFG
+        # if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores == 1:  # noqa
+        #     self.cache = True  # Push to CFG
+        # else:
+        #     self.cache = False  # Push to CFG
+        self.cache = False  # Push to CFG
         self.repeat = True  # Push to CFG
         self.shuffle = True  # Push to CFG
         self.vol_size = [64, 128, 128, 2]
         self.label_size = [64, 128, 128, 6]
         self.vol_transpose = (3, 0, 1, 2)
         self.label_transpose = (3, 0, 1, 2)
-        self.shape = [32, 32, 32]
-        self.augmentations = {
-            "randomcrop": self.shape,
-            "randomrotate": [0, 1, 2],  # Axes to rotate
-            "randomflip": [0, 1, 2],  # Axes to rotate
-            "normalize_volume": [0, 255],  # Min/max
-        }
+        self.augmentations = [
+            {"randomcrop": self.shape},
+            {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # Axes to rotate
+            {"randomflip": [1, 2, 3]},  # Axes to rotate
+            {"normalize_volume": [0, 255]},  # Min/max
+        ]
         # self.batch_size = 1
         tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
         train = "train" if self.train else "val"
         self.len = getattr(tag, train).len
+        self.shape = getattr(tag, train).shape
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
@@ -157,17 +160,17 @@ class Volumetric(Dataset):
         label = data["label"].astype(int)
         volume = volume.reshape(self.vol_size)
         label = label.reshape(self.label_size)
+        volume = torch.as_tensor(volume)
+        label = torch.as_tensor(label)
+        volume = volume.permute(self.vol_transpose)
+        label = label.permute(self.label_transpose)
 
         # Add augs here
         volume, label = augment3d(
             volume=volume,
             label=label,
             augmentations=self.augmentations)
-        volume = volume[:self.shape[0], :self.shape[1], :self.shape[2]]
-        label = label[:self.shape[0], :self.shape[1], :self.shape[2]]
-
-        volume = volume.transpose(self.vol_transpose)
-        label = label.transpose(self.label_transpose)
+        label = label.int()
         return volume, label
 
     def __repr__(self) -> str:

@@ -51,7 +51,7 @@ class MyDataModule(pl.LightningDataModule):
             )
             if self.val_percentage  == 0:
                 plank_val = hydra.utils.instantiate(
-                    self.datasets[self.use_val_dataset].train, cfg=self.cfg, transform=transform,
+                    self.datasets[self.use_val_dataset].val[0], cfg=self.cfg, transform=transform,
                     _recursive_=False
                 )
                 self.train_dataset = plank_train
