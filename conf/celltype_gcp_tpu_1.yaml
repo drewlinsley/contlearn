@@ -20,19 +20,19 @@ data:
           train: True
           path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
           len: 97
-          shape: [64, 64, 64]
+          # shape: [64, 64, 64]
         val:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
             len: 11
-            shape: [64, 64, 64]
+            # shape: [64, 64, 64]
         test:
           - _target_: src.pl_data.dataset.Volumetric
             train: False
             path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
             len: 11
-            shape: [64, 64, 64]
+            # shape: [64, 64, 64]
 
     num_workers:
       train: 32
