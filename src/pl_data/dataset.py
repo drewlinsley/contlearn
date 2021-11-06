@@ -110,21 +110,20 @@ class Volumetric(Dataset):
         self.label_size = [64, 128, 128, 6]
         self.vol_transpose = (3, 0, 1, 2)
         self.label_transpose = (3, 0, 1, 2)
+        # self.batch_size = 1
+        tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
+        train = "train" if self.train else "val"
+        self.len = getattr(tag, train).len
+        self.shape = getattr(tag, train).shape
+        self.shuffle_buffer = min(32, self.len)
+        # self.shuffle_buffer = min(64, self.len)
+        # self.len = None  # TESTING AUTO-COUNT
         self.augmentations = [
             {"randomcrop": self.shape},
             {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # Axes to rotate
             {"randomflip": [1, 2, 3]},  # Axes to rotate
             {"normalize_volume": [0, 255]},  # Min/max
         ]
-        # self.batch_size = 1
-        tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
-        train = "train" if self.train else "val"
-        self.len = getattr(tag, train).len
-        self.shape = [64, 64, 64]  # getattr(tag, train).shape
-        self.shuffle_buffer = min(32, self.len)
-        # self.shuffle_buffer = min(64, self.len)
-        # self.len = None  # TESTING AUTO-COUNT
-
 
         ds = tf.data.TFRecordDataset(self.path, num_parallel_reads=tf.data.experimental.AUTOTUNE)  # noqa
         ds = ds.map(full_read_labeled_tfrecord, num_parallel_calls=tf.data.experimental.AUTOTUNE)  # noqa
