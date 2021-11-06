@@ -120,7 +120,7 @@ class Volumetric(Dataset):
         tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
         train = "train" if self.train else "val"
         self.len = getattr(tag, train).len
-        self.shape = getattr(tag, train).shape
+        self.shape = [64, 64, 64]  # getattr(tag, train).shape
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
