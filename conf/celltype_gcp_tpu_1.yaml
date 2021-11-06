@@ -35,20 +35,22 @@ data:
           shape: [64, 64, 64]
 
     num_workers:
-      train: 32
-      val: 32
-      test: 32
+      train: 64
+      val: 16
+      test: 16
 
     batch_size:
-      train: 2  # 240  # 128
+      train: 4  # 240  # 128
       val: 1 # 240  # 128
       test: 1  # 128
 hydra:
   run:
-    dir: gs://serrelab/connectomics/results/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: results/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    # dir: gs://serrelab/connectomics/results/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
   sweep:
-    dir: gs://serrelab/connectomics/results/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}/
+    dir: results/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}/
+    # dir: gs://serrelab/connectomics/results/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}/
     subdir: ${hydra.job.num}_${hydra.job.id}
 
   job:
