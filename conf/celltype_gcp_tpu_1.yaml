@@ -80,7 +80,8 @@ model:
   _target_: src.pl_modules.model.MyModel
   name: UNet3D
 loss:
-  _target_: src.pl_modules.losses.dice_loss  # cce
+  # _target_: src.pl_modules.losses.dice_loss  # cce
+  _target_: src.pl_modules.losses.cce
 optim:
   optimizer:
     #  Adam-oriented deep learning
