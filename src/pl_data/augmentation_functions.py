@@ -96,12 +96,12 @@ def randomcrop(volume, label, params):
     combined = torch.cat((volume, label), 0)
     cropped = crop(combined, j, k, h, w)
 
-    # # Now transpose to swap depth and height and run another crop
-    # cropped = cropped.permute((0, 2, 1, 3))
-    # cropped = crop(cropped, i, 0, d, w)
+    # Now transpose to swap depth and height and run another crop
+    cropped = cropped.permute((0, 2, 1, 3))
+    cropped = crop(cropped, i, 0, d, w)
 
-    # # Now transpose back to the original ordering and split volume/label
-    # cropped = cropped.permute((0, 2, 1, 3))
+    # Now transpose back to the original ordering and split volume/label
+    cropped = cropped.permute((0, 2, 1, 3))
     volume = cropped[:vol_shape[0]]
     label = cropped[vol_shape[0]:]
     return volume, label
