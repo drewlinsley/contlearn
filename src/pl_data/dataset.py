@@ -166,10 +166,12 @@ class Volumetric(Dataset):
         label = label.permute(self.label_transpose)
 
         # Add augs here
-        volume, label = augment3d(
+        volume, c = augment3d(
             volume=volume,
             label=label,
             augmentations=self.augmentations)
+        volume = volume[:, :64, :64, :64]
+        label = label[:, :64, :64, :64]
         label = label.int()
         return volume, label
 
