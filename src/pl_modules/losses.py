@@ -13,7 +13,7 @@ def cce(input, target):
 def bce(input, target):
     """Binary crossentropy loss. Assumes input is logits."""
     loss = nn.BCEWithLogitsLoss()
-    output = loss(input, target)
+    output = loss(input, target.float())
     return output
 
 
