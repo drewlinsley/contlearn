@@ -81,7 +81,7 @@ model:
   name: UNet3D
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
-  _target_: src.pl_modules.losses.cce
+  _target_: src.pl_modules.losses.bce
 optim:
   optimizer:
     #  Adam-oriented deep learning
@@ -90,9 +90,9 @@ optim:
     lr: 1e-3  # 0.001
     betas: [ 0.9, 0.999 ]
     eps: 1e-08
-    weight_decay: 1e-6
+    # weight_decay: 1e-7
 
-  use_lr_scheduler: False
+  use_lr_scheduler: True
   lr_scheduler:
     _target_: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
     T_0: 10
