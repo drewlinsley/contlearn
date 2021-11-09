@@ -135,8 +135,8 @@ class ResidualUNet3D(Abstract3DUNet):
     Since the model effectively becomes a residual net, in theory it allows for deeper UNet.
     """
 
-    def __init__(self, in_channels, out_channels, final_sigmoid=True, f_maps=64, layer_order='gcr',
-                 num_groups=8, num_levels=5, is_segmentation=True, conv_padding=1, **kwargs):
+    def __init__(self, in_channels, out_channels, final_sigmoid=False, f_maps=64, layer_order='gcr',
+                 num_groups=8, num_levels=3, is_segmentation=False, conv_padding=1, **kwargs):
         super(ResidualUNet3D, self).__init__(in_channels=in_channels,
                                              out_channels=out_channels,
                                              final_sigmoid=final_sigmoid,
@@ -145,6 +145,7 @@ class ResidualUNet3D(Abstract3DUNet):
                                              layer_order=layer_order,
                                              num_groups=num_groups,
                                              num_levels=num_levels,
+                                             pool_kernel_size=(1, 2, 2),
                                              is_segmentation=is_segmentation,
                                              conv_padding=conv_padding,
                                              **kwargs)
@@ -156,7 +157,7 @@ class UNet2D(Abstract3DUNet):
     """
 
     def __init__(self, in_channels, out_channels, final_sigmoid=True, f_maps=64, layer_order='gcr',
-                 num_groups=8, num_levels=4, is_segmentation=True, conv_padding=1, **kwargs):
+                 num_groups=8, num_levels=4, is_segmentation=False, conv_padding=1, **kwargs):
         if conv_padding == 1:
             conv_padding = (0, 1, 1)
         super(UNet2D, self).__init__(in_channels=in_channels,
