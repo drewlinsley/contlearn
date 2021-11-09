@@ -173,6 +173,7 @@ class Volumetric(Dataset):
         # volume = volume[:, :64, :64, :64]
         # label = label[:, :64, :64, :64]
         label = label.int()
+        volume = volume[0][None]
         return volume, label
 
     def __repr__(self) -> str:
