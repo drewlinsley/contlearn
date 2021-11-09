@@ -119,7 +119,7 @@ class Volumetric(Dataset):
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
         self.augmentations = [
-            {"randomcrop": self.shape},
+            # {"randomcrop": self.shape},
             # # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
             # {"randomrotate": [(2, 3)]},  # Axes to rotate
             # {"randomflip": [1, 2, 3]},  # Axes to rotate
@@ -170,8 +170,8 @@ class Volumetric(Dataset):
             volume=volume,
             label=label,
             augmentations=self.augmentations)
-        # volume = volume[:, :64, :64, :64]
-        # label = label[:, :64, :64, :64]
+        volume = volume[:, :64, :64, :64]
+        label = label[:, :64, :64, :64]
         label = label.int()
         volume = volume[0][None]
         return volume, label
