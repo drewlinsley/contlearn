@@ -172,8 +172,9 @@ class Volumetric(Dataset):
             augmentations=self.augmentations)
         volume = volume[:, :32, :80, :80]
         label = label[:, :32, :80, :80]
-        label = label.int()
-        volume = volume[0][None]
+        label = (label == 4).int()
+        # volume = volume[0][None]
+        # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
         return volume, label
 
     def __repr__(self) -> str:
