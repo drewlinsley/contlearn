@@ -170,8 +170,8 @@ class Volumetric(Dataset):
             volume=volume,
             label=label,
             augmentations=self.augmentations)
-        volume = volume[:, :64, :64, :64]
-        label = label[:, :64, :64, :64]
+        volume = volume[:, :32, :80, :80]
+        label = label[:, :32, :80, :80]
         label = label.int()
         volume = volume[0][None]
         return volume, label
