@@ -145,7 +145,8 @@ class ResidualUNet3D(Abstract3DUNet):
                                              layer_order=layer_order,
                                              num_groups=num_groups,
                                              num_levels=num_levels,
-                                             pool_kernel_size=(1, 2, 2),
+                                             pool_kernel_size=(2, 2, 2),
+                                             conv_kernel_size=(3, 3, 3),
                                              is_segmentation=is_segmentation,
                                              conv_padding=conv_padding,
                                              **kwargs)
