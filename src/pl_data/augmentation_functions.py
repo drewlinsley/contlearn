@@ -7,7 +7,6 @@ from torch import Tensor
 from typing import List, Tuple, Any, Optional
 from torchvision.transforms import functional_pil as F_pil
 from torchvision.transforms import functional_tensor as F_t
-import numpy as np
 
 
 def crop(img: Tensor, top: int, left: int, height: int, width: int) -> Tensor:
@@ -122,7 +121,7 @@ def randomcrop(volume, label, params):
     combined = torch.cat((volume, label), 0)
 
     c, h, w, d = combined.shape
-    assert (h, w, d) > np.asarray(params)
+    assert (h, w, d) > tuple(params)
     img_sz = tuple((h, w, d))
     crop_sz = tuple(crop_sz)
 
