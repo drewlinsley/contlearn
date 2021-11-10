@@ -7,6 +7,7 @@ from torch import Tensor
 from typing import List, Tuple, Any, Optional
 from torchvision.transforms import functional_pil as F_pil
 from torchvision.transforms import functional_tensor as F_t
+import numpy as np
 
 
 def crop(img: Tensor, top: int, left: int, height: int, width: int) -> Tensor:
