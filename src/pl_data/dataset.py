@@ -135,6 +135,12 @@ class Volumetric(Dataset):
             "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
             "label": (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
         }
+        if self.trim_dims or self.trim_dims is not None:
+            z = self.trim_dims[0]
+            y = self.trim_dims[1]
+            x = self.trim_dims[2]
+            self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
+            self.ds["label"] = self.ds["label"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
@@ -148,12 +154,6 @@ class Volumetric(Dataset):
         volume = data["volume"]
         # volume = self.norma(volume)
         label = data["label"]
-        if self.trim_dims or self.trim_dims is not None:
-            z = self.trim_dims[0]
-            y = self.trim_dims[1]
-            x = self.trim_dims[2]
-            volume = volume[:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]
-            label = label[:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]
 
         # Add augs here
         volume, label = augment3d(
