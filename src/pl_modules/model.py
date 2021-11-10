@@ -36,7 +36,7 @@ class MyModel(pl.LightningModule):
         mod = import_module(p)
         self.loss = getattr(mod, m)
         if hasattr(self.cfg.loss, "weights") and self.cfg.loss.weights is not None:
-            self.weights = read_gcs(self.cfg.loss.weights)
+            self.weights = self.cfg.loss.weights  # read_gcs(self.cfg.loss.weights)
         else:
             self.weights = 1.
 
