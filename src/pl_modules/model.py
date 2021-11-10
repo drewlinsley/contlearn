@@ -20,6 +20,7 @@ from captum.attr import visualization as viz
 from src.common.utils import iterate_elements_in_batches, render_images
 
 from src.pl_modules import UNet3D
+from src.pl_data.utils import read_gcs
 
 
 class MyModel(pl.LightningModule):
@@ -35,7 +36,7 @@ class MyModel(pl.LightningModule):
         mod = import_module(p)
         self.loss = getattr(mod, m)
         if hasattr(self.cfg.loss, "weights") and self.cfg.loss.weights is not None:
-            self.weights = np.load(self.cfg.loss.weights)
+            self.weights = read_gcs(self.cfg.loss.weights)
         else:
             self.weights = 1.
 

@@ -10,6 +10,7 @@ import tensorflow as tf  # for reading TFRecord Dataset
 import tensorflow_datasets as tfds  # for making tf.data.Dataset to return numpy arrays
 from src.pl_data import augmentation_functions as af
 from inspect import getmembers, isfunction
+from src.pl_data.utils import read_gcs
 
 
 def load_image(directory):
@@ -127,7 +128,9 @@ class Volumetric(Dataset):
             {"normalize_volume": [0, 255]},  # Min/max
         ]
         print("Caching data")
-        ds = np.load(path)
+        file = path.split(os.path.sep)[-1]
+        stem = path.replace(file, "")
+        ds = read_gcs(stem, file)
         self.ds = {
             "volume": torch.as_tensor(ds["volume"]),
             "label": (torch.as_tensor(ds["label"] == self.selected_label).int())[None]  # noqa
