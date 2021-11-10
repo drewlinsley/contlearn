@@ -38,7 +38,7 @@ class MyModel(pl.LightningModule):
         if hasattr(self.cfg.loss, "weights") and self.cfg.loss.weights is not None:
             path = self.cfg.loss.weights
             file = path.split(os.path.sep)[-1]
-            stem = path.replace(file, "")
+            stem = path.replace(file, "")[:-1]
             self.weights = read_gcs(stem, file)
         else:
             self.weights = 1.

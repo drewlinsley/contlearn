@@ -129,7 +129,7 @@ class Volumetric(Dataset):
         ]
         print("Caching data")
         file = path.split(os.path.sep)[-1]
-        stem = path.replace(file, "")
+        stem = path.replace(file, "")[:-1]
         ds = read_gcs(stem, file)
         self.ds = {
             "volume": torch.as_tensor(ds["volume"]),
