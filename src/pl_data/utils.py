@@ -1,9 +1,8 @@
-from io import StringIO
-import tensorflow as tf
+from io import BytesIO
 import numpy as np
 from tensorflow.python.lib.io import file_io
 
 
 def read_gcs(file):
-    import pdb;pdb.set_trace()
-    data = StringIO(file_io.read_file_to_string(file))
+    f_stream = file_io.FileIO(file, 'rb')
+    return np.load(BytesIO(f_stream.read()))
