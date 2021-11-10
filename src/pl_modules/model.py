@@ -39,6 +39,7 @@ class MyModel(pl.LightningModule):
             self.weights = self.cfg.loss.weights  # read_gcs(self.cfg.loss.weights)
         else:
             self.weights = 1.
+        self.weights = torch.tensor(self.weights)
 
         if self.name == "UNet3D":
             self.net = UNet3D.ResidualUNet3D(in_channels=2, out_channels=1)  # Replace this with cfg
