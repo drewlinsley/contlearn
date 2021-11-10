@@ -71,7 +71,7 @@ def center_crop(img: Tensor, output_size: List[int]) -> Tensor:
     return crop(img, crop_top, crop_left, crop_height, crop_width)
 
 
-def randomcrop(volume, label, params):
+def Oldrandomcrop(volume, label, params):
     """Apply random crop to both volume and label."""
     def get_params(vol, vol_shape, output_size):
         print(vol_shape)
@@ -99,6 +99,36 @@ def randomcrop(volume, label, params):
 
     # # Now transpose back to the original ordering and split volume/label
     # cropped = cropped.permute((0, 2, 1, 3))
+    volume = cropped[:vol_shape[0]]
+    label = cropped[vol_shape[0]:]
+    return volume, label
+
+
+def randomcrop(volume, label, params):
+    """Apply random crop to both volume and label."""
+    def _get_slice(sz, crop_sz):
+        try : 
+            lower_bound = torch.randint(sz-crop_sz, (1,)).item()
+            return lower_bound, lower_bound + crop_sz
+        except: 
+            return (None, None)
+
+    def _crop(x, slice_h, slice_w, slice_d):
+        return x[:, slice_h[0]:slice_h[1], slice_w[0]:slice_w[1], slice_d[0]:slice_d[1]]
+
+    vol_shape = volume.shape
+    label_shape = label.shape
+    combined = torch.cat((volume, label), 0)
+
+    c, h, w, d = combined.shape
+    assert (h, w, d) > crop_sz
+    img_sz = tuple((h, w, d))
+    crop_sz = tuple(crop_sz)
+
+    slice_hwd = [_get_slice(i, k) for i, k in zip(img_sz, crop_sz)]
+    cropped = _crop(x, *slice_hwd)
+
+    # Now transpose back to the original ordering and split volume/label
     volume = cropped[:vol_shape[0]]
     label = cropped[vol_shape[0]:]
     return volume, label
