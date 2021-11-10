@@ -10,7 +10,7 @@ core:
 data:
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
-    val_percentage: 0.10
+    val_percentage: 0.0
     use_train_dataset: Celltype_Prediction
     use_val_dataset: Celltype_Prediction
     datasets:
@@ -22,15 +22,15 @@ data:
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
           # len: 97
           len: 128
-          shape: [16, 80, 80]
+          shape: [16, 384, 384]
         val:
           _target_: src.pl_data.dataset.Volumetric
           train: False
-          path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
+          path: gs://serrelab/connectomics/npy/celltype/cells_1.npz
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
           len: 16
-          shape: [16, 80, 80]
+          shape: [16, 384, 384]
         test:
           _target_: src.pl_data.dataset.VolumetricTF
           train: False
@@ -44,7 +44,7 @@ data:
       test: 16
 
     batch_size:
-      train: 8  # 240  # 128
+      train: 2  # 240  # 128
       val: 1 # 240  # 128
       test: 1  # 128
 hydra:
