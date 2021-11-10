@@ -135,7 +135,7 @@ class Volumetric(Dataset):
             "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
             "label": (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
         }
-        if self.trim_dims or self.trim_dims is not None:
+        if self.trim_dims:
             z = self.trim_dims[0]
             y = self.trim_dims[1]
             x = self.trim_dims[2]
