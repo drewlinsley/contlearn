@@ -1,18 +1,9 @@
-from google.cloud import storage
+from StringIO import StringIO
+import tensorflow as tf
+import numpy as np
+from tensorflow.python.lib.io import file_io
 
 
-def read_gcs(bucket_name, blob_name):
-    """Write and read a blob from GCS using file-like IO"""
-    # The ID of your GCS bucket
-    # bucket_name = "your-bucket-name"
-
-    # The ID of your new GCS object
-    # blob_name = "storage-object-name"
+def read_gcs(file):
     import pdb;pdb.set_trace()
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    # Mode can be specified as wb/rb for bytes mode.
-    # See: https://docs.python.org/3/library/io.html
-    with blob.open("r") as f:
-        print(f.read())
+    data = StringIO(file_io.read_file_to_string(file))

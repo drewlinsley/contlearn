@@ -128,9 +128,7 @@ class Volumetric(Dataset):
             {"normalize_volume": [0, 255]},  # Min/max
         ]
         print("Caching data")
-        file = path.split(os.path.sep)[-1]
-        stem = path.replace(file, "")[:-1]
-        ds = read_gcs(stem, file)
+        ds = read_gcs(path)
         self.ds = {
             "volume": torch.as_tensor(ds["volume"]),
             "label": (torch.as_tensor(ds["label"] == self.selected_label).int())[None]  # noqa
