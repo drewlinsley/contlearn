@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset, random_split, Subset
 from torchvision import transforms
 from PIL import Image
 from torch._utils import _accumulate
-from torch import default_generator
+from torch import default_generator, Generator
 from typing import (
     TypeVar,
 )
