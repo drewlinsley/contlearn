@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader, Dataset, random_split, Subset
 from torchvision import transforms
 from PIL import Image
 from torch._utils import _accumulate
+from torch import default_generator
 
 
 def continuous_random_split(dataset: Dataset[T], lengths: Sequence[int],
