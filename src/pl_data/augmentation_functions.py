@@ -173,3 +173,10 @@ def normalize_volume(volume, label, params):
     min_val, max_val = params
     volume = (volume - min_val) / (max_val - min_val)
     return volume, label
+
+
+def normalize_volume_z(volume, label, params):
+    """Apply normalization to volume."""
+    mu, std = params
+    volume = (volume - mu) / std
+    return volume, label

@@ -1,5 +1,4 @@
-VMNAME=pytorch
-TPUNAME=pytorch-tpu
+TPUNAME=pytorch-tpu1
 ZONE=us-central1-a  # europe-west4-a
 # ZONE=europe-west4-a
 # ZONE=us-east1-d
@@ -17,6 +16,6 @@ gcloud alpha compute tpus tpu-vm create $TPUNAME \
 #   --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && pip3 -r install requirements.txt && bash tpu_vm.sh"
 gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
   --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && git checkout gcp && cp netrc ../.netrc && pip install -r requirements.txt"
-gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
-  --command "cd contlearn && bash run_cell_tpu_vm.sh"
+# gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
+#   --command "cd contlearn && bash run_cell_tpu_vm.sh"
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE

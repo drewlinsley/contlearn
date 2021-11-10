@@ -117,6 +117,7 @@ class Volumetric(Dataset):
         self.len = tag.get(train).get("len")
         self.shape = tag.get(train).get("shape")
         self.selected_label = tag.get(train).get("label")
+        self.trim_dims = tag.get(train).get("trim_dims")
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
@@ -125,7 +126,8 @@ class Volumetric(Dataset):
             # # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
             # {"randomrotate": [(2, 3)]},  # Axes to rotate
             # {"randomflip": [1, 2, 3]},  # Axes to rotate
-            {"normalize_volume": [0, 255]},  # Min/max
+            # {"normalize_volume": [0, 255]},  # Min/max
+            {"normalize_volume_z": [150.4, 31.8]},  # Min/max
         ]
         print("Caching data")
         ds = read_gcs(path)
@@ -146,6 +148,12 @@ class Volumetric(Dataset):
         volume = data["volume"]
         # volume = self.norma(volume)
         label = data["label"]
+        if self.trim_dims or self.trim_dims is not None:
+            z = self.trim_dims[z]
+            y = self.trim_dims[y]
+            x = self.trim_dims[x]
+            volume = volume[:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]
+            label = label[:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]
 
         # Add augs here
         volume, label = augment3d(

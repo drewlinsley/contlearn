@@ -23,6 +23,7 @@ data:
           # len: 97
           len: 128
           shape: [16, 224, 224]
+          trim_dims: False
         val:
           _target_: src.pl_data.dataset.Volumetric
           train: False
@@ -31,6 +32,7 @@ data:
           # len: 11
           len: 16
           shape: [16, 224, 224]
+          trim_dims: [[32, 48], [0, 384], [0, 384]]
         test:
           _target_: src.pl_data.dataset.VolumetricTF
           train: False
