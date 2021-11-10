@@ -74,6 +74,7 @@ def center_crop(img: Tensor, output_size: List[int]) -> Tensor:
 def randomcrop(volume, label, params):
     """Apply random crop to both volume and label."""
     def get_params(vol, vol_shape, output_size):
+        print(vol_shape)
         _, d, w, h = vol_shape
         td, th, tw = output_size
 

@@ -130,8 +130,8 @@ class Volumetric(Dataset):
         print("Caching data")
         ds = read_gcs(path)
         self.ds = {
-            "volume": torch.as_tensor(ds["volume"]),
-            "label": (torch.as_tensor(ds["label"] == self.selected_label).int())[None]  # noqa
+            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
+            "label": (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
         }
         if self.len is None:
             print("Counting length of {}".format(train))
