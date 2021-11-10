@@ -149,9 +149,9 @@ class Volumetric(Dataset):
         # volume = self.norma(volume)
         label = data["label"]
         if self.trim_dims or self.trim_dims is not None:
-            z = self.trim_dims[z]
-            y = self.trim_dims[y]
-            x = self.trim_dims[x]
+            z = self.trim_dims[0]
+            y = self.trim_dims[1]
+            x = self.trim_dims[2]
             volume = volume[:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]
             label = label[:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]
 
