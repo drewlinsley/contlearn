@@ -22,7 +22,7 @@ data:
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
           # len: 97
           len: 128
-          shape: [20, 160, 160]
+          shape: [16, 196, 196]
           trim_dims: False
         val:
           _target_: src.pl_data.dataset.Volumetric
@@ -31,7 +31,7 @@ data:
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
           len: 16
-          shape: [20, 160, 160]
+          shape: [16, 196, 196]
           trim_dims: [[30, 50], [0, 228], [0, 228]]
         test:
           _target_: src.pl_data.dataset.VolumetricTF
