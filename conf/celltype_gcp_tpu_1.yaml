@@ -30,13 +30,13 @@ data:
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
           len: 16
-          shape: [16, 160, 160]
+          shape: [16, 80, 80]
         test:
           _target_: src.pl_data.dataset.VolumetricTF
           train: False
           path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           len: 11
-          shape: [16, 160, 160]
+          shape: [16, 80, 80]
 
     num_workers:
       train: 64
@@ -86,7 +86,7 @@ model:
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
   _target_: src.pl_modules.losses.bce
-  weights: gs://serrelab/connectomics/npy/celltype/cells_0_props.npy
+  weights: [4.76]
 optim:
   optimizer:
     #  Adam-oriented deep learning
