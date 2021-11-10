@@ -1,4 +1,4 @@
-from StringIO import StringIO
+from io import StringIO
 import tensorflow as tf
 import numpy as np
 from tensorflow.python.lib.io import file_io
