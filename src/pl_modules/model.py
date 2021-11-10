@@ -34,10 +34,13 @@ class MyModel(pl.LightningModule):
         p, m = self.cfg.loss._target_.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)
-        # self.automatic_optimization = False
+        if hasattr(self.cfg.loss, "weights") and self.cfg.loss.weights is not None:
+            self.weights = np.load(self.cfg.loss.weights)
+        else:
+            self.weights = 1.
 
         if self.name == "UNet3D":
-            self.net = UNet3D.ResidualUNet3D(in_channels=2, out_channels=6)  # Replace this with cfg
+            self.net = UNet3D.ResidualUNet3D(in_channels=2, out_channels=1)  # Replace this with cfg
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
@@ -52,14 +55,13 @@ class MyModel(pl.LightningModule):
     def step(self, x, y) -> Dict[str, torch.Tensor]:
         logits = self(x)
 
-        # Eventually insert Dice loss here
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = self.loss(logits, y)
+            loss = self.loss(logits, y, self.weights)
             loss = loss + penalty
         else:
-            loss = self.loss(logits, y)
+            loss = self.loss(logits, y, self.weights)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
