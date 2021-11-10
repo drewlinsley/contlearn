@@ -121,7 +121,7 @@ def randomcrop(volume, label, params):
     combined = torch.cat((volume, label), 0)
 
     c, h, w, d = combined.shape
-    assert (h, w, d) > crop_sz
+    assert (h, w, d) > params
     img_sz = tuple((h, w, d))
     crop_sz = tuple(crop_sz)
 
