@@ -9,6 +9,10 @@ from torchvision import transforms
 from PIL import Image
 from torch._utils import _accumulate
 from torch import default_generator
+from typing import (
+    TypeVar,
+)
+T = TypeVar('T')
 
 
 def continuous_random_split(dataset: Dataset[T], lengths: Sequence[int],
