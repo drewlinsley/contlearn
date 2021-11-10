@@ -11,6 +11,7 @@ from torch._utils import _accumulate
 from torch import default_generator, Generator
 from typing import (
     TypeVar,
+    List,
 )
 T = TypeVar('T')
 
