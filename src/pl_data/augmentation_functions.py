@@ -125,7 +125,7 @@ def randomcrop(volume, label, params):
     img_sz = tuple((h, w, d))
     crop_sz = tuple(crop_sz)
 
-    slice_hwd = [_get_slice(i, k) for i, k in zip(img_sz, crop_sz)]
+    slice_hwd = [_get_slice(i, k) for i, k in zip(img_sz, params)]
     cropped = _crop(x, *slice_hwd)
 
     # Now transpose back to the original ordering and split volume/label
