@@ -101,8 +101,28 @@ def run(cfg: DictConfig) -> None:
     # Instantiate the callbacks
     callbacks: List[Callback] = build_callbacks(cfg=cfg)
 
-    # Logger instantiation/configuration
+    if cfg.eval_only:
+        if cfg.model.weights is not None:
+            print("Loading weights from ", cfg.model.weights)
+            #model = model.load_from_checkpoint(cfg.model.weights)
+            model = weights_update(model=model, checkpoint=torch.load(cfg.model.weights))
 
+        trainer = pl.Trainer(
+            logger=False,
+            default_root_dir=Path('./experiments/train'),
+            deterministic=cfg.train.deterministic,
+            val_check_interval=cfg.logging.val_check_interval,
+            log_every_n_steps=10,
+            progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
+            auto_select_gpus=True,
+            **cfg.train.pl_trainer,
+        )
+
+        hydra.utils.log.info(f"EVAL ONLY SELECTED. Starting testing!")
+        trainer.test(model=model, datamodule=datamodule)
+        sys.exit()
+
+    # Logger instantiation/configuration
     wandb_logger = None
     if "wandb" in cfg.logging:
         hydra.utils.log.info(f"Instantiating <WandbLogger>")
