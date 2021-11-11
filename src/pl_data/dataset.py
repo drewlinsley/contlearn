@@ -168,6 +168,83 @@ class Volumetric(Dataset):
         return f"MyDataset({self.name}, {self.path})"
 
 
+class VolumetricTEST(Dataset):
+    def __init__(
+        self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs  # noqa
+    ):
+        super().__init__()
+        self.cfg = cfg
+        self.path = path
+        self.train = train
+        self.transform = transform
+        # if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores == 1:  # noqa
+        #     self.cache = True  # Push to CFG
+        # else:
+        #     self.cache = False  # Push to CFG
+        self.cache = False  # Push to CFG
+        self.repeat = True  # Push to CFG
+        self.shuffle = True  # Push to CFG
+        self.vol_size = [64, 128, 128, 2]
+        self.label_size = [64, 128, 128, 6]
+        self.vol_transpose = (3, 0, 1, 2)
+        self.label_transpose = (3, 0, 1, 2)
+        # self.batch_size = 1
+        tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
+        train = "train" if self.train else "val"
+        self.len = tag.get(train).get("len")
+        self.shape = tag.get(train).get("shape")
+        self.selected_label = tag.get(train).get("label")
+        self.trim_dims = tag.get(train).get("trim_dims")
+        self.shuffle_buffer = min(32, self.len)
+        # self.shuffle_buffer = min(64, self.len)
+        # self.len = None  # TESTING AUTO-COUNT
+        self.augmentations = [
+            {"randomcrop": self.shape},
+            # # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
+            # {"randomrotate": [(2, 3)]},  # Axes to rotate
+            # {"randomflip": [1, 2, 3]},  # Axes to rotate
+            # {"normalize_volume": [0, 255]},  # Min/max
+            {"normalize_volume_z": [150.4, 31.8]},  # Min/max
+        ]
+        print("Caching data")
+        ds = read_gcs(path)
+        self.ds = {
+            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
+        }
+        self.ds["label"] = torch.zeros_like(self.ds["volume"])
+        if self.trim_dims:
+            z = self.trim_dims[0]
+            y = self.trim_dims[1]
+            x = self.trim_dims[2]
+            self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
+            self.ds["label"] = self.ds["label"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
+        if self.len is None:
+            print("Counting length of {}".format(train))
+            self.len = len([idx for idx, _ in enumerate(self.ds)])
+            print("Found length of {}".format(self.len))
+
+    def __len__(self) -> int:
+        return self.len
+
+    def __getitem__(self, index: int):
+        data = self.ds
+        volume = data["volume"]
+        # volume = self.norma(volume)
+        label = data["label"]
+
+        # Add augs here
+        volume, label = augment3d(
+            volume=volume,
+            label=label,
+            augmentations=self.augmentations)
+        # volume = volume[0][None]
+        # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
+        return volume, label
+
+    def __repr__(self) -> str:
+        return f"MyDataset({self.name}, {self.path})"
+
+
 class VolumetricTF(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs  # noqa
