@@ -25,6 +25,7 @@ data:
           len: 128
           shape: [16, 160, 160]
           trim_dims: False
+          label: 4
         val:
           _target_: src.pl_data.dataset.Volumetric
           train: False
@@ -34,12 +35,14 @@ data:
           len: 16
           shape: [16, 160, 160]
           trim_dims: [[30, 50], [0, 228], [0, 228]]
+          label: 4
         test:
           _target_: src.pl_data.dataset.VolumetricTF
           train: False
           path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           len: 11
           shape: [16, 80, 80]
+          label: 4
 
     num_workers:
       train: 64
