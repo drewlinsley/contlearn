@@ -86,6 +86,7 @@ logging:
 model:
   _target_: src.pl_modules.model.MyModel
   name: UNet3D
+  weights: None
   # weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2
   out_channels: 1
