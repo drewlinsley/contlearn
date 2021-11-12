@@ -11,7 +11,7 @@ tensorflow_datasets
 rising
 captum
 matplotlib
-pytorchvideo
+# pytorchvideo
 torchvision
 tfrecord
 gcsfs
