@@ -6,6 +6,7 @@ core:
 
 #defaults:
 #  - override hydra/launcher: joblib
+eval_only: False
 
 data:
   datamodule:
