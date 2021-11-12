@@ -21,7 +21,6 @@ from src.common.utils import iterate_elements_in_batches, render_images
 
 from src.pl_modules import UNet3D
 from src.pl_data.utils import read_gcs
-import sys
 
 
 class MyModel(pl.LightningModule):
