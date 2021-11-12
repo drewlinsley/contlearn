@@ -65,6 +65,14 @@ def build_callbacks(cfg: DictConfig) -> List[Callback]:
     return callbacks
 
 
+def weights_update(model, checkpoint):
+    model_dict = model.state_dict()
+    pretrained_dict = {k: v for k, v in checkpoint['state_dict'].items() if k in model_dict}
+    model_dict.update(pretrained_dict)
+    model.load_state_dict(model_dict)
+    return model
+
+
 def run(cfg: DictConfig) -> None:
     """
     Generic train loop
@@ -104,17 +112,16 @@ def run(cfg: DictConfig) -> None:
     if cfg.eval_only:
         if cfg.model.weights is not None:
             print("Loading weights from ", cfg.model.weights)
-            #model = model.load_from_checkpoint(cfg.model.weights)
             model = weights_update(model=model, checkpoint=torch.load(cfg.model.weights))
 
         trainer = pl.Trainer(
             logger=False,
-            default_root_dir=Path('./experiments/train'),
-            deterministic=cfg.train.deterministic,
+            default_root_dir=hydra_dir,  # Path('./experiments/train'),
+            # deterministic=cfg.train.deterministic,
             val_check_interval=cfg.logging.val_check_interval,
-            log_every_n_steps=10,
-            progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
-            auto_select_gpus=True,
+            log_every_n_steps=cfg.logging.log_every_n_steps,
+            # progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
+            # auto_select_gpus=True,
             **cfg.train.pl_trainer,
         )
 

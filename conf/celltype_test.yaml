@@ -4,9 +4,14 @@ core:
   tags:
     - connectomics
 
-#defaults:
-#  - override hydra/launcher: joblib
 eval_only: True
+
+model:
+  _target_: src.pl_modules.model.MyModel
+  name: UNet3D
+  weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
+  in_channels: 2
+  out_channels: 1
 
 data:
   datamodule:
@@ -26,32 +31,34 @@ data:
           shape: [16, 160, 160]
           trim_dims: False
         val:
-          _target_: src.pl_data.dataset.Volumetric
+          _target_: src.pl_data.dataset.VolumetricTEST
           train: False
-          path: gs://serrelab/connectomics/npy/celltype/cells_1.npz
+          path: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/connectomics_data_scratch_v1/mag1_membranes/x0010/y0079/z0001/110629_k0725_mag1_x0010_y0079_z0001.raw.npy
+          trim_dims: [[0, 32], [0, 384], [0, 384]]
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
-          len: 16
-          shape: [16, 160, 160]
-          trim_dims: [[30, 50], [0, 228], [0, 228]]
+          len: 1
+          shape: [384, 1152, 1152]
+          # trim_dims: False
         test:
           _target_: src.pl_data.dataset.VolumetricTEST
           train: False
           path: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/connectomics_data_scratch_v1/mag1_membranes/x0010/y0079/z0001/110629_k0725_mag1_x0010_y0079_z0001.raw.npy
+          trim_dims: [[0, 32], [0, 32], [0, 32]]
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
-          len: 16
-          shape: [16, 160, 160]
-          trim_dims: [[30, 50], [0, 228], [0, 228]]
+          len: 1
+          shape: [384, 1152, 1152]
+          # trim_dims: False
 
     num_workers:
-      train: 64
-      val: 16
-      test: 16
+      train: 4
+      val: 4
+      test: 4
 
     batch_size:
-      train: 2  # 240  # 128
-      val: 2 # 240  # 128
+      train: 1  # 240  # 128
+      val: 1 # 240  # 128
       test: 1  # 128
 hydra:
   run:
@@ -86,14 +93,17 @@ logging:
   lr_monitor:
     logging_interval: "step"
     log_momentum: False
-model:
-  _target_: src.pl_modules.model.MyModel
-  name: UNet3D
-  weights: /media/data_cifs/projects/prj_vis_sim/cont_learn/experiments/multirun/2021-10-18/20-43-37/0_0/experiments/2021-10-18/20-43-37/cont-learn/2iikvy74/checkpoints/epoch=125-step=35783.ckpt
+
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
-  _target_: src.pl_modules.losses.bce
+  _target_: src.pl_modules.losses.no_loss
   weights: 4.76
+
+metric:
+  name: Accuracy
+  _target_: torchmetrics.Accuracy  # src.pl_modules.losses.no_loss
+  is_function: True
+
 optim:
   optimizer:
     #  Adam-oriented deep learning
@@ -123,7 +133,7 @@ train:
     fast_dev_run: False # Enable this for debug purposes
     gpus: 1
     # tpu_cores: 1
-    precision: 32
+    precision: 16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
     num_sanity_val_steps: 2

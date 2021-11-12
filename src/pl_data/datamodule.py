@@ -93,8 +93,9 @@ class MyDataModule(pl.LightningDataModule):
                 )
         if stage is None or stage == "test":
             self.test_datasets = [
-                hydra.utils.instantiate(x, cfg=self.cfg, transform=transform, _recursive_=False)
-                for x in self.datasets[self.use_train_dataset].test
+                # hydra.utils.instantiate(x, cfg=self.cfg, transform=transform, _recursive_=False)
+                # for x in self.datasets[self.use_train_dataset].test
+                hydra.utils.instantiate(self.datasets[self.use_train_dataset].test, cfg=self.cfg, transform=transform, _recursive_=False)
             ]
 
     def train_dataloader(self) -> DataLoader:

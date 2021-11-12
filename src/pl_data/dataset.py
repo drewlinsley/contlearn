@@ -1,3 +1,4 @@
+import numpy as np
 from omegaconf import DictConfig, ValueNode
 import torch
 from torch.utils.data import Dataset
@@ -207,17 +208,17 @@ class VolumetricTEST(Dataset):
             {"normalize_volume_z": [150.4, 31.8]},  # Min/max
         ]
         print("Caching data")
-        ds = read_gcs(path)
-        self.ds = {
-            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
-        }
-        self.ds["label"] = torch.zeros_like(self.ds["volume"])
+        ds = np.load(path)
+        ds = ds.transpose((3, 0, 1, 2))
         if self.trim_dims:
             z = self.trim_dims[0]
             y = self.trim_dims[1]
             x = self.trim_dims[2]
-            self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
-            self.ds["label"] = self.ds["label"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
+            ds = ds[:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
+        self.ds = {
+            "volume": torch.as_tensor(ds).to(torch.uint8),
+        }
+        self.ds["label"] = torch.zeros_like(self.ds["volume"])[0][None]  # Match idealized output size
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])

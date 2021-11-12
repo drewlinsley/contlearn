@@ -1,18 +1,18 @@
 pathlib
 Pillow
-git-deps
+# git-deps
 pytorch-lightning
 hydra-core
 wandb
-dvc
+# dvc
 python-dotenv
 tensorflow
 tensorflow_datasets
 rising
 captum
 matplotlib
-pytorchvideo
-torchvision
+# pytorchvideo
+# torchvision
 tfrecord
 gcsfs
 pytest

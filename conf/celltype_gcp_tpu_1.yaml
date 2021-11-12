@@ -85,10 +85,17 @@ logging:
 model:
   _target_: src.pl_modules.model.MyModel
   name: UNet3D
+  # weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
+  in_channels: 2
+  out_channels: 1
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
   _target_: src.pl_modules.losses.bce
   weights: 4.76
+metric:
+  name: Accuracy
+  _target_: torchmetrics.Accuracy  # src.pl_modules.losses.no_loss
+  is_function: True
 optim:
   optimizer:
     #  Adam-oriented deep learning
