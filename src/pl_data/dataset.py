@@ -119,16 +119,23 @@ class Volumetric(Dataset):
         self.shape = tag.get(train).get("shape")
         self.selected_label = tag.get(train).get("label")
         self.trim_dims = tag.get(train).get("trim_dims")
+
+        assert self.len is not None, "self.len returned None"
+        assert self.shape is not None, "self.shape returned None"
+        assert self.selected_label is not None, "self.selected_label returned None"
+        assert self.trim_dims is not None, "self.trim_dims returned None"
+
+
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
         self.augmentations = [
             {"randomcrop": self.shape},
-            # # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
-            # {"randomrotate": [(2, 3)]},  # Axes to rotate
-            # {"randomflip": [1, 2, 3]},  # Axes to rotate
-            # {"normalize_volume": [0, 255]},  # Min/max
-            {"normalize_volume_z": [150.4, 31.8]},  # Min/max
+            # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
+            {"randomrotate": [(2, 3)]},  # Axes to rotate
+            {"randomflip": [1, 2, 3]},  # Axes to rotate
+            {"normalize_volume": [0, 255]},  # Min/max
+            # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
         ]
         print("Caching data")
         ds = read_gcs(path)
