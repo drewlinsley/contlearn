@@ -21,10 +21,11 @@ from src.common.utils import iterate_elements_in_batches, render_images
 
 from src.pl_modules import UNet3D
 from src.pl_data.utils import read_gcs
+import sys
 
 
 class MyModel(pl.LightningModule):
-    def __init__(self, cfg: DictConfig, name, *args, **kwargs) -> None:
+    def __init__(self, cfg: DictConfig, name, weights, in_channels, out_channels, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cfg = cfg
         if hasattr(self.cfg.train.pl_trainer, "gpus"):
@@ -42,11 +43,17 @@ class MyModel(pl.LightningModule):
         self.weights = torch.tensor(self.weights)
 
         if self.name == "UNet3D":
-            self.net = UNet3D.ResidualUNet3D(in_channels=2, out_channels=1)  # Replace this with cfg
+            self.net = UNet3D.ResidualUNet3D(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)  # Replace this with cfg
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
-        metric = torchmetrics.Accuracy()
+        # metric_mod = import_module(torchmetrics)
+        # metric = getattr(metric_mod, self.cfg.metric.name)()
+        p, m = self.cfg.metric._target_.rsplit('.', 1)
+        mod = import_module(p)
+        metric = getattr(mod, m)
+        if self.cfg.metric.is_function:
+            metric = metric()
         self.train_accuracy = metric.clone().to(self.device)
         self.val_accuracy = metric.clone().to(self.device)
         self.test_accuracy = metric.clone().to(self.device)
@@ -109,8 +116,9 @@ class MyModel(pl.LightningModule):
         }
 
     def test_step(self, batch: Any, batch_idx: int) -> Dict[str, torch.Tensor]:
-        x, y = batch
-        out = self.step(x, y)
+        with torch.no_grad():
+            x, y = batch
+            out = self.step(x, y)
         return out
 
     def test_step_end(self, out):
@@ -170,6 +178,9 @@ class MyModel(pl.LightningModule):
         # noise_tunnel = NoiseTunnel(integrated_gradients)
         
         # self.logger.experiment.log({"Test Images": images}, step=self.global_step)
+        outputs[0]['logits'].detach().cpu().numpy().squeeze().max()
+        from matplotlib import pyplot as plt
+        plt.subplot(131);plt.imshow(outputs[0]['image'].detach().cpu().numpy().squeeze()[0, 31]);plt.subplot(132);plt.imshow(outputs[0]['image'].detach().cpu().numpy().squeeze()[1, 31]);plt.subplot(133);plt.imshow(outputs[0]['logits'].detach().cpu().numpy().squeeze()[31].astype(np.float32));plt.show()
         return  # Don't need this stuff below vvvv
 
         for output_element in iterate_elements_in_batches(
