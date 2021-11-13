@@ -24,7 +24,7 @@ from src.pl_data.utils import read_gcs
 
 
 class MyModel(pl.LightningModule):
-    def __init__(self, cfg: DictConfig, name, weights, in_channels, out_channels, *args, **kwargs) -> None:
+    def __init__(self, cfg: DictConfig, name, weights, in_channels, out_channels, plot_argmax, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cfg = cfg
         if hasattr(self.cfg.train.pl_trainer, "gpus"):
