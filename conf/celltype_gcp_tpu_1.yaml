@@ -14,7 +14,6 @@ data:
     val_percentage: 0.0
     use_train_dataset: Celltype_Prediction
     use_val_dataset: Celltype_Prediction
-    plot_argmax: False
     datasets:
       Celltype_Prediction:
         train:
@@ -94,6 +93,7 @@ model:
   # weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2
   out_channels: 1
+  plot_argmax: False
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
   _target_: src.pl_modules.losses.bce
