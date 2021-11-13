@@ -6,6 +6,7 @@ def no_loss(input, target, weights=None):
     """Dummy function."""
     return torch.tensor([0.])
 
+
 def cce(input, target, weights=None):
     """Categorical crossentropy loss. Assumes input is logits."""
     loss = nn.CrossEntropyLoss(weight=weights)

@@ -14,6 +14,7 @@ data:
     val_percentage: 0.0
     use_train_dataset: Celltype_Prediction
     use_val_dataset: Celltype_Prediction
+    plot_argmax: False
     datasets:
       Celltype_Prediction:
         train:
@@ -34,7 +35,7 @@ data:
           # len: 11
           len: 16
           shape: [16, 160, 160]
-          trim_dims: [[30, 50], [0, 228], [0, 228]]
+          trim_dims: [[34, 52], [156, 384], [156, 384]]
           label: 4
         test:
           _target_: src.pl_data.dataset.VolumetricTF
@@ -98,8 +99,8 @@ loss:
   _target_: src.pl_modules.losses.bce
   weights: 4.76
 metric:
-  name: Accuracy
-  _target_: torchmetrics.Accuracy  # src.pl_modules.losses.no_loss
+  name: F1
+  _target_: torchmetrics.F1  # src.pl_modules.losses.no_loss
   is_function: True
 optim:
   optimizer:

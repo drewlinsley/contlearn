@@ -30,6 +30,7 @@ load_envs()
 
 
 def build_callbacks(cfg: DictConfig) -> List[Callback]:
+    """TODO: are these messing with multi-tpu training?""" 
     callbacks: List[Callback] = []
 
     if "lr_monitor" in cfg.logging:

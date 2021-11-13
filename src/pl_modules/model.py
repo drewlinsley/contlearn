@@ -145,15 +145,22 @@ class MyModel(pl.LightningModule):
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
                 input_seg = output_element["image"][1, mid, ...].unsqueeze(dim=0)
-                gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
-                output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
-
+                if self.cfg.data.datamodule.plot_argmax:
+                    gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
+                    output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
+                else:
+                    gt = output_element["y_true"][:, mid, ...].unsqueeze(dim=0)
+                    output_seg = output_element["logits"][:, mid, ...].unsqueeze(dim=0)
                 rendered_image = render_images([input_img, input_seg, gt, output_seg], autoshow=False, nrow=4)
                 caption = f"image____mem____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
             else:
                 input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
-                gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
-                output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
+                if self.cfg.data.datamodule.plot_argmax:
+                    gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
+                    output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
+                else:
+                    gt = output_element["y_true"][:, mid, ...].unsqueeze(dim=0)
+                    output_seg = output_element["logits"][:, mid, ...].unsqueeze(dim=0)
                 rendered_image = render_images([input_img, gt, output_seg], autoshow=False, nrow=4)
                 caption = f"image____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
             images.append(
