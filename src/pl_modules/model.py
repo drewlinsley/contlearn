@@ -32,7 +32,6 @@ class MyModel(pl.LightningModule):
         else:
             self.save_hyperparameters()
         self.name = name
-        self.plot_argmax = plot_argmax
         p, m = self.cfg.loss._target_.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)
@@ -146,7 +145,7 @@ class MyModel(pl.LightningModule):
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
                 input_seg = output_element["image"][1, mid, ...].unsqueeze(dim=0)
-                if self.plot_argmax:
+                if self.cfg.data.datamodule.plot_argmax:
                     gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
                     output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
                 else:
@@ -156,7 +155,7 @@ class MyModel(pl.LightningModule):
                 caption = f"image____mem____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
             else:
                 input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
-                if self.plot_argmax:
+                if self.cfg.data.datamodule.plot_argmax:
                     gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
                     output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
                 else:
