@@ -96,7 +96,7 @@ model:
   plot_argmax: False
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
-  _target_: src.pl_modules.losses.bce
+  _target_: src.pl_modules.losses.dice_loss
   weights: 4.76
 metric:
   name: F1
@@ -112,7 +112,7 @@ optim:
     eps: 1e-08
     # weight_decay: 1e-7
 
-  use_lr_scheduler: True
+  use_lr_scheduler: False
   lr_scheduler:
     _target_: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
     T_0: 10
@@ -131,7 +131,7 @@ train:
     fast_dev_run: False # Enable this for debug purposes
     # gpus: 8
     tpu_cores: 1
-    precision: 16
+    precision: bf16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
     num_sanity_val_steps: 2
