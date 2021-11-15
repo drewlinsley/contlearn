@@ -24,7 +24,7 @@ data:
           # len: 97
           len: 128
           shape: [16, 160, 160]
-          trim_dims: False
+          trim_dims: [[0, 384], [340, 768], [340, 768]]
           label: 4
         val:
           _target_: src.pl_data.dataset.Volumetric
@@ -96,7 +96,7 @@ model:
   plot_argmax: False
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
-  _target_: src.pl_modules.losses.dice_loss
+  _target_: src.pl_modules.losses.bce
   weights: 4.76
 metric:
   name: F1
