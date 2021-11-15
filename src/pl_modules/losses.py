@@ -17,6 +17,8 @@ def cce(input, target, weights=None):
 
 def bce(input, target, weights=None):
     """Binary crossentropy loss. Assumes input is logits."""
+    weights_len = len(weights)
+    weights = weights.reshape(1, weights_len, 1, 1, 1)
     loss = nn.BCEWithLogitsLoss(weight=weights)
     output = loss(input, target.float())
     return output
