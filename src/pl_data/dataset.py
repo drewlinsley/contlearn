@@ -144,10 +144,7 @@ class Volumetric(Dataset):
         if self.selected_label:
             self.ds["label"] = (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
         else:
-            self.ds["label"] = torch.as_tensor(ds["label"]) # noqa
-            self.ds["label"] = F.one_hot(
-                self.ds["label"].to(torch.int64), 6).to(
-                torch.uint8).permute(3, 0, 1, 2)
+            self.ds["label"] = torch.as_tensor(ds["label"])[None] # noqa
 
         if self.trim_dims:
             z = self.trim_dims[0]
@@ -157,6 +154,13 @@ class Volumetric(Dataset):
             self.ds["label"] = self.ds["label"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
         del ds.f
         ds.close()
+
+        if not self.selected_label:
+            self.ds["label"] = self.ds["label"][0]
+            self.ds["label"] = F.one_hot(
+                self.ds["label"].to(torch.int64), 6).to(
+                torch.uint8).permute(3, 0, 1, 2)
+
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
