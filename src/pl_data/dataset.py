@@ -132,8 +132,8 @@ class Volumetric(Dataset):
         self.augmentations = [
             {"randomcrop": self.shape},
             # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
-            {"randomrotate": [(2, 3)]},  # Axes to rotate
-            {"randomflip": [1, 2, 3]},  # Axes to rotate
+            # {"randomrotate": [(2, 3)]},  # Axes to rotate
+            # {"randomflip": [1, 2, 3]},  # Axes to rotate
             {"normalize_volume": [0, 255]},  # Min/max
             # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
         ]
