@@ -25,7 +25,7 @@ data:
           len: 128
           shape: [16, 160, 160]
           trim_dims: [[0, 384], [0, 384], [340, 768]]
-          label: 4
+          label: False
         val:
           _target_: src.pl_data.dataset.Volumetric
           train: False
@@ -37,7 +37,7 @@ data:
           shape: [16, 160, 160]
           # trim_dims: [[34, 52], [156, 384], [156, 384]]
           trim_dims: [[140, 180], [0, 384], [0, 340]]
-          label: 4
+          label: False
         test:
           _target_: src.pl_data.dataset.VolumetricTF
           train: False
@@ -45,7 +45,7 @@ data:
           path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
           len: 11
           trim_dims: [[140, 180], [0, 384], [0, 340]]
-          label: 4
+          label: False
 
     num_workers:
       train: 64
@@ -95,12 +95,12 @@ model:
   weights: None
   # weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2
-  out_channels: 1
-  plot_argmax: False
+  out_channels: 6
+  plot_argmax: True
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
   _target_: src.pl_modules.losses.bce
-  weights: 4.76
+  weights: [1, 1, 1, 1, 4.76, 1]
 metric:
   name: F1
   _target_: torchmetrics.F1  # src.pl_modules.losses.no_loss

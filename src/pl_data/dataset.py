@@ -122,10 +122,8 @@ class Volumetric(Dataset):
 
         assert self.len is not None, "self.len returned None"
         assert self.shape is not None, "self.shape returned None"
-        assert self.selected_label is not None, "self.selected_label returned None"
+        assert self.selected_label is not None, "self.selected_label returned None"  # noqa
         assert self.trim_dims is not None, "self.trim_dims returned None"
-
-
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
@@ -141,8 +139,12 @@ class Volumetric(Dataset):
         ds = read_gcs(path)
         self.ds = {
             "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
-            "label": (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
         }
+        if self.selected_label:
+            self.ds["label"] = (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
+        else:
+            self.ds["label"] = torch.as_tensor(ds["label"]).to(torch.uint8)  # noqa
+
         if self.trim_dims:
             z = self.trim_dims[0]
             y = self.trim_dims[1]
