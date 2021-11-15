@@ -144,10 +144,10 @@ class Volumetric(Dataset):
         if self.selected_label:
             self.ds["label"] = (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
         else:
-            self.ds["label"] = torch.as_tensor(ds["label"]).to(torch.uint8).permute(3, 0, 1, 2)  # noqa
+            self.ds["label"] = torch.as_tensor(ds["label"]) # noqa
             self.ds["label"] = F.one_hot(
                 self.ds["label"].to(torch.int64), 6).to(
-                self.ds["label"].dtype)
+                torch.uint8).permute(3, 0, 1, 2)
 
         if self.trim_dims:
             z = self.trim_dims[0]
