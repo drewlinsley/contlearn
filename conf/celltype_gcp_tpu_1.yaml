@@ -36,7 +36,7 @@ data:
           len: 10
           shape: [16, 160, 160]
           # trim_dims: [[34, 52], [156, 384], [156, 384]]
-          trim_dims: [[140, 180], [0, 384]s, [0, 340]]
+          trim_dims: [[140, 180], [0, 384], [0, 340]]
           label: 4
         test:
           _target_: src.pl_data.dataset.VolumetricTF
@@ -44,7 +44,7 @@ data:
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
           len: 11
-          trim_dims: [[140, 180], [0, 384]s, [0, 340]]
+          trim_dims: [[140, 180], [0, 384], [0, 340]]
           label: 4
 
     num_workers:
