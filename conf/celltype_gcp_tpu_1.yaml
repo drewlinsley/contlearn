@@ -29,12 +29,14 @@ data:
         val:
           _target_: src.pl_data.dataset.Volumetric
           train: False
-          path: gs://serrelab/connectomics/npy/celltype/cells_1.npz
+          # path: gs://serrelab/connectomics/npy/celltype/cells_1.npz
+          path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
           len: 16
           shape: [16, 160, 160]
-          trim_dims: [[34, 52], [156, 384], [156, 384]]
+          # trim_dims: [[34, 52], [156, 384], [156, 384]]
+          trim_dims: [[140, 180], [0, 340], [0, 340]]
           label: 4
         test:
           _target_: src.pl_data.dataset.VolumetricTF
