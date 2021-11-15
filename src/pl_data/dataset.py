@@ -12,6 +12,7 @@ import tensorflow_datasets as tfds
 from src.pl_data import augmentation_functions as af
 from inspect import getmembers, isfunction
 from src.pl_data.utils import read_gcs
+from torch.nn import functional as F
 
 
 def load_image(directory):
@@ -144,6 +145,9 @@ class Volumetric(Dataset):
             self.ds["label"] = (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
         else:
             self.ds["label"] = torch.as_tensor(ds["label"]).to(torch.uint8)  # noqa
+            self.ds["label"] = F.one_hot(
+                self.ds["label"].to(torch.int64), 6).to(
+                self.ds["label"].dtype)
 
         if self.trim_dims:
             z = self.trim_dims[0]
