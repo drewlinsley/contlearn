@@ -41,9 +41,10 @@ data:
         test:
           _target_: src.pl_data.dataset.VolumetricTF
           train: False
-          path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
+          # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
+          path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
           len: 11
-          shape: [16, 80, 80]
+          trim_dims: [[140, 180], [0, 340], [0, 340]]
           label: 4
 
     num_workers:

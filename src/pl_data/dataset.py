@@ -149,6 +149,8 @@ class Volumetric(Dataset):
             x = self.trim_dims[2]
             self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
             self.ds["label"] = self.ds["label"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
+        del ds.f
+        ds.close()
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
