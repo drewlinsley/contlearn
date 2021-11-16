@@ -135,7 +135,7 @@ class ResidualUNet3D(Abstract3DUNet):
     Since the model effectively becomes a residual net, in theory it allows for deeper UNet.
     """
 
-    def __init__(self, in_channels, out_channels, final_sigmoid=False, f_maps=64, layer_order='gcr',
+    def __init__(self, in_channels, out_channels, final_sigmoid=False, f_maps=32, layer_order='gcr',
                  num_groups=8, num_levels=5, is_segmentation=False, conv_padding=3//2, **kwargs):
         super(ResidualUNet3D, self).__init__(in_channels=in_channels,
                                              out_channels=out_channels,

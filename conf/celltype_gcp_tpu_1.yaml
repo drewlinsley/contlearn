@@ -98,9 +98,9 @@ model:
   out_channels: 6
   plot_argmax: True
 loss:
-  _target_: src.pl_modules.losses.dice_loss  # cce
-  # _target_: src.pl_modules.losses.bce
-  weights: [4.76]
+  # _target_: src.pl_modules.losses.dice_loss  # cce
+  _target_: src.pl_modules.losses.bce
+  weights: [1, 1, 1, 1, 4.76, 1]
 metric:
   name: F1
   _target_: torchmetrics.F1  # src.pl_modules.losses.no_loss
