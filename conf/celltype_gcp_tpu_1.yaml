@@ -98,8 +98,8 @@ model:
   out_channels: 6
   plot_argmax: True
 loss:
-  # _target_: src.pl_modules.losses.dice_loss  # cce
-  _target_: src.pl_modules.losses.bce
+  _target_: src.pl_modules.losses.dice_loss  # cce
+  # _target_: src.pl_modules.losses.bce
   weights: [4.76]
 metric:
   name: F1
