@@ -172,7 +172,7 @@ class Volumetric(Dataset):
             self.ds["label"] = F.one_hot(
                 self.ds["label"].to(torch.int64),
                 int(self.ds["label"].max() + 1)).to(
-                torch.uint8).permute(0, 4, 1, 2, 3)
+                torch.uint8).permute(3, 0, 1, 2)
             self.ds["label"] = self.ds["label"]
         else:
             self.ds["label"] = self.ds["label"][None]  # Add singleton channel
