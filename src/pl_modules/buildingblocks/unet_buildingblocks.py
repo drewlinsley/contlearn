@@ -157,15 +157,15 @@ class ExtResNetBlock(nn.Module):
         super(ExtResNetBlock, self).__init__()
 
         # first convolution
-        self.conv1 = SingleConv(in_channels, out_channels, kernel_size=kernel_size, order=order, num_groups=num_groups)
+        self.conv1 = SingleConv(in_channels, out_channels, kernel_size=kernel_size, order=order, num_groups=num_groups, padding=kwargs["padding"])
         # residual block
-        self.conv2 = SingleConv(out_channels, out_channels, kernel_size=kernel_size, order=order, num_groups=num_groups)
+        self.conv2 = SingleConv(out_channels, out_channels, kernel_size=kernel_size, order=order, num_groups=num_groups, padding=kwargs["padding"])
         # remove non-linearity from the 3rd convolution since it's going to be applied after adding the residual
         n_order = order
         for c in 'rel':
             n_order = n_order.replace(c, '')
         self.conv3 = SingleConv(out_channels, out_channels, kernel_size=kernel_size, order=n_order,
-                                num_groups=num_groups)
+                                num_groups=num_groups, padding=kwargs["padding"])
 
         # create non-linearity separately
         if 'l' in order:

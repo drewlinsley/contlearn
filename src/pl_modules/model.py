@@ -41,10 +41,8 @@ class MyModel(pl.LightningModule):
             self.weights = 1.
         self.weights = torch.tensor(self.weights)
 
-        if self.name == "UNet3D":
-            self.net = UNet3D.ResidualUNet3D(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)  # Replace this with cfg
-        else:
-            raise NotImplementedError("Could not find network {}.".format(self.net))
+        model = getattr(UNet3D, self.name)
+        self.net = model(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)
 
         # metric_mod = import_module(torchmetrics)
         # metric = getattr(metric_mod, self.cfg.metric.name)()

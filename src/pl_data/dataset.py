@@ -121,6 +121,8 @@ class Volumetric(Dataset):
         self.shape = tag.get(train).get("shape")
         self.selected_label = tag.get(train).get("selected_label")
         self.trim_dims = tag.get(train).get("trim_dims")
+        import pdb;pdb.set_trace()
+        self.force_2d = tag.get(train).get("force_2d")
 
         assert self.len is not None, "self.len returned None"
         assert self.shape is not None, "self.shape returned None"
@@ -198,6 +200,9 @@ class Volumetric(Dataset):
             augmentations=self.augmentations)
         # volume = volume[0][None]
         # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
+        if self.force_2d:
+            volume = volume.squeeze(1)
+            label = label.squeeze(1)
         return volume, label
 
     def __repr__(self) -> str:
