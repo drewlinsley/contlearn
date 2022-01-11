@@ -1,4 +1,5 @@
-module load python/3.7.4
+
+module load python/3.8
 module load cuda/11.3.1
 module load cudnn/8.2.0
 virtualenv -p python3 pytorch.venv

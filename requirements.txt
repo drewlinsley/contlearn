@@ -18,3 +18,4 @@ gcsfs
 pytest
 # hydra-joblib-launcher
 webknossos
+fastremap
