@@ -118,7 +118,7 @@ class Volumetric(Dataset):
         train = "train" if self.train else "val"
         self.len = tag.get(train).get("len")
         self.shape = tag.get(train).get("shape")
-        self.selected_label = tag.get(train).get("label")
+        self.selected_label = tag.get(train).get("selected_label")
         self.trim_dims = tag.get(train).get("trim_dims")
 
         assert self.len is not None, "self.len returned None"
@@ -141,10 +141,18 @@ class Volumetric(Dataset):
         self.ds = {
             "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
         }
-        if self.selected_label:
-            self.ds["label"] = (torch.as_tensor(ds["label"] == self.selected_label).to(torch.uint8))[None]  # noqa
-        else:
+
+        # Remap labels if requested
+        if isinstance(self.selected_label, dict):
+            self.ds["label"] = fastremap.remap(
+                self.ds["label"],
+                self.selected_label,
+                preserve_missing_labels=True,
+                in_place=True)
+        elif not self.selected_label:
             self.ds["label"] = torch.as_tensor(ds["label"])[None] # noqa
+        else:
+            raise RuntimeError("The selected_label must be a dictionary or False.")
 
         if self.trim_dims:
             z = self.trim_dims[0]
@@ -155,10 +163,9 @@ class Volumetric(Dataset):
         del ds.f
         ds.close()
 
-        if not self.selected_label:
-            self.ds["label"] = self.ds["label"][0]
+        if isinstance(self.selected_label, dict):
             self.ds["label"] = F.one_hot(
-                self.ds["label"].to(torch.int64), 6).to(
+                self.ds["label"].to(torch.int64), int(self.ds["label"].max() + 1)).to(
                 torch.uint8).permute(3, 0, 1, 2)
 
         if self.len is None:
