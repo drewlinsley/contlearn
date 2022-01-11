@@ -140,7 +140,7 @@ class Volumetric(Dataset):
         print("Caching data")
         ds = read_gcs(path)
         self.ds = {
-            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
+            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8)[None],
         }
 
         # Remap labels if requested
@@ -172,7 +172,7 @@ class Volumetric(Dataset):
             self.ds["label"] = F.one_hot(
                 self.ds["label"].to(torch.int64),
                 int(self.ds["label"].max() + 1)).to(
-                torch.uint8).permute(3, 0, 1, 2)
+                torch.uint8).permute(0, 4, 1, 2, 3)
 
         if self.len is None:
             print("Counting length of {}".format(train))

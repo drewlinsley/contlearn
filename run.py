@@ -9,7 +9,7 @@ import hydra
 import omegaconf
 import pytorch_lightning as pl
 from hydra.core.hydra_config import HydraConfig
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback, seed_everything
 #from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.callbacks import (
@@ -27,6 +27,9 @@ os.chdir(Path(__file__).parent.parent)
 
 # Load environment variables
 load_envs()
+
+# Create handy resolvers for the omegaconfs
+OmegaConf.register_new_resolver("mult", lambda x, y: x * y)
 
 
 def build_callbacks(cfg: DictConfig) -> List[Callback]:
