@@ -1,6 +1,7 @@
 import numpy as np
 from omegaconf import DictConfig, ValueNode
 import torch
+import fastremap
 from torch.utils.data import Dataset
 from os import listdir
 from os.path import isfile, join
@@ -143,16 +144,20 @@ class Volumetric(Dataset):
         }
 
         # Remap labels if requested
-        if isinstance(self.selected_label, dict):
+        if type(dict(self.selected_label)) is dict:
+            self.selected_label = dict(self.selected_label)
             self.ds["label"] = fastremap.remap(
-                self.ds["label"],
+                ds["label"],
                 self.selected_label,
                 preserve_missing_labels=True,
                 in_place=True)
+
         elif not self.selected_label:
-            self.ds["label"] = torch.as_tensor(ds["label"])[None] # noqa
+            self.ds["label"] = ds["label"]
         else:
-            raise RuntimeError("The selected_label must be a dictionary or False.")
+            raise RuntimeError(
+                "The selected_label must be a dictionary or False.")
+        self.ds["label"] = torch.as_tensor(self.ds["label"])[None] # noqa
 
         if self.trim_dims:
             z = self.trim_dims[0]
@@ -163,9 +168,10 @@ class Volumetric(Dataset):
         del ds.f
         ds.close()
 
-        if isinstance(self.selected_label, dict):
+        if type(dict(self.selected_label)) is dict:
             self.ds["label"] = F.one_hot(
-                self.ds["label"].to(torch.int64), int(self.ds["label"].max() + 1)).to(
+                self.ds["label"].to(torch.int64),
+                int(self.ds["label"].max() + 1)).to(
                 torch.uint8).permute(3, 0, 1, 2)
 
         if self.len is None:
