@@ -17,3 +17,4 @@ tfrecord
 gcsfs
 pytest
 # hydra-joblib-launcher
+webknossos
