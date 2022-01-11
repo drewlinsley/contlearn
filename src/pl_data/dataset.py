@@ -140,7 +140,7 @@ class Volumetric(Dataset):
         print("Caching data")
         ds = read_gcs(path)
         self.ds = {
-            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8)[None],
+            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
         }
 
         # Remap labels if requested
