@@ -157,7 +157,7 @@ class Volumetric(Dataset):
         else:
             raise RuntimeError(
                 "The selected_label must be a dictionary or False.")
-        self.ds["label"] = torch.as_tensor(self.ds["label"])[None] # noqa
+        self.ds["label"] = torch.as_tensor(self.ds["label"])  # noqa
 
         if self.trim_dims:
             z = self.trim_dims[0]
@@ -173,7 +173,7 @@ class Volumetric(Dataset):
                 self.ds["label"].to(torch.int64),
                 int(self.ds["label"].max() + 1)).to(
                 torch.uint8).permute(0, 4, 1, 2, 3)
-            self.ds["label"] = self.ds["label"].squeeze(0)  # Remove the singleton channel
+            self.ds["label"] = self.ds["label"].squeeze(0)  # noqa Remove the singleton channel
 
         if self.len is None:
             print("Counting length of {}".format(train))
