@@ -162,7 +162,9 @@ class ResidualUNet2D(Abstract3DUNet):
     """
 
     def __init__(self, in_channels, out_channels, final_sigmoid=False, f_maps=64, layer_order='gcr',
-                 num_groups=8, num_levels=5, is_segmentation=False, conv_padding=3//2, **kwargs):
+                 num_groups=8, num_levels=5, is_segmentation=False, conv_padding=1, **kwargs):
+        if conv_padding == 1:
+            conv_padding = (0, 1, 1)
         super(ResidualUNet3D, self).__init__(in_channels=in_channels,
                                              out_channels=out_channels,
                                              final_sigmoid=final_sigmoid,
