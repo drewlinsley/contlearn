@@ -164,7 +164,7 @@ class Volumetric(Dataset):
             y = self.trim_dims[1]
             x = self.trim_dims[2]
             self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
-            self.ds["label"] = self.ds["label"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
+            self.ds["label"] = self.ds["label"][z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
         del ds.f
         ds.close()
 
@@ -173,7 +173,9 @@ class Volumetric(Dataset):
                 self.ds["label"].to(torch.int64),
                 int(self.ds["label"].max() + 1)).to(
                 torch.uint8).permute(0, 4, 1, 2, 3)
-            self.ds["label"] = self.ds["label"].squeeze(0)  # noqa Remove the singleton channel
+            self.ds["label"] = self.ds["label"]
+        else:
+            self.ds["label"] = self.ds["label"][None]  # Add singleton channel
 
         if self.len is None:
             print("Counting length of {}".format(train))
