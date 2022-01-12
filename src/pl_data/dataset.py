@@ -121,7 +121,6 @@ class Volumetric(Dataset):
         self.shape = tag.get(train).get("shape")
         self.selected_label = tag.get(train).get("selected_label")
         self.trim_dims = tag.get(train).get("trim_dims")
-        import pdb;pdb.set_trace()
         self.force_2d = tag.get(train).get("force_2d")
 
         assert self.len is not None, "self.len returned None"

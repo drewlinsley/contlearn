@@ -41,7 +41,6 @@ class MyModel(pl.LightningModule):
             self.weights = 1.
         self.weights = torch.tensor(self.weights)
 
-        import pdb;pdb.set_trace()
         if force_2d:
             model = getattr(resnet, self.name)
         else:
