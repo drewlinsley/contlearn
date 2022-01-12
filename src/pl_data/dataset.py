@@ -201,8 +201,8 @@ class Volumetric(Dataset):
         if self.force_2d:
             volume = volume.squeeze(1)
             label = label.squeeze(1)
-        else:
-            volume = volume[0][None]
+        # else:
+        #     volume = volume[0][None]
         return volume, label
 
     def __repr__(self) -> str:

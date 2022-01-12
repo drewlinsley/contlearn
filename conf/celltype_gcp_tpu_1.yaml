@@ -17,7 +17,7 @@ train:
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
     # gpus: 8
-    tpu_cores: 1
+    tpu_cores: 8
     precision: bf16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
@@ -42,9 +42,11 @@ train:
 
 model:
   _target_: src.pl_modules.model.MyModel
-  name: "resnet50"  # ResidualUNet2D
-  weights: None  # Set a path to use pretrained weights
-  # weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
+  name: ResidualUNet2D
+  loss: src.pl_modules.losses.cce
+  loss_weights: False  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
+  ckpt: False
+  # ckpt: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2  # Image/Membrane inputs
   out_channels: 3  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
   force_2d: True  # Use a 2d model
@@ -99,14 +101,9 @@ data:
       test: 1
 
     batch_size:
-      train: ${mult:8,16}
-      val: ${mult:8,16}
-      test: ${mult:8,16}
-
-loss:
-  # _target_: src.pl_modules.losses.dice_loss  # cce
-  _target_: src.pl_modules.losses.cce
-  weights: 1  # [1, 1, 1, 1, 4.76, 1]
+      train: ${mult:8,1}
+      val: ${mult:8,1}
+      test: ${mult:8,1}
 
 metric:
   name: F1
