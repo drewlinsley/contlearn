@@ -19,12 +19,13 @@ from captum.attr import visualization as viz
 
 from src.common.utils import iterate_elements_in_batches, render_images
 
-from src.pl_modules import UNet3D, resnet
+from src.pl_modules import UNet3D, resnet, unet
 from src.pl_data.utils import read_gcs
+from src.pl_modules import losses
 
 
 class MyModel(pl.LightningModule):
-    def __init__(self, cfg: DictConfig, name, weights, in_channels, out_channels, force_2d, plot_argmax, *args, **kwargs) -> None:
+    def __init__(self, cfg: DictConfig, name, loss_weights, ckpt, loss, in_channels, out_channels, force_2d, plot_argmax, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cfg = cfg
         if hasattr(self.cfg.train.pl_trainer, "gpus"):
@@ -32,20 +33,22 @@ class MyModel(pl.LightningModule):
         else:
             self.save_hyperparameters()
         self.name = name
-        p, m = self.cfg.loss._target_.rsplit('.', 1)
+        p, m = loss.rsplit('.', 1)
         mod = import_module(p)
-        self.loss = getattr(mod, m)
-        if hasattr(self.cfg.loss, "weights") and self.cfg.loss.weights is not None:
-            self.weights = self.cfg.loss.weights  # read_gcs(self.cfg.loss.weights)
+        self.loss = getattr(mod, m)  # getattr(losses, loss)
+        if loss_weights:
+            self.loss_weights = torch.tensor(loss_weights)
         else:
-            self.weights = 1.
-        self.weights = torch.tensor(self.weights)
+            self.loss_weights = None
 
-        if force_2d:
-            model = getattr(resnet, self.name)
-        else:
-            model = getattr(UNet3D, self.name)
-        self.net = model(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)
+        # if force_2d:
+        #     model = getattr(resnet, self.name)
+        # else:
+        #     model = getattr(UNet3D, self.name)
+
+        self.ckpt = ckpt
+        self.net = unet.UNet(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)
+        # self.net = model(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)
 
         # metric_mod = import_module(torchmetrics)
         # metric = getattr(metric_mod, self.cfg.metric.name)()
@@ -67,11 +70,10 @@ class MyModel(pl.LightningModule):
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = self.loss(logits, y, self.weights)
+            loss = self.loss(logits, y, self.loss_weights)
             loss = loss + penalty
         else:
-            loss = self.loss(logits, y, self.weights)
-        print(loss.shape)
+            loss = self.loss(logits, y, self.loss_weights)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
