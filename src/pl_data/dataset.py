@@ -197,11 +197,12 @@ class Volumetric(Dataset):
             volume=volume,
             label=label,
             augmentations=self.augmentations)
-        # volume = volume[0][None]
         # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
         if self.force_2d:
             volume = volume.squeeze(1)
             label = label.squeeze(1)
+        else:
+            volume = volume[0][None]
         return volume, label
 
     def __repr__(self) -> str:
