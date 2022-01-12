@@ -40,6 +40,16 @@ train:
 # The total batch size should be a multiple of 1024 (128 per TPU core), and feature dimension sizes should be a multiple of 8.
 # Using a batch size of 1024 and feature dimensions that are a multiple of 128 results in the best efficiency, although this may not be possible for all models.
 
+model:
+  _target_: src.pl_modules.model.MyModel
+  name: "resnet50"  # ResidualUNet2D
+  weights: None  # Set a path to use pretrained weights
+  # weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
+  in_channels: 2  # Image/Membrane inputs
+  out_channels: 3  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
+  force_2d: True  # Use a 2d model
+  plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
+
 data:
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
@@ -57,7 +67,7 @@ data:
           len: 128
           shape: [1, 128, 128]
           trim_dims: [[0, 384], [0, 384], [340, 768]]
-          force_2d: True
+          force_2d: "${model.force_2d}"
           selected_label: {1: 1, 2: 1, 3: 0, 4: 0, 5: 2, 6: 1}
           # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
         val:
@@ -71,7 +81,7 @@ data:
           shape: [1, 128, 128]
           # trim_dims: [[34, 52], [156, 384], [156, 384]]
           trim_dims: [[140, 180], [0, 384], [0, 340]]
-          force_2d: True
+          force_2d: "${model.force_2d}"
           selected_label: {1: 1, 2: 1, 3: 0, 4: 0, 5: 2, 6: 1}
         test:
           _target_: src.pl_data.dataset.VolumetricTF
@@ -80,7 +90,7 @@ data:
           path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
           len: 11
           trim_dims: [[140, 180], [0, 384], [0, 340]]
-          force_2d: True
+          force_2d: "${model.force_2d}"
           selected_label: {1: 1, 2: 1, 3: 0, 4: 0, 5: 2, 6: 1}
 
     num_workers:
@@ -92,15 +102,6 @@ data:
       train: ${mult:8,16}
       val: ${mult:8,16}
       test: ${mult:8,16}
-
-model:
-  _target_: src.pl_modules.model.MyModel
-  name: ResidualUNet2D
-  weights: None  # Set a path to use pretrained weights
-  # weights: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
-  in_channels: 2  # Image/Membrane inputs
-  out_channels: 3  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
-  plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
 
 loss:
   # _target_: src.pl_modules.losses.dice_loss  # cce
