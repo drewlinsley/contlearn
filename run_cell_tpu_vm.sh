@@ -7,6 +7,7 @@ cp netrc ../.netrc
 # python3 run.py --config-name=celltype_gcp_tpu_1.yaml -m model.name=ResidualUNet2D
 export PT_XLA_DEBUG=1
 export USE_TORCH=ON
+unset LD_PRELOAD
 
 python3 run.py --config-name=celltype_gcp_tpu_1.yaml
 # gsutil -m cp -r results/* gs://serrelab/connectomics/results/

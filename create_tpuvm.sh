@@ -9,7 +9,7 @@ gcloud alpha compute tpus tpu-vm delete $TPUNAME --zone=$ZONE --quiet
 gcloud alpha compute tpus tpu-vm create $TPUNAME \
 --zone=$ZONE \
 --accelerator-type=v3-8 \
---version=v2-alpha \
+--version=tpu-vm-pt-1.10  # v2-alpha \
 # --boot-disk-size=200GB \
 
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
