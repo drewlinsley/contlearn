@@ -53,6 +53,7 @@ model:
   plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
 
 data:
+  path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
     val_percentage: 0.0
@@ -63,7 +64,7 @@ data:
         train:
           _target_: src.pl_data.dataset.Volumetric
           train: True
-          path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
+          path: "${data.path}"
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
           # len: 97
           len: 128
@@ -76,7 +77,7 @@ data:
           _target_: src.pl_data.dataset.Volumetric
           train: False
           # path: gs://serrelab/connectomics/npy/celltype/cells_1.npz
-          path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
+          path: "${data.path}"
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
           len: 10
@@ -89,7 +90,7 @@ data:
           _target_: src.pl_data.dataset.VolumetricTF
           train: False
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
-          path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
+          path: "${data.path}"
           len: 11
           trim_dims: [[140, 180], [0, 384], [0, 340]]
           force_2d: "${model.force_2d}"

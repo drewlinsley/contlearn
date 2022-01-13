@@ -3,6 +3,7 @@ from omegaconf import DictConfig, ValueNode
 import torch
 import fastremap
 from torch.utils.data import Dataset
+import os
 from os import listdir
 from os.path import isfile, join
 from PIL import Image
@@ -139,7 +140,8 @@ class Volumetric(Dataset):
             # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
         ]
         print("Caching data")
-        ds = read_gcs(path)
+        # ds = read_gcs(path)
+        ds = np.load(path.split(os.path.sep)[-1])
         self.ds = {
             "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
         }
