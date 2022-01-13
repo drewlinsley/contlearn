@@ -14,6 +14,6 @@ cp netrc ../.netrc
 dlpath=$(python -c "from omegaconf import OmegaConf;conf = OmegaConf.load('conf/celltype_gcp_tpu_1.yaml');print(conf.data.path)")
 gsutil cp $dlpath .
 
-python3 run.py --config-name=celltype_gcp_tpu_1.yaml
+python run.py --config-name=celltype_gcp_tpu_1.yaml
 # gsutil -m cp -r results/* gs://serrelab/connectomics/results/
 # gsutil -m cp -r results/*/*/*/*/results/*/*/*/*/* gs://serrelab/connectomics/results/
