@@ -7,7 +7,8 @@ cp netrc ../.netrc
 # python3 run.py --config-name=celltype_gcp_tpu_1.yaml -m model.name=ResidualUNet2D
 # export PT_XLA_DEBUG=1
 # export USE_TORCH=ON
-unset LD_PRELOAD
+
+# unset LD_PRELOAD
 
 # DL the data
 dlpath=$(python -c "from omegaconf import OmegaConf;conf = OmegaConf.load('conf/celltype_gcp_tpu_1.yaml');print(conf.data.path)")
