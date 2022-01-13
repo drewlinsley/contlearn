@@ -22,6 +22,7 @@ from src.common.utils import iterate_elements_in_batches, render_images
 from src.pl_modules import UNet3D, unet
 from src.pl_data.utils import read_gcs
 from src.pl_modules import losses
+from src.pl_modules import dice_loss
 
 
 class MyModel(pl.LightningModule):
@@ -47,7 +48,7 @@ class MyModel(pl.LightningModule):
         self.name = name
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
-        self.loss = getattr(mod, m)  # getattr(losses, loss)
+        self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
         else:
@@ -84,10 +85,10 @@ class MyModel(pl.LightningModule):
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = self.loss(logits, y, self.loss_weights)
+            loss = self.loss.forward(logits, y, self.loss_weights)
             loss = loss + penalty
         else:
-            loss = self.loss(logits, y, self.loss_weights)
+            loss = self.loss.forward(logits, y, self.loss_weights)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
