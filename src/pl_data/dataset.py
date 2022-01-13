@@ -141,7 +141,11 @@ class Volumetric(Dataset):
         ]
         print("Caching data")
         # ds = read_gcs(path)
-        ds = np.load(path.split(os.path.sep)[-1])
+        ds = np.load(
+            os.path.join(
+                os.path.sep.join(
+                    os.getcwd().split(os.path.sep)[:-3]),
+                path.split(os.path.sep)[-1]))
         self.ds = {
             "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
         }
