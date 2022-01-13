@@ -120,8 +120,8 @@ def randomcrop(volume, label, params):
     img_sz = tuple((d, h, w))
 
     slice_hwd = [_get_slice(i, k) for i, k in zip(img_sz, params)]
-    cropped = _crop(volume, *slice_hwd)
-    cropped = _crop(label, *slice_hwd)
+    volume = _crop(volume, *slice_hwd)
+    label = _crop(label, *slice_hwd)
     return volume, label
 
 
