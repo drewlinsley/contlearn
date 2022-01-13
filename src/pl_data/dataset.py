@@ -141,6 +141,8 @@ class Volumetric(Dataset):
         ]
         print("Caching data")
         # ds = read_gcs(path)
+        # TODO: incorporate class weighting here
+        # compute_class_weight(class_weight='balanced', classes=np.unique(l), y=l.ravel())
         ds = np.load(
             os.path.join(
                 os.path.sep.join(
