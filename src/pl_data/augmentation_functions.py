@@ -115,22 +115,13 @@ def randomcrop(volume, label, params):
 
     def _crop(x, slice_h, slice_w, slice_d):
         return x[:, slice_h[0]:slice_h[1], slice_w[0]:slice_w[1], slice_d[0]:slice_d[1]]
-
-    vol_shape = volume.shape
-    label_shape = label.shape
-    combined = torch.cat((volume, label), 0)
-
-    c, h, w, d = combined.shape
+    _, d, h, w = volume.shape
     crop_sz = tuple(params)
-    assert (h, w, d) > crop_sz
-    img_sz = tuple((h, w, d))
+    img_sz = tuple((d, h, w))
 
     slice_hwd = [_get_slice(i, k) for i, k in zip(img_sz, params)]
-    cropped = _crop(combined, *slice_hwd)
-
-    # Now transpose back to the original ordering and split volume/label
-    volume = cropped[:vol_shape[0]]
-    label = cropped[vol_shape[0]:]
+    cropped = _crop(volume, *slice_hwd)
+    cropped = _crop(label, *slice_hwd)
     return volume, label
 
 
