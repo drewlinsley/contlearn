@@ -7,6 +7,7 @@ from omegaconf import DictConfig, ValueNode
 from torch.utils.data import DataLoader, Dataset, random_split, Subset
 from torchvision import transforms
 from PIL import Image
+
 from torch._utils import _accumulate
 from torch import default_generator, Generator
 from typing import (
@@ -67,7 +68,8 @@ class MyDataModule(pl.LightningDataModule):
                 # transforms.Resize((100, 100)),
                 # transforms.RandomHorizontalFlip(p=0.5),
                 # transforms.RandomVerticalFlip(p=0.5),
-                transforms.ToTensor(),
+                # tio.RescaleIntensity(out_min_max=(0, 1)),
+                # transforms.ToTensor(),
             ]
         )
 

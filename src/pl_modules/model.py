@@ -194,7 +194,8 @@ class MyModel(pl.LightningModule):
         if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores > 1:
             pass
         else:
-            self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
+            # self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
+            self.logger.experiment.log({"Validation Images": images})
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
@@ -237,8 +238,10 @@ class MyModel(pl.LightningModule):
                     caption=caption,
                 ))
             plt.close(vz[0])
-        self.logger.experiment.log({"Test Images": images}, step=self.global_step)
-        self.logger.experiment.log({"Test Images Feature Viz": images_feat_viz}, step=self.global_step)
+        # self.logger.experiment.log({"Test Images": images}, step=self.global_step)
+        # self.logger.experiment.log({"Test Images Feature Viz": images_feat_viz}, step=self.global_step)
+        self.logger.experiment.log({"Test Images": images})
+        self.logger.experiment.log({"Test Images Feature Viz": images_feat_viz})
 
     def configure_optimizers(
         self,
