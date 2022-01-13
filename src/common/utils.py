@@ -81,9 +81,10 @@ def iterate_elements_in_batches(
     """
     count = 0
     for output in outputs:
+        sz = len(output)
         for i in range(batch_size):
             count += 1
-            if count >= n_elements:
+            if count >= n_elements or count > sz:
                 return
             yield {
                 key: value if len(value.shape) == 0 else value[i]
