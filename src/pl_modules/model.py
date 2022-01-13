@@ -25,7 +25,19 @@ from src.pl_modules import losses
 
 
 class MyModel(pl.LightningModule):
-    def __init__(self, cfg: DictConfig, name, loss_weights, ckpt, loss, in_channels, out_channels, force_2d, plot_argmax, *args, **kwargs) -> None:
+    def __init__(
+            self,
+            cfg: DictConfig,
+            name,
+            loss_weights,
+            ckpt,
+            loss,
+            in_channels,
+            out_channels,
+            force_2d,
+            plot_argmax,
+            *args,
+            **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cfg = cfg
         if hasattr(self.cfg.train.pl_trainer, "gpus"):
@@ -41,14 +53,16 @@ class MyModel(pl.LightningModule):
         else:
             self.loss_weights = None
 
-        # if force_2d:
-        #     model = getattr(resnet, self.name)
-        # else:
-        #     model = getattr(UNet3D, self.name)
-
+        if force_2d:
+            self.net = unet.UNet(
+                in_channels=self.cfg.model.in_channels,
+                out_channels=self.cfg.model.out_channels)
+        else:
+            model = getattr(UNet3D, self.name)
+            self.net = model(
+                in_channels=self.cfg.model.in_channels,
+                out_channels=self.cfg.model.out_channels)
         self.ckpt = ckpt
-        self.net = unet.UNet(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)
-        # self.net = model(in_channels=self.cfg.model.in_channels, out_channels=self.cfg.model.out_channels)
 
         # metric_mod = import_module(torchmetrics)
         # metric = getattr(metric_mod, self.cfg.metric.name)()
