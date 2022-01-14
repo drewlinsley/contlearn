@@ -57,7 +57,7 @@ class GetData():
             assert self.scale is not None, "You must specify dataset scale."
             assert self.annotation_type in ["nml", "volumetric"], "You must specify annotation_type {'nml', 'volumetric'}"  # noqa
             assert self.wkdataset is not None, "You must specify the original dataset."  # noqa
-            assert self.image_layer_name is not None, "You must specify an image layer name. (Volume? color?)"  # noqa
+            assert self.image_layer_name is not None, "You must specify an image layer name. (images? color?)"  # noqa
             with wk.webknossos_context(
                     url="https://webknossos.org",
                     token=self.token):
