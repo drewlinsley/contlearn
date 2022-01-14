@@ -37,7 +37,7 @@ class GetData():
         self.data_type = data_type
         self.token = token
 
-    def __call__(self):
+    def load(self):
         if self.data_type == "GCS":
             ds = read_gcs(path)
             # Check that ds is an npz
