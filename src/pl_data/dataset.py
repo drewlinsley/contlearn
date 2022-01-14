@@ -123,7 +123,7 @@ class Volumetric(Dataset):
         self.selected_label = tag.get(train).get("selected_label")
         self.trim_dims = tag.get(train).get("trim_dims")
         self.force_2d = tag.get(train).get("force_2d")
-        self.token = self.cfg.data.token
+        token = self.cfg.data.token
 
         assert self.len is not None, "self.len returned None"
         assert self.shape is not None, "self.shape returned None"
