@@ -123,6 +123,7 @@ class Volumetric(Dataset):
         self.selected_label = tag.get(train).get("selected_label")
         self.trim_dims = tag.get(train).get("trim_dims")
         self.force_2d = tag.get(train).get("force_2d")
+        self.token = self.cfg.data.token
 
         assert self.len is not None, "self.len returned None"
         assert self.shape is not None, "self.shape returned None"
@@ -142,7 +143,7 @@ class Volumetric(Dataset):
         print("Caching data")
         # ds = read_gcs(path)
 
-        data = GetData(path)
+        data = GetData(path, token)
         volume, label = data.load()
 
         # TODO: incorporate class weighting here

@@ -54,6 +54,7 @@ model:
 
 data:
   path: gs://serrelab/connectomics/npy/celltype/cells_0.npz
+  token: False
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
     val_percentage: 0.0
