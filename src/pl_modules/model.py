@@ -110,8 +110,8 @@ class MyModel(pl.LightningModule):
                 "train_acc": self.train_accuracy,
                 "train_loss": out["loss"].mean(),
             },
-            on_step=True,
-            on_epoch=False
+            on_step=False,
+            on_epoch=True
         )
         return out["loss"].mean()
 

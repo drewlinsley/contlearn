@@ -8,11 +8,12 @@ cp netrc ../.netrc
 # export PT_XLA_DEBUG=1
 # export USE_TORCH=ON
 
-# unset LD_PRELOAD
+unset LD_PRELOAD
 
-# DL the data
-dlpath=$(python -c "from omegaconf import OmegaConf;conf = OmegaConf.load('conf/celltype_gcp_tpu_1.yaml');print(conf.data.path)")
-gsutil cp $dlpath .
+# # TEST CASE DL the data
+# dlpath=$(python -c "from omegaconf import OmegaConf;conf = OmegaConf.load('conf/celltype_gcp_tpu_1.yaml');print(conf.data.path)")
+# gsutil cp $dlpath .
+
 
 python run.py --config-name=celltype_gcp_tpu_1.yaml
 # gsutil -m cp -r results/* gs://serrelab/connectomics/results/
