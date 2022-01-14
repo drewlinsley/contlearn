@@ -150,16 +150,17 @@ class GetData():
                         startc = coord - (cube_size // 2)
                         startc = startc.astype(int)
                         endc = startc + cube_size
+                        import pdb;pdb.set_trace()
+                        cube = draw_cube(
+                            cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
+                            annotation_size,  # label size
+                            cube_size,  # volume shape
+                            dtype=label_vol.dtype,
+                            label=label)
                         label_vol[
                             startc[0]: endc[0],
                             startc[1]: endc[1],
-                            startc[2]: endc[2]] = draw_cube(
-                                cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
-                                annotation_size,  # label size
-                                cube_size,  # volume shape
-                                dtype=label_vol.dtype,
-                                label=label
-                            )
+                            startc[2]: endc[2]] = cube
                     import pdb;pdb.set_trace()
                     return volume, label_vol
 
