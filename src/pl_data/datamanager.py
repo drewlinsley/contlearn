@@ -4,6 +4,7 @@ import numpy as np
 from tensorflow.python.lib.io import file_io
 from time import gmtime, strftime
 from skimage.transform import resize
+from webknossos.geometry import Mag
 import fastremap
 
 
