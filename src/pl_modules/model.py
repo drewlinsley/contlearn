@@ -105,14 +105,14 @@ class MyModel(pl.LightningModule):
 
     def training_step_end(self, out):
         self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
-        # self.log_dict(
-        #     {
-        #         "train_acc": self.train_accuracy,
-        #         "train_loss": out["loss"].mean(),
-        #     },
-        #     on_step=True,
-        #     on_epoch=False
-        # )
+        self.log_dict(
+            {
+                "train_acc": self.train_accuracy,
+                "train_loss": out["loss"].mean(),
+            },
+            on_step=True,
+            on_epoch=False
+        )
         return out["loss"].mean()
 
     def validation_step(self, batch: Any, batch_idx: int) -> Dict[str, torch.Tensor]:
