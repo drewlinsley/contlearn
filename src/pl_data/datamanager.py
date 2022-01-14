@@ -4,6 +4,7 @@ import numpy as np
 from tensorflow.python.lib.io import file_io
 from time import gmtime, strftime
 from skimage.transform import resize
+import fastremap
 
 
 def read_gcs(file):
@@ -80,11 +81,14 @@ class GetData():
                             labels.append(node.groupId)
                             coords.append(node.nodes[0].position)
                     labels = np.asarray(labels)
+                    labels, remapping = fastremap.renumber(
+                        labels,
+                        in_place=True)
                     coords = np.asarray(coords)
 
                     import pdb;pdb.set_trace()
-                    min_coords = labels.min(0)
-                    max_coords = labels.max(0)
+                    min_coords = coords.min(0)
+                    max_coords = coords.max(0)
                     diffs = max_coords - min_coords
                     bbox = (
                         tuple(min_coords.tolist()),
