@@ -12,7 +12,7 @@ def read_gcs(file):
 
 class GetData():
     """Class for managing different dataset types."""
-    def __init__(self, path, token=None):
+    def __init__(self, path, cfg):
         self.path = path
 
         # Interpret the dataset type:
@@ -27,7 +27,9 @@ class GetData():
                 "Could not recognize the data resource: {}".format(
                     path))
         self.data_type = data_type
-        self.token = token
+        self.token = cfg.token
+        self.scale = cfg.scale
+        self.annotation_type = cfg.annotation_type
 
     def load(self):
         if self.data_type == "GCS":
