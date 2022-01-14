@@ -3,6 +3,7 @@ from io import BytesIO
 import numpy as np
 from tensorflow.python.lib.io import file_io
 from time import gmtime, strftime
+from skimage.transform import resize
 
 
 def read_gcs(file):
@@ -31,6 +32,9 @@ class GetData():
         self.scale = cfg.scale
         self.annotation_type = cfg.annotation_type
         self.wkdataset = cfg.wkdataset
+        self.annotation_size = cfg.annotation_size
+        self.image_transpose_xyz_zyx = cfg.image_transpose_xyz_zyx
+        self.image_downsample = cfg.downsample
 
     def load(self):
         if self.data_type == "GCS":
@@ -60,17 +64,72 @@ class GetData():
                 # Either extract nml data or volumetric data
                 if self.annotation_type == "nml":
                     # These are synapse annotations
+                    assert self.annotation_size is not None, "You are using an nml and must specify annotation size"  # noqa
                     original_dataset = annotation.skeleton
                     nml_meta = annotation._nml[0]
                     nml_list = [x for x in annotation._nml[1:] if len(x)]
                     nml_lens = [len(x) for x in nml_list]
                     annotations = nml_list[np.argmax(nml_lens)]
-                    nml_labels = nml_list[-2]
+                    nml_label_key = nml_list[-2]
                     import pdb;pdb.set_trace()
-                    # There are multiple entries in the NML list. Figure
-                    # out how to handle these in the future.
-                    bbox = None  # Alternatively use the bounds of the nml?
+
+                    # Get the labels and xyzs in each annotation
+                    labels, coords = [], []
+                    for node in annotations:
+                        if len(node.nodes):
+                            labels.append(node.groupId)
+                            coords.append(node.nodes[0].position)
+                    labels = np.asarray(labels)
+                    coords = np.asarray(coords)
+
+                    # Remove bad nodes
                     import pdb;pdb.set_trace()
+                    mask = coords != False  # noqa
+                    labels = labels[mask]
+                    coords = coords[mask]
+
+                    min_coords = labels.min(0)
+                    max_coords = labels.max(0)
+                    diffs = max_coords - min_coords
+                    bbox = (
+                        tuple(min_coords.tolist()),
+                        tuple(diffs.tolist())
+                    )
+
+                    # Then get the dataset images
+                    dataset = wk.download_dataset(
+                        original_dataset_name,
+                        original_dataset_org,
+                        bbox=bbox,
+                        layers=["color"],  # , "Volume Layer"],
+                        mags=[Mag("1")],
+                        path="../wkdata",
+                    )
+                    volume = dataset.read()
+
+                    # Transpose images if requested
+                    if self.image_transpose_xyz_zyx:
+                        volume = volume.transpose(self.image_transpose_xyz_zyx)
+
+                    # Downsample images if requested.
+                    if self.image_downsample:
+                        volume = resize(
+                            volume,
+                            image_downsample,
+                            anti_aliasing=True,
+                            preserve_range=True,
+                            order=3)
+                        labels = labels / np.asarray(
+                            self.image_downsample)[None]
+                        labels = labels.astype(int)
+
+                    # Create annotation image
+                    label_vol = np.zeros_like(data)
+                    for label in labels:
+                        label_vol[label[0], label[1], label[2]] = draw_sphere(
+                            label,
+                            self.annotation_size)
+                    return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
@@ -80,14 +139,4 @@ class GetData():
                     annotation_layer = annotation.save_volume_annotation(dataset)
                     bbox = annotation_layer.bounding_box
                     raise NotImplementedError("Need to finish this")
-
-                # Then get the dataset images
-                ds_name = path.split("/")[-2]
-                train_dataset = wk.download_dataset(
-                    original_dataset_name,
-                    original_dataset_org,
-                    bbox=bbox,
-                    layers=["color"],  # , "Volume Layer"],
-                    mags=[Mag("1")],
-                    path="../wkdata",
-                )
+                    return volume, label_vol
