@@ -20,7 +20,6 @@ from captum.attr import visualization as viz
 from src.common.utils import iterate_elements_in_batches, render_images
 
 from src.pl_modules import UNet3D, unet
-from src.pl_data.utils import read_gcs
 from src.pl_modules import losses
 from src.pl_modules import dice_loss
 
