@@ -34,7 +34,7 @@ class GetData():
         self.wkdataset = cfg.wkdataset
         self.annotation_size = cfg.annotation_size
         self.image_transpose_xyz_zyx = cfg.image_transpose_xyz_zyx
-        self.image_downsample = cfg.downsample
+        self.image_downsample = cfg.image_downsample
 
     def load(self):
         if self.data_type == "GCS":
@@ -71,7 +71,6 @@ class GetData():
                     nml_lens = [len(x) for x in nml_list]
                     annotations = nml_list[np.argmax(nml_lens)]
                     nml_label_key = nml_list[-2]
-                    import pdb;pdb.set_trace()
 
                     # Get the labels and xyzs in each annotation
                     labels, coords = [], []
