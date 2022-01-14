@@ -55,6 +55,7 @@ class GetData():
                 import pdb;pdb.set_trace()
                 time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
                 new_dataset_name = annotation.dataset_name + f"_segmented_{time_str}"  # noqa
+                dataset = wk.Dataset(new_dataset_name, scale=scale)
                 annotation_layer = annotation.save_volume_annotation(dataset)
                 bbox = annotation_layer.bounding_box
 
