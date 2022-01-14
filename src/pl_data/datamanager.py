@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.python.lib.io import file_io
 from time import gmtime, strftime
 from skimage.transform import resize
-from webknossos.geometry import Mag
+from webknossos.geometry import Mag, BoundingBox
 import fastremap
 
 
@@ -98,10 +98,7 @@ class GetData():
                     diffs = max_coords - min_coords
                     min_coords = min_coords.astype(int)
                     diffs = diffs.astype(int)
-                    bbox = (
-                        tuple(min_coords.tolist()),
-                        tuple(diffs.tolist())
-                    )
+                    bbox = BoundingBox([min_coords.tolist(), diffs.tolist()])
 
                     # Then get the dataset images
                     dataset = wk.download_dataset(
