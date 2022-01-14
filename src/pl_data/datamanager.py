@@ -2,6 +2,7 @@ import webknossos as wk
 from io import BytesIO
 import numpy as np
 from tensorflow.python.lib.io import file_io
+from time import gmtime, strftime
 
 
 def read_gcs(file):
@@ -43,12 +44,26 @@ class GetData():
             # 1. Have token in the config
             # 2. Specify a processing strategy
             assert self.token is not None, "You need to pass a token for WK."
-            with wk.webknossos_context(url="https://webknossos.org", token=self.token):
-                annotation = wk.Annotation.download(
-                    self.path
-                )
+            assert self.scale is not None, "You must specify dataset scale."
+            assert self.annotation_type in ["nml", "volumetric"], "You must specify annotation_type {'nml', 'volumetric'}"  # noqa
+            with wk.webknossos_context(
+                    url="https://webknossos.org",
+                    token=self.token):
+                annotation = wk.Annotation.download(self.path)
                 import pdb;pdb.set_trace()
+                time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
+                new_dataset_name = annotation.dataset_name + f"_segmented_{time_str}"  # noqa
+                annotation_layer = annotation.save_volume_annotation(dataset)
+                bbox = annotation_layer.bounding_box
 
+                # Either extract nml data or volumetric data
+                if self.annotation_type == "nml":
+                    # These are synapse annotations
+                    import pdb;pdb.set_trace()
+
+                elif self.annotation_type == "volumetric":
+                    # These annotations are volumetric, for semantic seg.
+                    raise NotImplementedError("Need to finish this")
                 # Then get the dataset
                 ds_name = path.split("/")[-2]
                 train_dataset = wk.download_dataset(
