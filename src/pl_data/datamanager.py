@@ -43,11 +43,10 @@ class GetData():
             # 1. Have token in the config
             # 2. Specify a processing strategy
             assert self.token is not None, "You need to pass a token for WK."
-            with wk.webknossos_context(
-                    url="https://webknossos.org",
-                    token=self.token):
-                # First get the annotations
-                annotation = wk.Annotation.download(self.path)
+            with wk.webknossos_context(url="https://webknossos.org", token=token):
+                annotation = wk.Annotation.download(
+                    self.path
+                )
                 import pdb;pdb.set_trace()
 
                 # Then get the dataset
