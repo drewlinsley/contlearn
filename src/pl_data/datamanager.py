@@ -133,7 +133,7 @@ class GetData():
                     label_shape = label_vol.shape
                     dtype = label_vol.dtype
                     for label, coord in zip(labels, coords):
-                        startc = coord - (cube_size // 2)
+                        startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))
                         startc = startc.astype(int)
                         endc = np.minimum(startc + cube_size, label_shape)
                         label_cube_size = endc - startc
