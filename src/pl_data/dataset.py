@@ -39,9 +39,9 @@ class GetData():
 
     def load(self):
         if self.data_type == "GCS":
-            ds = read_gcs(path)
+            ds = read_gcs(self.path)
             # Check that ds is an npz
-            assert ".npz" in path, "GCS is only set up for .npz files."
+            assert ".npz" in self.path, "GCS is only set up for .npz files."
             volume = ds["volume"]
             label = ds["label"]
             del ds.f
