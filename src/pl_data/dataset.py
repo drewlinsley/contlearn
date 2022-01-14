@@ -224,8 +224,6 @@ class Volumetric(Dataset):
             x = self.trim_dims[2]
             self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
             self.ds["label"] = self.ds["label"][z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
-        del ds.f
-        ds.close()
 
         if type(dict(self.selected_label)) is dict:
             self.ds["label"] = F.one_hot(
