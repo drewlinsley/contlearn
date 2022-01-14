@@ -98,7 +98,7 @@ class GetData():
                     diffs = max_coords - min_coords
                     min_coords = min_coords.astype(int)
                     diffs = diffs.astype(int)
-                    bbox = BoundingBox([min_coords.tolist(), diffs.tolist()])
+                    bbox = BoundingBox(min_coords.tolist(), diffs.tolist())
 
                     # Then get the dataset images
                     dataset = wk.download_dataset(
