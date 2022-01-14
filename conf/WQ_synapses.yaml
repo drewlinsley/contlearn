@@ -54,7 +54,7 @@ model:
 
 data:
   path: https://webknossos.org/annotations/Explorational/61d2f118010000ba00ed3a8a
-  token: UTUOQJvbbyRFbD_sNSnTMig
+  token: UTUOQJvbbyRFbD_NSnTMig
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
     val_percentage: 0.0
