@@ -126,6 +126,30 @@ class GetData():
                     image_mag = image_layer.get_mag(Mag("1"))
                     volume = image_mag.read().squeeze(0)
 
+                    # Create annotation image
+                    dtype = label_vol.dtype
+                    annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
+                    cube_size = np.asarray(self.cube_size).astype(int)
+                    label_vol = np.zeros_like(volume)
+                    label_shape = label_vol.shape
+                    for label, coord in zip(labels, coords):
+                        startc = coord - (cube_size // 2)
+                        startc = startc.astype(int)
+                        endc = np.minimum(startc + cube_size, label_shape)
+                        label_cube_size = endc - startc
+                        cube = draw_cube(
+                            cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
+                            annotation_size,  # label size
+                            label_cube_size,  # volume shape
+                            dtype=dtype,
+                            label=label)
+
+                        label_vol[
+                            startc[0]: endc[0],
+                            startc[1]: endc[1],
+                            startc[2]: endc[2]] = cube
+                    import pdb;pdb.set_trace()
+
                     # Transpose images if requested
                     if self.image_transpose_xyz_zyx:
                         volume = volume.transpose(self.image_transpose_xyz_zyx)
@@ -137,31 +161,13 @@ class GetData():
                             image_downsample,
                             anti_aliasing=True,
                             preserve_range=True,
-                            order=3)
-                        labels = labels / np.asarray(
-                            self.image_downsample)[None]
-                        labels = labels.astype(int)
-
-                    # Create annotation image
-                    annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
-                    cube_size = np.asarray(self.cube_size).astype(int)
-                    label_vol = np.zeros_like(volume)
-                    for label, coord in zip(labels, coords):
-                        startc = coord - (cube_size // 2)
-                        startc = startc.astype(int)
-                        endc = startc + cube_size
-                        import pdb;pdb.set_trace()
-                        cube = draw_cube(
-                            cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
-                            annotation_size,  # label size
-                            cube_size,  # volume shape
-                            dtype=label_vol.dtype,
-                            label=label)
-                        label_vol[
-                            startc[0]: endc[0],
-                            startc[1]: endc[1],
-                            startc[2]: endc[2]] = cube
-                    import pdb;pdb.set_trace()
+                            order=3).astype(dtype)
+                        label_vol = resize(
+                            label_vol,
+                            image_downsample,
+                            anti_aliasing=True,
+                            preserve_range=True,
+                            order=1).astype(dtype)
                     return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
