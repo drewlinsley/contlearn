@@ -76,17 +76,13 @@ class GetData():
                     labels, coords = [], []
                     for node in annotations:
                         if len(node.nodes):
+                            # Remove bad nodes
                             labels.append(node.groupId)
                             coords.append(node.nodes[0].position)
                     labels = np.asarray(labels)
                     coords = np.asarray(coords)
 
-                    # Remove bad nodes
                     import pdb;pdb.set_trace()
-                    mask = coords != False  # noqa
-                    labels = labels[mask]
-                    coords = coords[mask]
-
                     min_coords = labels.min(0)
                     max_coords = labels.max(0)
                     diffs = max_coords - min_coords
