@@ -145,7 +145,7 @@ class GetData():
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
-                    label_vol = np.zeros_like(data)
+                    label_vol = np.zeros_like(volume)
                     for label in labels:
                         startc = label - (cube_size // 2)
                         startc = startc.astype(int)
