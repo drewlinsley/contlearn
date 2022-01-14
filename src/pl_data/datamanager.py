@@ -87,8 +87,10 @@ class GetData():
                     coords = np.asarray(coords)
 
                     import pdb;pdb.set_trace()
-                    min_coords = coords.min(0)
-                    max_coords = coords.max(0)
+                    min_coords = np.maximum(
+                        coords.min(0) - self.annotation_size,
+                        np.asarray([0, 0, 0]))
+                    max_coords = coords.max(0) + self.annotation_size
                     diffs = max_coords - min_coords
                     bbox = (
                         tuple(min_coords.tolist()),
