@@ -8,14 +8,14 @@ from webknossos.geometry import Mag, BoundingBox
 import fastremap
 
 
-def draw_cube(start, label_size, shape, dtype):
+def draw_cube(start, label_size, shape, label, dtype):
     """Draw a cube in a volume."""
     vol = np.zeros(shape, dtype=dtype)
     vol[
         start[0]: start[0] + label_size[0],
         start[1]: start[1] + label_size[1],
         start[2]: start[2] + label_size[2],
-        ] = 1.
+    ] = label
     return vol
 
 
@@ -146,8 +146,8 @@ class GetData():
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
                     label_vol = np.zeros_like(volume)
-                    for label in labels:
-                        startc = label - (cube_size // 2)
+                    for label, coord in zip(labels, coords):
+                        startc = coord - (cube_size // 2)
                         startc = startc.astype(int)
                         endc = startc + cube_size
                         label_vol[
@@ -157,9 +157,10 @@ class GetData():
                                 cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
                                 annotation_size,  # label size
                                 cube_size,  # volume shape
-                                dtype=label_vol.dtype
+                                dtype=label_vol.dtype,
+                                label=label
                             )
-                    import pdb;pdb.set_trace()s
+                    import pdb;pdb.set_trace()
                     return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
