@@ -1,5 +1,4 @@
 import webknossos as wk
-from src.pl_data.utils import read_gcs
 from io import BytesIO
 import numpy as np
 from tensorflow.python.lib.io import file_io
