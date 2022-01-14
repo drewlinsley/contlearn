@@ -43,7 +43,7 @@ class GetData():
             # 1. Have token in the config
             # 2. Specify a processing strategy
             assert self.token is not None, "You need to pass a token for WK."
-            with wk.webknossos_context(url="https://webknossos.org", token=token):
+            with wk.webknossos_context(url="https://webknossos.org", token=self.token):
                 annotation = wk.Annotation.download(
                     self.path
                 )
