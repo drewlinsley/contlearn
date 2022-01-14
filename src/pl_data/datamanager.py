@@ -37,6 +37,7 @@ class GetData():
         self.annotation_size = cfg.annotation_size
         self.image_transpose_xyz_zyx = cfg.image_transpose_xyz_zyx
         self.image_downsample = cfg.image_downsample
+        self.image_layer_name = cfg.image_layer_name
 
     def load(self):
         if self.data_type == "GCS":
@@ -56,12 +57,15 @@ class GetData():
             assert self.scale is not None, "You must specify dataset scale."
             assert self.annotation_type in ["nml", "volumetric"], "You must specify annotation_type {'nml', 'volumetric'}"  # noqa
             assert self.wkdataset is not None, "You must specify the original dataset."  # noqa
+            assert self.image_layer_name is not None, "You must specify an image layer name. (Volume? color?)"  # noqa
             with wk.webknossos_context(
                     url="https://webknossos.org",
                     token=self.token):
                 annotation = wk.Annotation.download(self.path)
                 original_dataset_name = self.wkdataset.split("/")[-1]
                 original_dataset_org = self.wkdataset.split("/")[-2]
+                time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
+                new_dataset_name = annotation.dataset_name + f"_segmented_{time_str}"  # noqa
 
                 # Either extract nml data or volumetric data
                 if self.annotation_type == "nml":
@@ -87,12 +91,13 @@ class GetData():
                         in_place=True)
                     coords = np.asarray(coords)
 
-                    import pdb;pdb.set_trace()
                     min_coords = np.maximum(
                         coords.min(0) - self.annotation_size,
                         np.asarray([0, 0, 0]))
                     max_coords = coords.max(0) + self.annotation_size
                     diffs = max_coords - min_coords
+                    min_coords = min_coords.astype(int)
+                    diffs = diffs.astype(int)
                     bbox = (
                         tuple(min_coords.tolist()),
                         tuple(diffs.tolist())
@@ -103,10 +108,11 @@ class GetData():
                         original_dataset_name,
                         original_dataset_org,
                         bbox=bbox,
-                        layers=["color"],  # , "Volume Layer"],
+                        layers=[self.image_layer_name],  # , "Volume Layer"],
                         mags=[Mag("1")],
-                        path="../wkdata",
+                        path="../{}".format(new_dataset_name),
                     )
+                    import pdb;pdb.set_trace()
                     volume = dataset.read()
 
                     # Transpose images if requested
@@ -135,8 +141,6 @@ class GetData():
 
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
-                    time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
-                    new_dataset_name = annotation.dataset_name + f"_segmented_{time_str}"  # noqa
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))
                     annotation_layer = annotation.save_volume_annotation(dataset)
                     bbox = annotation_layer.bounding_box
