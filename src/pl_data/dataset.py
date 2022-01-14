@@ -14,6 +14,7 @@ import tensorflow_datasets as tfds
 from src.pl_data import augmentation_functions as af
 from inspect import getmembers, isfunction
 from torch.nn import functional as F
+from src.pl_data.datamanager import GetData
 
 
 def load_image(directory):
