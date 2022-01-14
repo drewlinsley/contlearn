@@ -17,7 +17,6 @@ from src.pl_data.utils import read_gcs
 from torch.nn import functional as F
 
 
-
 class GetData():
     """Class for managing different dataset types."""
     def __init__(self, path, token=None):
@@ -195,25 +194,25 @@ class Volumetric(Dataset):
         # ds = read_gcs(path)
 
         data = GetData(path)
-        ds = data.load()
+        volume, label = data.load()
 
         # TODO: incorporate class weighting here
         # compute_class_weight(class_weight='balanced', classes=np.unique(l), y=l.ravel())
         self.ds = {
-            "volume": torch.as_tensor(ds["volume"]).to(torch.uint8),
+            "volume": torch.as_tensor(volume).to(torch.uint8),
         }
 
         # Remap labels if requested
         if type(dict(self.selected_label)) is dict:
             self.selected_label = dict(self.selected_label)
             self.ds["label"] = fastremap.remap(
-                ds["label"],
+                label,
                 self.selected_label,
                 preserve_missing_labels=True,
                 in_place=True)
 
         elif not self.selected_label:
-            self.ds["label"] = ds["label"]
+            self.ds["label"] = label
         else:
             raise RuntimeError(
                 "The selected_label must be a dictionary or False.")
