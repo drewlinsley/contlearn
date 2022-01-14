@@ -30,6 +30,7 @@ class GetData():
         self.token = cfg.token
         self.scale = cfg.scale
         self.annotation_type = cfg.annotation_type
+        self.wkdataset = cfg.wkdataset
 
     def load(self):
         if self.data_type == "GCS":
@@ -48,32 +49,45 @@ class GetData():
             assert self.token is not None, "You need to pass a token for WK."
             assert self.scale is not None, "You must specify dataset scale."
             assert self.annotation_type in ["nml", "volumetric"], "You must specify annotation_type {'nml', 'volumetric'}"  # noqa
+            assert self.wkdataset is not None, "You must specify the original dataset."  # noqa
             with wk.webknossos_context(
                     url="https://webknossos.org",
                     token=self.token):
                 annotation = wk.Annotation.download(self.path)
-                import pdb;pdb.set_trace()
-                time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
-                new_dataset_name = annotation.dataset_name + f"_segmented_{time_str}"  # noqa
-                dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))
-                annotation_layer = annotation.save_volume_annotation(dataset)
-                bbox = annotation_layer.bounding_box
+                original_dataset_name = self.wkdataset.split("/")[-1]
+                original_dataset_org = self.wkdataset.split("/")[-2]
 
                 # Either extract nml data or volumetric data
                 if self.annotation_type == "nml":
                     # These are synapse annotations
+                    original_dataset = annotation.skeleton
+                    nml_meta = annotation._nml[0]
+                    nml_list = [x for x in annotation._nml[1:] if len(x)]
+                    nml_lens = [len(x) for x in nml_list]
+                    annotations = nml_list[np.argmax(nml_lens)]
+                    nml_labels = nml_list[-2]
+                    import pdb;pdb.set_trace()
+                    # There are multiple entries in the NML list. Figure
+                    # out how to handle these in the future.
+                    bbox = None  # Alternatively use the bounds of the nml?
                     import pdb;pdb.set_trace()
 
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
+                    time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
+                    new_dataset_name = annotation.dataset_name + f"_segmented_{time_str}"  # noqa
+                    dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))
+                    annotation_layer = annotation.save_volume_annotation(dataset)
+                    bbox = annotation_layer.bounding_box
                     raise NotImplementedError("Need to finish this")
-                # Then get the dataset
+
+                # Then get the dataset images
                 ds_name = path.split("/")[-2]
                 train_dataset = wk.download_dataset(
-                    "zebrafish_vertebra_250um",  # zebrafish_vertebra_250um",
-                    "b2275d664e4c2a96",
-                    bbox=BoundingBox((10533, 7817, 3547), (1152, 1152, 384)),
+                    original_dataset_name,
+                    original_dataset_org,
+                    bbox=bbox,
                     layers=["color"],  # , "Volume Layer"],
                     mags=[Mag("1")],
-                    path="../zebrafish",
+                    path="../wkdata",
                 )

@@ -57,6 +57,7 @@ data:
   token: UTUOQJvbbyRFbD_NSnTMig
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
+  wkdataset: "https://webknossos.org/datasets/4fd6473e68256c0a/W-Q_x0_y0_z0_2022-01-02_00-43-18"  # set to "???" if not using
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
     val_percentage: 0.0
