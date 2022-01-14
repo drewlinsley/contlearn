@@ -8,6 +8,17 @@ from webknossos.geometry import Mag, BoundingBox
 import fastremap
 
 
+def draw_cube(start, label_size, shape, dtype):
+    """Draw a cube in a volume."""
+    vol = np.zeros(shape, dtype=dtype)
+    vol[
+        start[0]: start[0] + label_size[0],
+        start[1]: start[1] + label_size[1],
+        start[2]: start[2] + label_size[2],
+        ] = 1.
+    return vol
+
+
 def read_gcs(file):
     f_stream = file_io.FileIO(file, 'rb')
     return np.load(BytesIO(f_stream.read()))
@@ -38,6 +49,7 @@ class GetData():
         self.image_transpose_xyz_zyx = cfg.image_transpose_xyz_zyx
         self.image_downsample = cfg.image_downsample
         self.image_layer_name = cfg.image_layer_name
+        self.cube_size = cfg.cube_size
 
     def load(self):
         if self.data_type == "GCS":
@@ -58,6 +70,7 @@ class GetData():
             assert self.annotation_type in ["nml", "volumetric"], "You must specify annotation_type {'nml', 'volumetric'}"  # noqa
             assert self.wkdataset is not None, "You must specify the original dataset."  # noqa
             assert self.image_layer_name is not None, "You must specify an image layer name. (images? color?)"  # noqa
+            assert self.cube_size is not None, "You must specify an image cube size"  # noqa
             with wk.webknossos_context(
                     url="https://webknossos.org",
                     token=self.token):
@@ -109,8 +122,9 @@ class GetData():
                         mags=[Mag("1")],
                         path="../{}".format(new_dataset_name),
                     )
-                    import pdb;pdb.set_trace()
-                    volume = dataset.read()
+                    image_layer = dataset.get_layer(self.image_layer_name)
+                    image_mag = image_layer.get_mag(Mag("1"))
+                    volume = image_mag.read().squeeze(0)
 
                     # Transpose images if requested
                     if self.image_transpose_xyz_zyx:
@@ -129,11 +143,23 @@ class GetData():
                         labels = labels.astype(int)
 
                     # Create annotation image
+                    annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
+                    cube_size = np.asarray(self.cube_size).astype(int)
                     label_vol = np.zeros_like(data)
                     for label in labels:
-                        label_vol[label[0], label[1], label[2]] = draw_sphere(
-                            label,
-                            self.annotation_size)
+                        startc = label - (cube_size // 2)
+                        startc = startc.astype(int)
+                        endc = startc + cube_size
+                        label_vol[
+                            startc[0]: endc[0],
+                            startc[1]: endc[1],
+                            startc[2]: endc[2]] = draw_cube(
+                                cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
+                                annotation_size,  # label size
+                                cube_size,  # volume shape
+                                dtype=label_vol.dtype
+                            )
+                    import pdb;pdb.set_trace()s
                     return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
