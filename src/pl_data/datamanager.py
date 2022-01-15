@@ -137,7 +137,7 @@ class GetData():
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
-                    label_shape = np.ceil(np.asarray(volume.shape[:-1]) * self.label_downsample).astype(int)[::-1]  # noqa
+                    label_shape = np.ceil(np.asarray(volume.shape[:-1]) / self.image_downsample).astype(int)[::-1]  # noqa
                     dtype = volume.dtype
                     label_vol = np.zeros((label_shape), dtype=dtype)
                     for label, coord in zip(labels, coords):
@@ -171,7 +171,7 @@ class GetData():
                     if self.label_downsample:
                         label_vol = resize(
                             label_vol,
-                            image_downsample,
+                            self.label_downsample,
                             anti_aliasing=True,
                             preserve_range=True,
                             order=1).astype(dtype)
