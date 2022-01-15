@@ -136,9 +136,9 @@ class GetData():
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
-                    label_vol = np.zeros_like(volume)
-                    label_shape = label_vol.shape
-                    dtype = label_vol.dtype
+                    label_shape = label_vol.shape[1:]
+                    dtype = volume.dtype
+                    label_vol = np.zeros((label_shape), dtype=dtype)
                     for label, coord in zip(labels, coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
@@ -188,6 +188,7 @@ class GetData():
                             anti_aliasing=True,
                             preserve_range=True,
                             order=3).astype(dtype)
+
                     return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
