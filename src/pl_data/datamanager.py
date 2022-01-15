@@ -164,7 +164,7 @@ class GetData():
 
                     if self.label_transpose_xyz_zyx:
                         label_vol = label_vol.transpose(
-                            self.image_transpose_xyz_zyx)
+                            self.label_transpose_xyz_zyx)
 
                     # Downsample images if requested.
                     import pdb;pdb.set_trace()
