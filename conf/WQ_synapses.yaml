@@ -60,7 +60,6 @@ data:
   cube_size: [12, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
   label_transpose_xyz_zyx: [2, 0, 1]
   image_transpose_xyz_zyx: False
-  image_downsample: False  # [1, 4.114, 4.114]
   layer_downsample: [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
   annotation_path: https://webknossos.org/annotations/Explorational/61d2f118010000ba00ed3a8a
