@@ -7,6 +7,7 @@ from skimage.transform import resize
 from webknossos.geometry import Mag, BoundingBox
 import fastremap
 from tqdm import tqdm
+from joblib import Parallel, delayed
 
 
 def draw_cube(start, label_size, shape, label, dtype):
@@ -177,14 +178,17 @@ class GetData():
                             order=1).astype(dtype)
                     if self.image_downsample:
                         res_volume = []
-                        for vol in tqdm(volume, "Resizing images", total=len(volume)):
-                            res_volume.append(
-                                resize(
-                                    vol,
-                                    label_vol.shape[1:],
+                        res_volume = Parallel(n_jobs=-1)(
+                            delayed(
+                                lambda x, y: resize(
+                                    x,
+                                    y,
                                     anti_aliasing=True,
                                     preserve_range=True,
-                                    order=3).astype(dtype))
+                                    order=True))(vol) for vol in tqdm(
+                                volume,
+                                "Resizing images",
+                                total=len(volume)))
                         import pdb;pdb.set_trace()
                         volume = np.asarray(res_volume)
 
