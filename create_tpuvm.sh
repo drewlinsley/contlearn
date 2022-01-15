@@ -20,5 +20,3 @@ gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
   # --command "cd contlearn && bash run_cell_tpu_vm.sh"
 gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE  --ssh-flag="-X"
-# 
-

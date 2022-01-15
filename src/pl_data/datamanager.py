@@ -50,6 +50,7 @@ class GetData():
         self.image_transpose_xyz_zyx = cfg.image_transpose_xyz_zyx
         self.label_transpose_xyz_zyx = cfg.label_transpose_xyz_zyx
         self.image_downsample = cfg.image_downsample
+        self.label_downsample = cfg.label_downsample
         self.image_layer_name = cfg.image_layer_name
         self.cube_size = cfg.cube_size
 
@@ -136,7 +137,7 @@ class GetData():
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
-                    label_shape = volume.shape[:-1]
+                    label_shape = np.ceil(np.asarray(volume.shape[:-1]) * [1, 4.114, 4.114])  # noqa
                     dtype = volume.dtype
                     label_vol = np.zeros((label_shape), dtype=dtype)
                     for label, coord in zip(labels, coords):
@@ -167,20 +168,14 @@ class GetData():
 
                     # Downsample images if requested.
                     import pdb;pdb.set_trace()
-                    if self.image_downsample:
-                        # volume = resize(
-                        #     volume,
-                        #     image_downsample,
-                        #     anti_aliasing=True,
-                        #     preserve_range=True,
-                        #     order=3).astype(dtype)
+                    if self.label_downsample:
                         label_vol = resize(
                             label_vol,
                             image_downsample,
                             anti_aliasing=True,
                             preserve_range=True,
                             order=1).astype(dtype)
-                    else:
+                    if self.image_downsample:
                         # Upsample volume to native res
                         volume = resize(
                             volume,
