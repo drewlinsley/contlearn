@@ -185,7 +185,7 @@ class GetData():
                                     y,
                                     anti_aliasing=True,
                                     preserve_range=True,
-                                    order=True))(vol) for vol in tqdm(
+                                    order=True))(vol, label_vol.shape[1:]) for vol in tqdm(  # noqa
                                 volume,
                                 "Resizing images",
                                 total=len(volume)))

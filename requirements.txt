@@ -20,3 +20,4 @@ pytest
 webknossos
 fastremap
 monai
+joblib
