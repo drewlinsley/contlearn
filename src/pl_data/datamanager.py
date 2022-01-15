@@ -26,15 +26,15 @@ def read_gcs(file):
 
 class GetData():
     """Class for managing different dataset types."""
-    def __init__(self, path, cfg):
-        self.image_path = image_path
-        self.annotation_path = path
+    def __init__(self, cfg):
+        self.image_path = cfg.image_path
+        self.annotation_path = cfg.annotation_path
 
         # Interpret the dataset type:
-        if "gs://" in path:
+        if "gs://" in self.annotation_path:
             # We have google data, use read_gcs
             data_type = "GCS"
-        elif "webknossos" in path:
+        elif "webknossos" in self.annotation_path:
             # We have webknossos data, use wk
             data_type = "WK"
         else:

@@ -101,7 +101,6 @@ class Volumetric(Dataset):
     ):
         super().__init__()
         self.cfg = cfg
-        self.path = path
         self.train = train
         self.transform = transform
         # if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores == 1:  # noqa
@@ -142,7 +141,7 @@ class Volumetric(Dataset):
         print("Caching data")
         # ds = read_gcs(path)
 
-        data = GetData(path, self.cfg.data)
+        data = GetData(self.cfg.data)
         volume, label = data.load()
 
         # TODO: incorporate class weighting here
