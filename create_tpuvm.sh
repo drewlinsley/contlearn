@@ -19,6 +19,6 @@ gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
   --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && git checkout gcp && sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 100 && cp netrc ../.netrc && pip install -r requirements.txt"
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
   # --command "cd contlearn && bash run_cell_tpu_vm.sh"
-gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE
+gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE  --ssh-flag="-X"
 # 
 

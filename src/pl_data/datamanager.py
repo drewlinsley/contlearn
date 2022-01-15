@@ -148,11 +148,11 @@ class GetData():
                             startc[0]: endc[0],
                             startc[1]: endc[1],
                             startc[2]: endc[2]] = cube
-                    import pdb;pdb.set_trace()
 
                     # Transpose images if requested
                     if self.image_transpose_xyz_zyx:
                         volume = volume.transpose(self.image_transpose_xyz_zyx)
+                        label_vol = label_vol.transpose(self.image_transpose_xyz_zyx)
 
                     # Downsample images if requested.
                     if self.image_downsample:

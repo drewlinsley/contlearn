@@ -131,14 +131,14 @@ class Volumetric(Dataset):
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
-        self.augmentations = [
-            {"randomcrop": self.shape},
-            # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
-            # {"randomrotate": [(2, 3)]},  # Axes to rotate
-            # {"randomflip": [1, 2, 3]},  # Axes to rotate
-            {"normalize_volume": [0, 255]},  # Min/max
-            # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
-        ]
+        # self.augmentations = [
+        #     # {"randomcrop": self.shape},
+        #     # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
+        #     # {"randomrotate": [(2, 3)]},  # Axes to rotate
+        #     # {"randomflip": [1, 2, 3]},  # Axes to rotate
+        #     # {"normalize_volume": [0, 255]},  # Min/max
+        #     # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
+        # ]
         print("Caching data")
         # ds = read_gcs(path)
 
@@ -146,7 +146,7 @@ class Volumetric(Dataset):
         volume, label = data.load()
 
         # TODO: incorporate class weighting here
-        # compute_class_weight(class_weight='balanced', classes=np.unique(l), y=l.ravel())
+        # noqa compute_class_weight(class_weight='balanced', classes=np.unique(l), y=l.ravel())
         self.ds = {
             "volume": torch.as_tensor(volume).to(torch.uint8),
         }
@@ -197,15 +197,15 @@ class Volumetric(Dataset):
         # volume = self.norma(volume)
         label = data["label"]
 
-        # Add augs here
-        volume, label = augment3d(
-            volume=volume,
-            label=label,
-            augmentations=self.augmentations)
-        # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
-        if self.force_2d:
-            volume = volume.squeeze(1)
-            label = label.squeeze(1)
+        # # Add augs here
+        # volume, label = augment3d(
+        #     volume=volume,
+        #     label=label,
+        #     augmentations=self.augmentations)
+        # # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
+        # if self.force_2d:
+        #     volume = volume.squeeze(1)
+        #     label = label.squeeze(1)
         # else:
         #     volume = volume[0][None]
         return volume, label
