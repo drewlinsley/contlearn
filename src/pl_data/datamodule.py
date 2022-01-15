@@ -74,10 +74,10 @@ class MyDataModule(pl.LightningDataModule):
                     num_classes=3,
                     ratios=[0, 1, 1]),
                 ScaleIntensityRange(
-                    amin=0.,
-                    amax=255.,
-                    bmin=0.,
-                    bmax=1.)
+                    a_min=0.,
+                    a_max=255.,
+                    b_min=0.,
+                    b_max=1.)
                 # transforms.Resize((100, 100)),
                 # transforms.RandomHorizontalFlip(p=0.5),
                 # transforms.RandomVerticalFlip(p=0.5),
