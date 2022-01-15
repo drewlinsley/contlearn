@@ -189,15 +189,14 @@ class GetData():
                                 volume,
                                 "Resizing images",
                                 total=len(volume)))
-                        import pdb;pdb.set_trace()
                         volume = np.asarray(res_volume)
-
+                        volume = volume.transpose(3, 0, 1, 2)  # Channels first
                     return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
-                    dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))
-                    annotation_layer = annotation.save_volume_annotation(dataset)
+                    dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
+                    annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
                     bbox = annotation_layer.bounding_box
                     raise NotImplementedError("Need to finish this")
                     return volume, label_vol
