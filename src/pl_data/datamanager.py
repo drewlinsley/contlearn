@@ -131,7 +131,6 @@ class GetData():
                     # image_layer = dataset.get_layer(self.image_layer_name)
                     # image_mag = image_layer.get_mag(Mag("1"))
                     # volume = image_mag.read().squeeze(0)
-                    import pdb;pdb.set_trace()
                     volume = read_gcs(self.image_path)
 
                     # Create annotation image
@@ -167,6 +166,7 @@ class GetData():
                             self.image_transpose_xyz_zyx)
 
                     # Downsample images if requested.
+                    import pdb;pdb.set_trace()
                     if self.image_downsample:
                         # volume = resize(
                         #     volume,
