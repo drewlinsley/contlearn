@@ -8,6 +8,8 @@ from torch.utils.data import DataLoader, Dataset, random_split, Subset
 from torchvision import transforms
 from PIL import Image
 
+from monai.transforms import RandCropByLabelClassesd, ScaleIntensityRange
+
 from torch._utils import _accumulate
 from torch import default_generator, Generator
 from typing import (
@@ -65,6 +67,17 @@ class MyDataModule(pl.LightningDataModule):
         # transforms
         transform = transforms.Compose(
             [
+                RandCropByLabelClassesd(
+                    keys=["image", "label"],
+                    spatial_size=[12, 128, 128],
+                    label_key=["label"],
+                    num_classes=3,
+                    ratios=[0, 1, 1]),
+                ScaleIntensityRange(
+                    amin=0.,
+                    amax=255.,
+                    bmin=0.,
+                    bmax=1.)
                 # transforms.Resize((100, 100)),
                 # transforms.RandomHorizontalFlip(p=0.5),
                 # transforms.RandomVerticalFlip(p=0.5),
