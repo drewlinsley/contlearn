@@ -176,10 +176,9 @@ class GetData():
                             preserve_range=True,
                             order=1).astype(dtype)
                     if self.image_downsample:
-                        # Upsample volume to native res
                         volume = resize(
                             volume,
-                            label_vol.shape[:-1],
+                            label_vol.shape[1:],
                             anti_aliasing=True,
                             preserve_range=True,
                             order=3).astype(dtype)
