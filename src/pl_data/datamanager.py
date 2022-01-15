@@ -6,6 +6,7 @@ from time import gmtime, strftime
 from skimage.transform import resize
 from webknossos.geometry import Mag, BoundingBox
 import fastremap
+from tqdm import tqdm
 
 
 def draw_cube(start, label_size, shape, label, dtype):
@@ -167,7 +168,6 @@ class GetData():
                             self.label_transpose_xyz_zyx)
 
                     # Downsample images if requested.
-                    import pdb;pdb.set_trace()
                     if self.label_downsample:
                         label_vol = resize(
                             label_vol,
@@ -176,12 +176,17 @@ class GetData():
                             preserve_range=True,
                             order=1).astype(dtype)
                     if self.image_downsample:
-                        volume = resize(
-                            volume,
-                            label_vol.shape[1:],
-                            anti_aliasing=True,
-                            preserve_range=True,
-                            order=3).astype(dtype)
+                        res_volume = []
+                        for vol in tqdm(volume, "Resizing images", total=len(volume)):
+                            res_volume.append(
+                                resize(
+                                    vol,
+                                    label_vol.shape[1:],
+                                    anti_aliasing=True,
+                                    preserve_range=True,
+                                    order=3).astype(dtype))
+                        import pdb;pdb.set_trace()
+                        volume = np.asarray(res_volume)
 
                     return volume, label_vol
 
