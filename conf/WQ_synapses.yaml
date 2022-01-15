@@ -53,15 +53,17 @@ model:
   plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
 
 data:
-  path: https://webknossos.org/annotations/Explorational/61d2f118010000ba00ed3a8a
   token: UTUOQJvbbyRFbD_NSnTMig
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
   annotation_size: [60, 60, 7]  # x/y/z
   cube_size: [12, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
-  image_transpose_xyz_zyx: [2, 1, 0]
+  label_transpose_xyz_zyx: [2, 0, 1]
+  image_transpose_xyz_zyx: False
   image_downsample: False  # [1, 4.114, 4.114]
-  image_layer_name: "images"
+  image_layer_name: "images"  # Depreciated
+  annotation_path: https://webknossos.org/annotations/Explorational/61d2f118010000ba00ed3a8a
+  image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_mag1_x0_y0_z0.npy
   wkdataset: "https://webknossos.org/datasets/4fd6473e68256c0a/W-Q_x0_y0_z0_2022-01-02_00-43-18"  # set to "???" if not using
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule

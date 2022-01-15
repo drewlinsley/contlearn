@@ -27,7 +27,8 @@ def read_gcs(file):
 class GetData():
     """Class for managing different dataset types."""
     def __init__(self, path, cfg):
-        self.path = path
+        self.image_path = image_path
+        self.annotation_path = path
 
         # Interpret the dataset type:
         if "gs://" in path:
@@ -47,6 +48,7 @@ class GetData():
         self.wkdataset = cfg.wkdataset
         self.annotation_size = cfg.annotation_size
         self.image_transpose_xyz_zyx = cfg.image_transpose_xyz_zyx
+        self.label_transpose_xyz_zyx = cfg.label_transpose_xyz_zyx
         self.image_downsample = cfg.image_downsample
         self.image_layer_name = cfg.image_layer_name
         self.cube_size = cfg.cube_size
@@ -74,7 +76,7 @@ class GetData():
             with wk.webknossos_context(
                     url="https://webknossos.org",
                     token=self.token):
-                annotation = wk.Annotation.download(self.path)
+                annotation = wk.Annotation.download(self.annotation_path)
                 original_dataset_name = self.wkdataset.split("/")[-1]
                 original_dataset_org = self.wkdataset.split("/")[-2]
                 time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
@@ -113,18 +115,24 @@ class GetData():
                     diffs = diffs.astype(int)
                     bbox = BoundingBox(min_coords.tolist(), diffs.tolist())
 
-                    # Then get the dataset images
-                    dataset = wk.download_dataset(
-                        original_dataset_name,
-                        original_dataset_org,
-                        bbox=bbox,
-                        layers=[self.image_layer_name],  # , "Volume Layer"],
-                        mags=[Mag("1")],
-                        path="../{}".format(new_dataset_name),
-                    )
-                    image_layer = dataset.get_layer(self.image_layer_name)
-                    image_mag = image_layer.get_mag(Mag("1"))
-                    volume = image_mag.read().squeeze(0)
+                    # The below WK loading works, but is missing
+                    # the extra membrane prediction layer.
+                    # Not using for now
+                    #
+                    # # Then get the dataset images
+                    # dataset = wk.download_dataset(
+                    #     original_dataset_name,
+                    #     original_dataset_org,
+                    #     bbox=bbox,
+                    #     layers=[self.image_layer_name],  # , "Volume Layer"],
+                    #     mags=[Mag("1")],
+                    #     path="../{}".format(new_dataset_name),
+                    # )
+                    # image_layer = dataset.get_layer(self.image_layer_name)
+                    # image_mag = image_layer.get_mag(Mag("1"))
+                    # volume = image_mag.read().squeeze(0)
+                    import pdb;pdb.set_trace()
+                    volume = read_gcs(self.image_path)
 
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
@@ -133,7 +141,7 @@ class GetData():
                     label_shape = label_vol.shape
                     dtype = label_vol.dtype
                     for label, coord in zip(labels, coords):
-                        startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))
+                        startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
                         endc = np.minimum(startc + cube_size, label_shape)
                         label_cube_size = endc - startc
@@ -151,23 +159,35 @@ class GetData():
 
                     # Transpose images if requested
                     if self.image_transpose_xyz_zyx:
-                        volume = volume.transpose(self.image_transpose_xyz_zyx)
-                        label_vol = label_vol.transpose(self.image_transpose_xyz_zyx)
+                        volume = volume.transpose(
+                            self.image_transpose_xyz_zyx)
+
+                    if self.label_transpose_xyz_zyx:
+                        label_vol = label_vol.transpose(
+                            self.image_transpose_xyz_zyx)
 
                     # Downsample images if requested.
                     if self.image_downsample:
-                        volume = resize(
-                            volume,
-                            image_downsample,
-                            anti_aliasing=True,
-                            preserve_range=True,
-                            order=3).astype(dtype)
+                        # volume = resize(
+                        #     volume,
+                        #     image_downsample,
+                        #     anti_aliasing=True,
+                        #     preserve_range=True,
+                        #     order=3).astype(dtype)
                         label_vol = resize(
                             label_vol,
                             image_downsample,
                             anti_aliasing=True,
                             preserve_range=True,
                             order=1).astype(dtype)
+                    else:
+                        # Upsample volume to native res
+                        volume = resize(
+                            volume,
+                            label_vol.shape[:-1],
+                            anti_aliasing=True,
+                            preserve_range=True,
+                            order=3).astype(dtype)
                     return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
