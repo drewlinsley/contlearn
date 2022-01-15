@@ -136,7 +136,7 @@ class GetData():
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
-                    label_shape = volume.shape[1:]
+                    label_shape = volume.shape[:-1]
                     dtype = volume.dtype
                     label_vol = np.zeros((label_shape), dtype=dtype)
                     for label, coord in zip(labels, coords):
