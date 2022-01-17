@@ -20,4 +20,3 @@ pytest
 webknossos
 fastremap
 joblib
-albumentations

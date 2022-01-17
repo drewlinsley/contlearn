@@ -9,8 +9,8 @@ from torchvision import transforms
 from PIL import Image
 
 from monai import transforms as monai_transforms
-from pytorchvideo import transforms as video_transforms
-import albumentations as A
+# from pytorchvideo import transforms as video_transforms
+# import albumentations as A
 
 from torch._utils import _accumulate
 from torch import default_generator, Generator
@@ -41,30 +41,30 @@ def continuous_random_split(dataset: Dataset[T], lengths: Sequence[int],
     return [Subset(dataset, indices[offset - length : offset]) for offset, length in zip(_accumulate(lengths), lengths)]
 
 
-class RRC(video_transforms.RandomResizedCrop):
-    def __call__(self, image, label):
-        """
-        Args:
-            img (PIL Image): Image to be cropped and resized.
+# class RRC(video_transforms.RandomResizedCrop):
+#     def __call__(self, image, label):
+#         """
+#         Args:
+#             img (PIL Image): Image to be cropped and resized.
 
-        Returns:
-            PIL Image: Randomly cropped and resized image.
-        """
+#         Returns:
+#             PIL Image: Randomly cropped and resized image.
+#         """
 
-        # First find shape of image
-        im_shape = image.shape
-        print(im_shape)
+#         # First find shape of image
+#         im_shape = image.shape
+#         print(im_shape)
 
-        # Second concatenate image/label across chanel dim
-        cat = torch.cat((image, label), 1)
+#         # Second concatenate image/label across chanel dim
+#         cat = torch.cat((image, label), 1)
 
-        # Third crop
-        cat = self(cat)
+#         # Third crop
+#         cat = self(cat)
 
-        # Fourth split into image/label
-        image = cat[:, :im_shape[1]]
-        label = cat[:, im_shape[1]:]
-        return image, label
+#         # Fourth split into image/label
+#         image = cat[:, :im_shape[1]]
+#         label = cat[:, im_shape[1]:]
+#         return image, label
 
 
 class MyDataModule(pl.LightningDataModule):
