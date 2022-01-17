@@ -17,6 +17,8 @@ from captum.attr import IntegratedGradients
 from captum.attr import NoiseTunnel
 from captum.attr import visualization as viz
 
+from monai import losses
+
 from src.common.utils import iterate_elements_in_batches, render_images
 
 from src.pl_modules import UNet3D, unet
@@ -48,6 +50,7 @@ class MyModel(pl.LightningModule):
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)  # getattr(losses, loss)
+        self.loss = losses.DiceLoss
         # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
@@ -89,8 +92,8 @@ class MyModel(pl.LightningModule):
             # loss = self.loss.forward(logits, y, self.loss_weights)
             loss = loss + penalty
         else:
-            loss = self.loss(logits, y, self.loss_weights)
-            # loss = self.loss.forward(logits, y, self.loss_weights)
+            # loss = self.loss(logits, y, self.loss_weights)
+            loss = self.loss(logits, y)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -102,19 +105,22 @@ class MyModel(pl.LightningModule):
         # opt.step()
         return out
 
-    def training_step_end(self, out):
-        self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
-        self.log_dict(
-            {
-                "train_acc": self.train_accuracy,
-                "train_loss": out["loss"].mean(),
-            },
-            on_step=True,
-            on_epoch=False
-        )
-        return out["loss"].mean()
+    # def training_step_end(self, out):
+    #     self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
+    #     self.log_dict(
+    #         {
+    #             "train_acc": self.train_accuracy,
+    #             "train_loss": out["loss"].mean(),
+    #         },
+    #         on_step=True,
+    #         on_epoch=False
+    #     )
+    #     return out["loss"].mean()
 
-    def validation_step(self, batch: Any, batch_idx: int) -> Dict[str, torch.Tensor]:
+    def validation_step(
+            self,
+            batch: Any,
+            batch_idx: int) -> Dict[str, torch.Tensor]:
         x, y = batch
         out = self.step(x, y)
 
