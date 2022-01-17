@@ -26,7 +26,7 @@ def bce(input, target, weights=None):
         weights = weights.reshape(1, weights_len, 1, 1, 1)
     else:
         weights = None
-    loss = nn.BCEWithLogitsLoss(weight=weights)
+    loss = nn.BCEWithLogitsLoss()  # weight=weights)
 
     # One hot the labels
     target_max = target.max()
