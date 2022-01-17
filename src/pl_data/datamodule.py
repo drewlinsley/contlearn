@@ -96,7 +96,7 @@ class MyDataModule(pl.LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         # transform = video_transforms.Compose(
         #     [
-        #         RRC(interpolation="nearest", target_height=self.shape[1], target_width=self.shape[2])
+        #         RRC(interpolation="nearest", target_height=self.shape[1], target_width=self.shape[2])  # noqa
         #     ]
         # )
         # transform = monai_transforms.MapTransform(
@@ -120,8 +120,11 @@ class MyDataModule(pl.LightningDataModule):
         #             interpolation="nearest")
         #     ]
         # )
-        transform = []
-
+        transform = transforms.Compose(
+            [
+                transforms.ToTensor(),
+            ]
+        )
         if stage is None or stage == "fit":
             assert self.val_proportion >= 0 and self.val_proportion < 1., \
                 "val_proportion must be 1 > x >= 0"
