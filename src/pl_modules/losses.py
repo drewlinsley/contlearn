@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from torch.nn import functional as F
 
 
 def no_loss(input, target, weights=None):
@@ -24,6 +25,13 @@ def bce(input, target, weights=None):
         weights_len = len(weights)
         weights = weights.reshape(1, weights_len, 1, 1, 1)
     loss = nn.BCEWithLogitsLoss(weight=weights)
+
+    # One hot the labels
+    target_max = target.max()
+    target = F.one_hot(
+        target.to(torch.int64),
+        int(target_max + 1)).to(
+        torch.uint8).permute(3, 0, 1, 2)
     output = loss(input, target.float())
     return output
 

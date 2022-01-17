@@ -168,22 +168,22 @@ class Volumetric(Dataset):
                 "The selected_label must be a dictionary or False.")
         self.ds["label"] = torch.as_tensor(self.ds["label"])  # noqa
 
-        if self.trim_dims:
-            z = self.trim_dims[0]
-            y = self.trim_dims[1]
-            x = self.trim_dims[2]
-            self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
-            self.ds["label"] = self.ds["label"][z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
+        # if self.trim_dims:
+        #     z = self.trim_dims[0]
+        #     y = self.trim_dims[1]
+        #     x = self.trim_dims[2]
+        #     self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
+        #     self.ds["label"] = self.ds["label"][z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
 
-        label_max = self.ds["label"].max()
-        if label_max > 1:
-            self.ds["label"] = F.one_hot(
-                self.ds["label"].to(torch.int64),
-                int(label_max + 1)).to(
-                torch.uint8).permute(3, 0, 1, 2)
-            self.ds["label"] = self.ds["label"]
-        else:
-            self.ds["label"] = self.ds["label"][None]  # Add singleton channel
+        # label_max = self.ds["label"].max()
+        # if label_max > 1:
+        #     self.ds["label"] = F.one_hot(
+        #         self.ds["label"].to(torch.int64),
+        #         int(label_max + 1)).to(
+        #         torch.uint8).permute(3, 0, 1, 2)
+        #     self.ds["label"] = self.ds["label"]
+        # else:
+        #     self.ds["label"] = self.ds["label"][None]  # Add singleton channel
 
         self.ds["volume"] = self.ds["volume"].float()
         self.ds["label"] = self.ds["label"].float()
