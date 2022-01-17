@@ -136,6 +136,23 @@ class GetData():
                     # volume = image_mag.read().squeeze(0)
                     volume = read_gcs(self.image_path)
 
+                    # Downsample images if requested.
+                    if self.image_downsample:
+                        res_volume = []
+                        res_volume = Parallel(n_jobs=-1)(
+                            delayed(
+                                lambda x, y: resize(
+                                    x,
+                                    y,
+                                    anti_aliasing=True,
+                                    preserve_range=True,
+                                    order=True))(vol, label_vol.shape[1:]) for vol in tqdm(  # noqa
+                                volume,
+                                "Resizing images",
+                                total=len(volume)))
+                        volume = np.asarray(res_volume)
+                        volume = volume.transpose(3, 0, 1, 2)  # Channels first
+
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
@@ -176,7 +193,6 @@ class GetData():
                         label_vol = label_vol.transpose(
                             self.label_transpose_xyz_zyx)
 
-                    # Downsample images if requested.
                     if self.label_downsample:
                         label_vol = resize(
                             label_vol,
@@ -184,21 +200,6 @@ class GetData():
                             anti_aliasing=True,
                             preserve_range=True,
                             order=1).astype(dtype)
-                    if self.image_downsample:
-                        res_volume = []
-                        res_volume = Parallel(n_jobs=-1)(
-                            delayed(
-                                lambda x, y: resize(
-                                    x,
-                                    y,
-                                    anti_aliasing=True,
-                                    preserve_range=True,
-                                    order=True))(vol, label_vol.shape[1:]) for vol in tqdm(  # noqa
-                                volume,
-                                "Resizing images",
-                                total=len(volume)))
-                        volume = np.asarray(res_volume)
-                        volume = volume.transpose(3, 0, 1, 2)  # Channels first
                     return volume, label_vol
 
                 elif self.annotation_type == "volumetric":
