@@ -171,7 +171,7 @@ class Volumetric(Dataset):
             self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
             self.ds["label"] = self.ds["label"][z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
 
-        if type(dict(self.selected_label)) is dict:
+        if self.selected_label and type(dict(self.selected_label)) is dict:
             self.ds["label"] = F.one_hot(
                 self.ds["label"].to(torch.int64),
                 int(self.ds["label"].max() + 1)).to(
