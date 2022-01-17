@@ -45,7 +45,7 @@ class MyDataModule(pl.LightningDataModule):
         datasets: DictConfig,
         num_workers: DictConfig,
         batch_size: DictConfig,
-        val_percentage: float,
+        val_proportion: float,
         cfg: DictConfig,
         use_train_dataset: str,
         use_val_dataset: str,
@@ -55,7 +55,7 @@ class MyDataModule(pl.LightningDataModule):
         self.datasets = datasets
         self.num_workers = num_workers
         self.batch_size = batch_size
-        self.val_percentage = val_percentage
+        self.val_proportion = val_proportion
         self.use_train_dataset = use_train_dataset
         self.use_val_dataset = use_train_dataset
 
