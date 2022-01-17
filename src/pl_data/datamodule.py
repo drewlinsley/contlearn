@@ -86,32 +86,40 @@ class MyDataModule(pl.LightningDataModule):
             ]
         )
 
-        # split dataset
 
+        import pdb;pdb.set_trace()
         if stage is None or stage == "fit":
             plank_train = hydra.utils.instantiate(
-                self.datasets[self.use_train_dataset].train, cfg=self.cfg, transform=transform,
+                self.datasets[self.use_train_dataset].train,
+                cfg=self.cfg,
+                transform=transform,
                 _recursive_=False
             )
-            if self.val_percentage  == 0:
+            if self.val_percentage == 0:
                 plank_val = hydra.utils.instantiate(
-                    self.datasets[self.use_val_dataset].val, cfg=self.cfg, transform=transform,
+                    self.datasets[self.use_val_dataset].val,
+                    cfg=self.cfg,
+                    transform=transform,
                     _recursive_=False
                 )
                 self.train_dataset = plank_train
                 self.val_dataset = plank_val
             else:
-                train_length = int(len(plank_train) * (1 - self.val_percentage))
+                train_length = int(len(plank_train) * (1 - self.val_percentage))  # noqa
                 val_length = len(plank_train) - train_length
                 self.train_dataset, self.val_dataset = continuous_random_split(
                     plank_train, [train_length, val_length]
                 )
-        if stage is None or stage == "test":
+        elif stage == "test":
             self.test_datasets = [
-                # hydra.utils.instantiate(x, cfg=self.cfg, transform=transform, _recursive_=False)
-                # for x in self.datasets[self.use_train_dataset].test
-                hydra.utils.instantiate(self.datasets[self.use_train_dataset].test, cfg=self.cfg, transform=transform, _recursive_=False)
+                hydra.utils.instantiate(
+                    self.datasets[self.use_train_dataset].test,
+                    cfg=self.cfg,
+                    transform=transform,
+                    _recursive_=False)
             ]
+        else:
+            raise NotImplementedError("stage: {}".format(stage))
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
