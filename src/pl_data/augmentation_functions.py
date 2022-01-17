@@ -171,3 +171,10 @@ def normalize_volume_z(volume, label, params):
     mu, std = params
     volume = (volume - mu) / std
     return volume, label
+
+
+def cast_label(volume, label, params):
+    """Apply normalization to volume."""
+    dtype
+    label = label.to(dtype)
+    return volume, label

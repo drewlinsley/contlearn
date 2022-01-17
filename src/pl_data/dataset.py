@@ -136,6 +136,7 @@ class Volumetric(Dataset):
             # {"randomrotate": [(2, 3)]},  # Axes to rotate
             # {"randomflip": [1, 2, 3]},  # Axes to rotate
             {"normalize_volume": [0, 255]},  # Min/max
+            {"cast_label": torch.tensor.int}
             # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
         ]
         print("Caching data")
