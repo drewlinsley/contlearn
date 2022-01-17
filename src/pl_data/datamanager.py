@@ -154,19 +154,20 @@ class GetData():
                             label_cube_size,  # volume shape
                             dtype=dtype,
                             label=label)
-
                         # label_vol[
                         #     startc[0]: endc[0],
                         #     startc[1]: endc[1],
                         #     startc[2]: endc[2]] = cube
-                        label_list.append(cube)
-                        volume_list.append(volume[
-                            startc[0]: endc[0],
-                            startc[1]: endc[1],
-                            startc[2]: endc[2]])
-                        print(cube.shape)
+                        if np.all(np.asarray(cube.shape) == self.cube_size):
+                            label_list.append(cube)
+                            volume_list.append(volume[
+                                startc[0]: endc[0],
+                                startc[1]: endc[1],
+                                startc[2]: endc[2]])
+                            print(cube.shape)
 
                     # Transpose images if requested
+                    import pdb;pdb.set_trace()
                     if self.image_transpose_xyz_zyx:
                         volume = volume.transpose(
                             self.image_transpose_xyz_zyx)
