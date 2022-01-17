@@ -145,7 +145,7 @@ class GetData():
                     volume_list, label_list = [], []  # noqa Create a list of the processed label cubes
                     res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
                     if self.label_transpose_xyz_zyx:
-                        res_coords[:, self.label_transpose_xyz_zyx]
+                        res_coords = res_coords[:, self.label_transpose_xyz_zyx]
                     import pdb;pdb.set_trace()
                     for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
