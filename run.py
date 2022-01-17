@@ -104,12 +104,17 @@ def run(cfg: DictConfig) -> None:
     # Instantiate datamodule
     hydra.utils.log.info(f"Instantiating <{cfg.data.datamodule._target_}>")
     datamodule: pl.LightningDataModule = hydra.utils.instantiate(
-        cfg.data.datamodule, cfg=cfg, _recursive_=False
+        cfg.data.datamodule,
+        cfg=cfg,
+        _recursive_=False
     )
 
     # Instantiate model
     hydra.utils.log.info(f"Instantiating <{cfg.model._target_}>")
-    model: pl.LightningModule = hydra.utils.instantiate(cfg.model, cfg=cfg, _recursive_=False)
+    model: pl.LightningModule = hydra.utils.instantiate(
+        cfg.model,
+        cfg=cfg,
+        _recursive_=False)
 
     # Instantiate the callbacks
     callbacks: List[Callback] = build_callbacks(cfg=cfg)
@@ -117,7 +122,9 @@ def run(cfg: DictConfig) -> None:
     if cfg.eval_only:
         if cfg.model.weights is not None:
             print("Loading weights from ", cfg.model.weights)
-            model = weights_update(model=model, checkpoint=torch.load(cfg.model.weights))
+            model = weights_update(
+                model=model,
+                checkpoint=torch.load(cfg.model.weights))
 
         trainer = pl.Trainer(
             logger=False,

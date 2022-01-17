@@ -74,7 +74,8 @@ class MyDataModule(pl.LightningDataModule):
                     spatial_size=self.shape,
                     label_key=["label"],
                     num_classes=3,
-                    ratios=[0, 1, 1]),
+                    num_samples=1,
+                    ratios=[0.1, 2, 2]),
                 ScaleIntensityRange(
                     a_min=0.,
                     a_max=255.,
@@ -82,7 +83,7 @@ class MyDataModule(pl.LightningDataModule):
                     b_max=1.)
                 # transforms.ToTensor(),
             ]
-        )
+        ).ToTensor()
 
         if stage is None or stage == "fit":
             assert self.val_proportion >= 0 and self.val_proportion < 1., \
