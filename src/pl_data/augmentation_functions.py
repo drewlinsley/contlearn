@@ -2,6 +2,7 @@
 import random
 import torch
 import torch.nn.functional as F
+import numpy as np
 from PIL import Image
 from torch import Tensor
 from typing import List, Tuple, Any, Optional
