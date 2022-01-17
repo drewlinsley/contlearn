@@ -82,6 +82,7 @@ data:
           # len: 97
           len: 128
           trim_dims: [[0, 384], [0, 384], [340, 768]]
+          shape: "${data.cube_size}"
           force_2d: "${model.force_2d}"
           selected_label: False  
           # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
@@ -95,6 +96,7 @@ data:
           len: 10
           # trim_dims: [[34, 52], [156, 384], [156, 384]]
           trim_dims: [[140, 180], [0, 384], [0, 340]]
+          shape: "${data.cube_size}"
           force_2d: "${model.force_2d}"
           selected_label: False  
         test:
@@ -104,6 +106,7 @@ data:
           path: "${data.image_path}"
           len: 11
           trim_dims: [[140, 180], [0, 384], [0, 340]]
+          shape: "${data.cube_size}"
           force_2d: "${model.force_2d}"
           selected_label: False  
 

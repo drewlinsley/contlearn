@@ -9,6 +9,8 @@ from torchvision import transforms
 from PIL import Image
 
 from monai import transforms as monai_transforms
+from pytorchvideo import transforms as video_transforms
+import albumentations as A
 
 from torch._utils import _accumulate
 from torch import default_generator, Generator
@@ -39,6 +41,32 @@ def continuous_random_split(dataset: Dataset[T], lengths: Sequence[int],
     return [Subset(dataset, indices[offset - length : offset]) for offset, length in zip(_accumulate(lengths), lengths)]
 
 
+class RRC(video_transforms.RandomResizedCrop):
+    def __call__(self, image, label):
+        """
+        Args:
+            img (PIL Image): Image to be cropped and resized.
+
+        Returns:
+            PIL Image: Randomly cropped and resized image.
+        """
+
+        # First find shape of image
+        im_shape = image.shape
+        print(im_shape)
+
+        # Second concatenate image/label across chanel dim
+        cat = torch.cat((image, label), 1)
+
+        # Third crop
+        cat = self(cat)
+
+        # Fourth split into image/label
+        image = cat[:, :im_shape[1]]
+        label = cat[:, im_shape[1]:]
+        return image, label
+
+
 class MyDataModule(pl.LightningDataModule):
     def __init__(
         self,
@@ -66,24 +94,33 @@ class MyDataModule(pl.LightningDataModule):
         self.test_datasets: Optional[Sequence[Dataset]] = None
 
     def setup(self, stage: Optional[str] = None):
-        # transforms
-        transform = monai_transforms.Compose(
-            [
-                monai_transforms.ToDevice("cpu"),
-                monai_transforms.RandCropByLabelClassesd(
-                    keys=["image", "label"],
-                    spatial_size=self.shape,
-                    label_key=["label"],
-                    num_classes=3,
-                    num_samples=1,
-                    ratios=[0.1, 2, 2]),
-                monai_transforms.ScaleIntensityRange(
-                    a_min=0.,
-                    a_max=255.,
-                    b_min=0.,
-                    b_max=1.)
-            ]
-        )
+        # transform = video_transforms.Compose(
+        #     [
+        #         RRC(interpolation="nearest", target_height=self.shape[1], target_width=self.shape[2])
+        #     ]
+        # )
+        # transform = monai_transforms.MapTransform(
+        #     [
+        #         monai_transforms.ToDevice("cpu"),
+        #         monai_transforms.RandCropByLabelClassesd(
+        #             keys=["image", "label"],
+        #             spatial_size=self.shape,
+        #             label_key=["label"],
+        #             num_classes=3,
+        #             num_samples=1,
+        #             ratios=[0.1, 2, 2]),
+        #         monai_transforms.ScaleIntensityRange(
+        #             a_min=0.,
+        #             a_max=255.,
+        #             b_min=0.,
+        #             b_max=1.)
+        #         transforms.RandomResizedCrop(
+        #             target_height=self.shape[1],
+        #             target_width=self.shape[2],
+        #             interpolation="nearest")
+        #     ]
+        # )
+        transform = []
 
         if stage is None or stage == "fit":
             assert self.val_proportion >= 0 and self.val_proportion < 1., \

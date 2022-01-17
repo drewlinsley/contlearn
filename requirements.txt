@@ -19,5 +19,5 @@ pytest
 # hydra-joblib-launcher
 webknossos
 fastremap
-monai
 joblib
+albumentations
