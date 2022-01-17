@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset, random_split, Subset
 from torchvision import transforms
 from PIL import Image
 
-from monai.transforms import RandCropByLabelClassesd, ScaleIntensityRange
+from monai import transforms as monai_transforms
 
 from torch._utils import _accumulate
 from torch import default_generator, Generator
@@ -67,17 +67,17 @@ class MyDataModule(pl.LightningDataModule):
 
     def setup(self, stage: Optional[str] = None):
         # transforms
-        transform = transforms.Compose(
+        transform = monai_transforms.Compose(
             [
-                transforms.ToTensor(),
-                RandCropByLabelClassesd(
+                monai_transforms.ToDevice("cpu"),
+                monai_transforms.RandCropByLabelClassesd(
                     keys=["image", "label"],
                     spatial_size=self.shape,
                     label_key=["label"],
                     num_classes=3,
                     num_samples=1,
                     ratios=[0.1, 2, 2]),
-                ScaleIntensityRange(
+                monai_transforms.ScaleIntensityRange(
                     a_min=0.,
                     a_max=255.,
                     b_min=0.,
@@ -109,6 +109,7 @@ class MyDataModule(pl.LightningDataModule):
                 self.train_dataset, self.val_dataset = continuous_random_split(
                     plank_train, [train_length, val_length]
                 )
+
         elif stage == "test":
             self.test_datasets = [
                 hydra.utils.instantiate(
@@ -126,7 +127,7 @@ class MyDataModule(pl.LightningDataModule):
             shuffle=True,
             batch_size=self.batch_size.train,
             num_workers=self.num_workers.train,
-            multiprocessing_context='fork'
+            # multiprocessing_context='fork'
         )
 
     def val_dataloader(self) -> DataLoader:
@@ -135,7 +136,7 @@ class MyDataModule(pl.LightningDataModule):
             shuffle=False,
             batch_size=self.batch_size.val,
             num_workers=self.num_workers.val,
-            multiprocessing_context='fork'
+            # multiprocessing_context='fork'
         )
 
     def test_dataloader(self) -> Sequence[DataLoader]:
@@ -145,7 +146,7 @@ class MyDataModule(pl.LightningDataModule):
                 shuffle=False,
                 batch_size=self.batch_size.test,
                 num_workers=self.num_workers.test,
-                multiprocessing_context='fork'
+                # multiprocessing_context='fork'
             )
             for dataset in self.test_datasets
         ]
