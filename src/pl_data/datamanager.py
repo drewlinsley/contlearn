@@ -143,7 +143,7 @@ class GetData():
                     dtype = volume.dtype
                     # label_vol = np.zeros((label_shape), dtype=dtype)
                     volume_list, label_list = [], []  # noqa Create a list of the processed label cubes
-                    res_coords = np.ceil(coords * self.image_downsample)  # Resize the coordinates
+                    res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
                     if self.label_transpose_xyz_zyx:
                         res_coords[:, self.label_transpose_xyz_zyx]
                     import pdb;pdb.set_trace()
