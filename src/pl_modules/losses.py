@@ -10,7 +10,7 @@ def no_loss(input, target, weights=None):
 
 def cce(input, target, weights=None):
     """Categorical crossentropy loss. Assumes input is logits."""
-    if weights is not None:
+    if weights and weights is not None:
         weights_len = len(weights)
         weights = weights.reshape(1, weights_len, 1, 1)
     loss = nn.CrossEntropyLoss(weight=weights)
@@ -21,7 +21,7 @@ def cce(input, target, weights=None):
 
 def bce(input, target, weights=None):
     """Binary crossentropy loss. Assumes input is logits."""
-    if weights is not None:
+    if weights and weights is not None:
         weights_len = len(weights)
         weights = weights.reshape(1, weights_len, 1, 1, 1)
     loss = nn.BCEWithLogitsLoss(weight=weights)
