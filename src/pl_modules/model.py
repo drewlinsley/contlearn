@@ -83,7 +83,7 @@ class MyModel(pl.LightningModule):
         return self.net(x)
 
     def step(self, x, y) -> Dict[str, torch.Tensor]:
-        print("step")
+        # print("step")
         logits = self(x)
 
         if isinstance(logits, dict):
