@@ -121,10 +121,12 @@ class Volumetric(Dataset):
         self.selected_label = tag.get(train).get("selected_label")
         self.trim_dims = tag.get(train).get("trim_dims")
         self.force_2d = tag.get(train).get("force_2d")
+        self.shape = tag.get(train).get("shape")
 
         assert self.len is not None, "self.len returned None"
         assert self.selected_label is not None, "self.selected_label returned None"  # noqa
         assert self.trim_dims is not None, "self.trim_dims returned None"
+        assert self.shape is not None, "Provide a shape in the dataset cfg."
         self.shuffle_buffer = min(32, self.len)
         # self.shuffle_buffer = min(64, self.len)
         # self.len = None  # TESTING AUTO-COUNT
