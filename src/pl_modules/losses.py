@@ -33,7 +33,7 @@ def bce(input, target, weights=None):
     target = F.one_hot(
         target.to(torch.int64),
         int(target_max + 1)).to(
-        torch.uint8)  # .permute(3, 0, 1, 2)
+        torch.uint8).permute(0, 4, 1, 2, 3)
     output = loss(input, target.float())
     return output
 
