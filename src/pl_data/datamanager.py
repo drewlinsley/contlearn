@@ -146,7 +146,7 @@ class GetData():
                     res_coords = np.ceil(coords / self.image_downsample)  # Resize the coordinates
                     if self.label_transpose_xyz_zyx:
                         res_coords[:, self.label_transpose_xyz_zyx]
-                    for label, coord in zip(labels, coords):
+                    for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
                         endc = np.minimum(startc + cube_size, label_shape)
