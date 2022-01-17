@@ -69,6 +69,7 @@ class MyDataModule(pl.LightningDataModule):
         # transforms
         transform = transforms.Compose(
             [
+                transforms.ToTensor(),
                 RandCropByLabelClassesd(
                     keys=["image", "label"],
                     spatial_size=self.shape,
@@ -81,9 +82,8 @@ class MyDataModule(pl.LightningDataModule):
                     a_max=255.,
                     b_min=0.,
                     b_max=1.)
-                # transforms.ToTensor(),
             ]
-        ).ToTensor()
+        )
 
         if stage is None or stage == "fit":
             assert self.val_proportion >= 0 and self.val_proportion < 1., \
