@@ -49,7 +49,7 @@ class MyDataModule(pl.LightningDataModule):
         cfg: DictConfig,
         use_train_dataset: str,
         use_val_dataset: str,
-        cube_size: list,
+        shape: list,
     ):
         super().__init__()
         self.cfg = cfg
@@ -59,7 +59,7 @@ class MyDataModule(pl.LightningDataModule):
         self.val_proportion = val_proportion
         self.use_train_dataset = use_train_dataset
         self.use_val_dataset = use_train_dataset
-        self.cube_size = cube_size
+        self.shape = shape
 
         self.train_dataset: Optional[Dataset] = None
         self.val_dataset: Optional[Dataset] = None
@@ -71,7 +71,7 @@ class MyDataModule(pl.LightningDataModule):
             [
                 RandCropByLabelClassesd(
                     keys=["image", "label"],
-                    spatial_size=cube_size,
+                    spatial_size=shape,
                     label_key=["label"],
                     num_classes=3,
                     ratios=[0, 1, 1]),

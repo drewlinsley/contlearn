@@ -71,6 +71,7 @@ data:
     val_proportion: 0.2
     use_train_dataset: Celltype_Prediction
     use_val_dataset: Celltype_Prediction
+    shape: "${data.cube_size}"
     datasets:
       Celltype_Prediction:
         train:
@@ -80,7 +81,6 @@ data:
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
           # len: 97
           len: 128
-          shape: "${data.cube_size}"
           trim_dims: [[0, 384], [0, 384], [340, 768]]
           force_2d: "${model.force_2d}"
           selected_label: {1: 1, 2: 1, 3: 0, 4: 0, 5: 2, 6: 1}
@@ -93,7 +93,6 @@ data:
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
           # len: 11
           len: 10
-          shape: "${data.cube_size}"
           # trim_dims: [[34, 52], [156, 384], [156, 384]]
           trim_dims: [[140, 180], [0, 384], [0, 340]]
           force_2d: "${model.force_2d}"
