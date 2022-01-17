@@ -71,7 +71,7 @@ class MyDataModule(pl.LightningDataModule):
             [
                 RandCropByLabelClassesd(
                     keys=["image", "label"],
-                    spatial_size=shape,
+                    spatial_size=self.shape,
                     label_key=["label"],
                     num_classes=3,
                     ratios=[0, 1, 1]),
