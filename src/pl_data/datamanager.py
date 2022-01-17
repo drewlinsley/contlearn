@@ -141,7 +141,8 @@ class GetData():
                     cube_size = np.asarray(self.cube_size).astype(int)
                     label_shape = np.ceil(np.asarray(volume.shape[:-1]) / self.image_downsample).astype(int)[::-1]  # noqa
                     dtype = volume.dtype
-                    label_vol = np.zeros((label_shape), dtype=dtype)
+                    # label_vol = np.zeros((label_shape), dtype=dtype)
+                    volume_list, label_list = [], []  # noqa Create a list of the processed label cubes
                     for label, coord in zip(labels, coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
@@ -154,10 +155,16 @@ class GetData():
                             dtype=dtype,
                             label=label)
 
-                        label_vol[
+                        # label_vol[
+                        #     startc[0]: endc[0],
+                        #     startc[1]: endc[1],
+                        #     startc[2]: endc[2]] = cube
+                        label_list.append(cube)
+                        volume_list.append(volume[
                             startc[0]: endc[0],
                             startc[1]: endc[1],
-                            startc[2]: endc[2]] = cube
+                            startc[2]: endc[2]])
+                        print(cube.shape)
 
                     # Transpose images if requested
                     if self.image_transpose_xyz_zyx:
