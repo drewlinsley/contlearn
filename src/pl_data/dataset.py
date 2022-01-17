@@ -171,10 +171,11 @@ class Volumetric(Dataset):
             self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
             self.ds["label"] = self.ds["label"][z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
 
-        if self.selected_label and type(dict(self.selected_label)) is dict:
+        label_max = self.ds["label"].max()
+        if label_max > 1:
             self.ds["label"] = F.one_hot(
                 self.ds["label"].to(torch.int64),
-                int(self.ds["label"].max() + 1)).to(
+                int(label_max + 1)).to(
                 torch.uint8).permute(3, 0, 1, 2)
             self.ds["label"] = self.ds["label"]
         else:
