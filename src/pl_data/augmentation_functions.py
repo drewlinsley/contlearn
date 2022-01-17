@@ -184,5 +184,5 @@ def cast_label(volume, label, params):
 def random_selection(volume, label, params):
     """Apply normalization to volume."""
     bs = len(volume)
-    sel = np.random.randint(bs)[0]
+    sel = np.random.randint(bs)
     return volume[sel], label[sel]
