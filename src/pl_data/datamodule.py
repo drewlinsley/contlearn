@@ -86,9 +86,10 @@ class MyDataModule(pl.LightningDataModule):
             ]
         )
 
-
         import pdb;pdb.set_trace()
         if stage is None or stage == "fit":
+            assert self.val_percentage >= 0 and self.val_percentage < 1., \
+                "val_percentage must be 1 > x >= 0"
             plank_train = hydra.utils.instantiate(
                 self.datasets[self.use_train_dataset].train,
                 cfg=self.cfg,
