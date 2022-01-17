@@ -24,6 +24,8 @@ def bce(input, target, weights=None):
     if weights and weights is not None:
         weights_len = len(weights)
         weights = weights.reshape(1, weights_len, 1, 1, 1)
+    else:
+        weights = None
     loss = nn.BCEWithLogitsLoss(weight=weights)
 
     # One hot the labels
