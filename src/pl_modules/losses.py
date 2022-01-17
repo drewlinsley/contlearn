@@ -29,12 +29,11 @@ def bce(input, target, weights=None):
     loss = nn.BCEWithLogitsLoss()  # weight=weights)
 
     # One hot the labels
-    print(target.shape)
     target_max = target.max()
     target = F.one_hot(
         target.to(torch.int64),
         int(target_max + 1)).to(
-        torch.uint8).permute(3, 0, 1, 2)
+        torch.uint8)  # .permute(3, 0, 1, 2)
     output = loss(input, target.float())
     return output
 
