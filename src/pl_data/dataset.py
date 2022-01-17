@@ -182,6 +182,8 @@ class Volumetric(Dataset):
         else:
             self.ds["label"] = self.ds["label"][None]  # Add singleton channel
 
+        self.ds["volume"] = self.ds["volume"].float()
+        self.ds["label"] = self.ds["label"].float()
         if self.len is None:
             print("Counting length of {}".format(train))
             self.len = len([idx for idx, _ in enumerate(self.ds)])
