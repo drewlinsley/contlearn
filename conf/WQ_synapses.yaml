@@ -114,9 +114,9 @@ data:
       test: 1
 
     batch_size:
-      train: ${mult:8,2}
-      val: ${mult:8,2}
-      test: ${mult:8,2}
+      train: ${mult:8,1}
+      val: ${mult:8,1}
+      test: ${mult:8,1}
 
 metric:
   name: F1
