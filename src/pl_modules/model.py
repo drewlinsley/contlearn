@@ -84,6 +84,7 @@ class MyModel(pl.LightningModule):
 
     def step(self, x, y) -> Dict[str, torch.Tensor]:
         logits = self(x)
+        print("step")
 
         if isinstance(logits, dict):
             penalty = logits["penalty"]
