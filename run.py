@@ -27,8 +27,8 @@ os.chdir(Path(__file__).parent.parent)
 
 # Load environment variables
 load_envs()
-if os.environ.get("LOCAL_RANK", None) is None:
-    os.environ["EXP_LOG_DIR"] = logger.experiment.dir
+# if os.environ.get("LOCAL_RANK", None) is None:
+#     os.environ["EXP_LOG_DIR"] = logger.experiment.dir
 
 # Create handy resolvers for the omegaconfs
 OmegaConf.register_new_resolver("mult", lambda x, y: x * y)
