@@ -139,7 +139,7 @@ class GetData():
                     # Create annotation image
                     annotation_size = np.asarray(self.annotation_size).astype(int)  # noqa
                     cube_size = np.asarray(self.cube_size).astype(int)
-                    label_shape = np.ceil(np.asarray(volume.shape[:-1]) / self.image_downsample).astype(int)[::-1]  # noqa
+                    label_shape = np.ceil(np.asarray(volume.shape[:-1]) / self.image_downsample).astype(int)  # noqa
                     dtype = volume.dtype
                     # label_vol = np.zeros((label_shape), dtype=dtype)
                     volume_list, label_list = [], []  # noqa Create a list of the processed label cubes
