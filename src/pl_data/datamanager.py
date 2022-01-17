@@ -172,7 +172,6 @@ class GetData():
                             volume_list.append(vol)
 
                     # Transpose images if requested
-                    import pdb;pdb.set_trace()
                     volume = np.asarray(volume_list)
                     label = np.asarray(label_list)
                     # if self.image_transpose_xyz_zyx:
@@ -206,7 +205,7 @@ class GetData():
                     #             total=len(volume)))
                     #     volume = np.asarray(res_volume)
                     #     volume = volume.transpose(3, 0, 1, 2)  # Channels first
-                    return volume, label_vol
+                    return volume, label
 
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
