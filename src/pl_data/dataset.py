@@ -149,7 +149,7 @@ class Volumetric(Dataset):
         }
 
         # Remap labels if requested
-        if type(dict(self.selected_label)) is dict:
+        if self.selected_label and type(dict(self.selected_label)) is dict:
             self.selected_label = dict(self.selected_label)
             self.ds["label"] = fastremap.remap(
                 label,
