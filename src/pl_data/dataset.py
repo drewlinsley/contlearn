@@ -132,7 +132,7 @@ class Volumetric(Dataset):
         # self.len = None  # TESTING AUTO-COUNT
         self.augmentations = [
             # {"randomcrop": self.shape},
-            {"randomselection": None}
+            {"randomselection": None},
             # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
             # {"randomrotate": [(2, 3)]},  # Axes to rotate
             # {"randomflip": [1, 2, 3]},  # Axes to rotate
@@ -167,13 +167,6 @@ class Volumetric(Dataset):
             raise RuntimeError(
                 "The selected_label must be a dictionary or False.")
         self.ds["label"] = torch.as_tensor(self.ds["label"])  # noqa
-
-        # if self.trim_dims:
-        #     z = self.trim_dims[0]
-        #     y = self.trim_dims[1]
-        #     x = self.trim_dims[2]
-        #     self.ds["volume"] = self.ds["volume"][:, z[0]: z[1], y[0]: y[1], x[0]: x[1]] # noqa
-        #     self.ds["label"] = self.ds["label"][z[0]: z[1], y[0]: y[1], x[0]: x[1]]  # noqa
 
         # label_max = self.ds["label"].max()
         # if label_max > 1:
