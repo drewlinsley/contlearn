@@ -158,13 +158,13 @@ class GetData():
                         #     startc[0]: endc[0],
                         #     startc[1]: endc[1],
                         #     startc[2]: endc[2]] = cube
-                        if np.all(np.asarray(cube.shape) == self.cube_size):
+                        vol = volume[
+                            startc[0]: endc[0],
+                            startc[1]: endc[1],
+                            startc[2]: endc[2]]
+                        if np.all(np.asarray(vol.shape) == self.cube_size):
                             label_list.append(cube)
-                            volume_list.append(volume[
-                                startc[0]: endc[0],
-                                startc[1]: endc[1],
-                                startc[2]: endc[2]])
-                            print(cube.shape)
+                            volume_list.append(vol)
 
                     # Transpose images if requested
                     import pdb;pdb.set_trace()
