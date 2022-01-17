@@ -143,7 +143,9 @@ class GetData():
                     dtype = volume.dtype
                     # label_vol = np.zeros((label_shape), dtype=dtype)
                     volume_list, label_list = [], []  # noqa Create a list of the processed label cubes
-                    import pdb;pdb.set_trace()
+                    res_coords = np.ceil(coords / self.image_downsample)  # Resize the coordinates
+                    if self.label_transpose_xyz_zyx:
+                        res_coords[:, self.label_transpose_xyz_zyx]
                     for label, coord in zip(labels, coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
@@ -160,9 +162,9 @@ class GetData():
                         #     startc[1]: endc[1],
                         #     startc[2]: endc[2]] = cube
                         vol = volume[
-                            startc[2]: endc[2],
+                            startc[0]: endc[0],
                             startc[1]: endc[1],
-                            startc[0]: endc[0]]
+                            startc[2]: endc[2]]
                         if np.all(np.asarray(vol.shape) == self.cube_size):
                             label_list.append(cube)
                             volume_list.append(vol)
