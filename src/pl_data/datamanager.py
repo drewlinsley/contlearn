@@ -205,6 +205,8 @@ class GetData():
                     #             total=len(volume)))
                     #     volume = np.asarray(res_volume)
                     #     volume = volume.transpose(3, 0, 1, 2)  # Channels first
+                    volume = volume.tranpose(0, 4, 1, 2, 3)
+                    label = label[:, None]  # Add singleton channel
                     return volume, label
 
                 elif self.annotation_type == "volumetric":

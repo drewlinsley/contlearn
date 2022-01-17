@@ -29,6 +29,7 @@ def bce(input, target, weights=None):
     loss = nn.BCEWithLogitsLoss()  # weight=weights)
 
     # One hot the labels
+    print(target.shape)
     target_max = target.max()
     target = F.one_hot(
         target.to(torch.int64),
