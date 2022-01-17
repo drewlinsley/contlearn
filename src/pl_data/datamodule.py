@@ -88,15 +88,15 @@ class MyDataModule(pl.LightningDataModule):
 
         import pdb;pdb.set_trace()
         if stage is None or stage == "fit":
-            assert self.val_percentage >= 0 and self.val_percentage < 1., \
-                "val_percentage must be 1 > x >= 0"
+            assert self.val_proportion >= 0 and self.val_proportion < 1., \
+                "val_proportion must be 1 > x >= 0"
             plank_train = hydra.utils.instantiate(
                 self.datasets[self.use_train_dataset].train,
                 cfg=self.cfg,
                 transform=transform,
                 _recursive_=False
             )
-            if self.val_percentage == 0:
+            if self.val_proportion == 0:
                 plank_val = hydra.utils.instantiate(
                     self.datasets[self.use_val_dataset].val,
                     cfg=self.cfg,
@@ -106,7 +106,7 @@ class MyDataModule(pl.LightningDataModule):
                 self.train_dataset = plank_train
                 self.val_dataset = plank_val
             else:
-                train_length = int(len(plank_train) * (1 - self.val_percentage))  # noqa
+                train_length = int(len(plank_train) * (1 - self.val_proportion))  # noqa
                 val_length = len(plank_train) - train_length
                 self.train_dataset, self.val_dataset = continuous_random_split(
                     plank_train, [train_length, val_length]
