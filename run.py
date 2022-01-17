@@ -27,6 +27,8 @@ os.chdir(Path(__file__).parent.parent)
 
 # Load environment variables
 load_envs()
+if os.environ.get("LOCAL_RANK", None) is None:
+    os.environ["EXP_LOG_DIR"] = logger.experiment.dir
 
 # Create handy resolvers for the omegaconfs
 OmegaConf.register_new_resolver("mult", lambda x, y: x * y)
@@ -145,18 +147,21 @@ def run(cfg: DictConfig) -> None:
     wandb_logger = None
     if "wandb" in cfg.logging:
         hydra.utils.log.info(f"Instantiating <WandbLogger>")
-        wandb_config = cfg.logging.wandb
-        wandb_logger = WandbLogger(
-            name=cfg.data.datamodule.use_train_dataset + "__" + cfg.model.name,
-            project=wandb_config.project,
-            entity=wandb_config.entity,
-            tags=cfg.core.tags,
-            log_model=True,
-        )
-        hydra.utils.log.info(f"W&B is now watching <{wandb_config.watch.log}>!")
-        wandb_logger.watch(
-            model, log=wandb_config.watch.log, log_freq=wandb_config.watch.log_freq
-        )
+        # wandb_config = cfg.logging.wandb
+        # wandb_logger = WandbLogger(
+        #     name=cfg.data.datamodule.use_train_dataset + "__" + cfg.model.name,
+        #     project=wandb_config.project,
+        #     entity=wandb_config.entity,
+        #     tags=cfg.core.tags,
+        #     log_model=True,
+        # )
+        # hydra.utils.log.info(
+        #     f"W&B is now watching <{wandb_config.watch.log}>!")
+        # wandb_logger.watch(
+        #     model,
+        #     log=wandb_config.watch.log,
+        #     log_freq=wandb_config.watch.log_freq
+        # )
 
     hydra.utils.log.info(f"Instantiating the Trainer")
 
