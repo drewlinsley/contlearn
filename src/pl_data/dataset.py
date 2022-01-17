@@ -118,13 +118,11 @@ class Volumetric(Dataset):
         tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
         train = "train" if self.train else "val"
         self.len = tag.get(train).get("len")
-        self.shape = tag.get(train).get("shape")
         self.selected_label = tag.get(train).get("selected_label")
         self.trim_dims = tag.get(train).get("trim_dims")
         self.force_2d = tag.get(train).get("force_2d")
 
         assert self.len is not None, "self.len returned None"
-        assert self.shape is not None, "self.shape returned None"
         assert self.selected_label is not None, "self.selected_label returned None"  # noqa
         assert self.trim_dims is not None, "self.trim_dims returned None"
         self.shuffle_buffer = min(32, self.len)
