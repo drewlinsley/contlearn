@@ -94,7 +94,7 @@ class MyModel(pl.LightningModule):
             loss = loss + penalty
         else:
             # loss = self.loss(logits, y, self.loss_weights)
-            loss = self.loss(logits, y)
+            loss = self.loss(logits, y.float())
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
