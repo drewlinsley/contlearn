@@ -17,7 +17,7 @@ from captum.attr import IntegratedGradients
 from captum.attr import NoiseTunnel
 from captum.attr import visualization as viz
 
-from monai import losses
+from monai import losses as monai_losses
 
 from src.common.utils import iterate_elements_in_batches, render_images
 
@@ -50,7 +50,7 @@ class MyModel(pl.LightningModule):
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)  # getattr(losses, loss)
-        self.loss = losses.DiceLoss
+        self.loss = monai_losses.DiceLoss
         # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
