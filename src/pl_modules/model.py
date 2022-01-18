@@ -183,20 +183,17 @@ class MyModel(pl.LightningModule):
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
-            print("image: {}".format(output_element["image"].shape))
-            print("y_true: {}".format(output_element["y_true"].shape))
-            print("logits: {}".format(output_element["logits"].shape))
+            # print("image: {}".format(output_element["image"].shape))
+            # print("y_true: {}".format(output_element["y_true"].shape))
+            # print("logits: {}".format(output_element["logits"].shape))
 
-            mid = output_element["image"].shape[2] // 2  # midpoint on z-axis
+            mid = output_element["image"].shape[1] // 2  # midpoint on z-axis
 
             if self.cfg.model.plot_argmax:
                 gt = output_element["y_true"][mid].argmax(dim=0)[None]
-                output_seg = output_element["logits"][:, mid].argmax(dim=0)[None]  # noqa
             else:
-                gt = output_element["y_true"]
-                gt = gt[mid][None]
-                output_seg = output_element["logits"]
-                output_seg = output_seg[:, mid].argmax(dim=0)[None]
+                gt = output_element["y_true"][mid][None]
+            output_seg = output_element["logits"].argmax(dim=0)[mid][None]
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
