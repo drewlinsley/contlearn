@@ -180,7 +180,6 @@ class MyModel(pl.LightningModule):
     def validation_epoch_end(self, outputs: List[Any]) -> None:
         batch_size = self.cfg.data.datamodule.batch_size.val
         images = []
-        print("start logging image")
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
@@ -216,7 +215,7 @@ class MyModel(pl.LightningModule):
                 )
             )
         self.logger.experiment.log(
-            {"Validation Images": images})
+            {"Validation Images": images}, commit=False)
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
