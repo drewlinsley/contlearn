@@ -3,7 +3,7 @@ import os
 import hydra
 import pytorch_lightning as pl
 import torchmetrics
-import torchvision.float()
+import torchvision
 import torch
 import torch.nn.functional as F
 import wandb
