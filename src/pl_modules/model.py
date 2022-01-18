@@ -71,6 +71,7 @@ class MyModel(pl.LightningModule):
                 in_channels=self.cfg.model.in_channels,
                 out_channels=self.cfg.model.out_channels)
         self.ckpt = ckpt
+        self.maxval = out_channels
 
         # metric_mod = import_module(torchmetrics)
         # metric = getattr(metric_mod, self.cfg.metric.name)()
@@ -91,12 +92,12 @@ class MyModel(pl.LightningModule):
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = self.loss(logits, y, self.loss_weights)
+            loss = self.loss(logits, y, self.loss_weights, maxval=self.maxval)
             # loss = self.loss.forward(logits, y, self.loss_weights)
             loss = loss + penalty
         else:
             # loss = self.loss(logits, y, self.loss_weights)
-            loss = self.loss(logits, y)
+            loss = self.loss(logits, y, maxval=self.maxval)
         return {
             "logits": logits.detach(),
             "loss": loss,

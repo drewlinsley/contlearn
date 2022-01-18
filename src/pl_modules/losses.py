@@ -3,12 +3,12 @@ from torch import nn
 from torch.nn import functional as F
 
 
-def no_loss(input, target, weights=None):
+def no_loss(input, target, maxval=None, weights=None):
     """Dummy function."""
     return torch.tensor([0.])
 
 
-def cce(input, target, weights=None):
+def cce(input, target, maxval=None, maxval=None, weights=None):
     """Categorical crossentropy loss. Assumes input is logits."""
     if weights and weights is not None:
         weights_len = len(weights)
@@ -19,8 +19,9 @@ def cce(input, target, weights=None):
     return output
 
 
-def bce(input, target, weights=None):
+def bce(input, target, maxval=None, weights=None):
     """Binary crossentropy loss. Assumes input is logits."""
+    assert maxval is not None, "Loss needs a maxval for the target."
     if weights and weights is not None:
         weights_len = len(weights)
         weights = weights.reshape(1, weights_len, 1, 1, 1)
@@ -40,7 +41,7 @@ def bce(input, target, weights=None):
     return output
 
 
-def dice_loss(input, target, smooth=1., weights=None):
+def dice_loss(input, target, maxval=None, smooth=1., weights=None):
     """Dice loss. Assumes input is logits."""
     iflat = input.view(-1)
     tflat = target.view(-1)
