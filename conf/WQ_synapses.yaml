@@ -17,7 +17,7 @@ train:
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
     # gpus: 8
-    tpu_cores: 8
+    tpu_cores: 1
     precision: bf16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
@@ -112,8 +112,8 @@ data:
           selected_label: False  
 
     num_workers:
-      train: 0
-      val: 0
+      train: 48
+      val: 48
       test: 1
 
     batch_size:
