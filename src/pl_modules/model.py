@@ -207,6 +207,7 @@ class MyModel(pl.LightningModule):
                     [input_img, gt, output_seg],
                     autoshow=False, nrow=4)
                 caption = f"image____GT____output"
+            print("logging image")
             images.append(
                 wandb.Image(
                     rendered_image,
@@ -214,8 +215,7 @@ class MyModel(pl.LightningModule):
                 )
             )
         self.logger.experiment.log(
-            {"Validation Images": images},
-            step=self.global_step)
+            {"Validation Images": images})
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
