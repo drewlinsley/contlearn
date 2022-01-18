@@ -218,7 +218,10 @@ class MyModel(pl.LightningModule):
                 caption = f"image____GT____output"
             images.append(rendered_image)
         print("loop end")
-        wandb_image = wandb.Image(images[0].numpy(), caption=caption, mode="L")
+        wandb_image = wandb.Image(
+            images[0].cpu().numpy(),
+            caption=caption,
+            mode="L")
         # wandb_image = [wandb.Image(x, caption=caption) for x in images]
         self.logger.experiment.log(
             {"Validation Images": wandb_image})
