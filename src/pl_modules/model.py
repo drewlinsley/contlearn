@@ -188,6 +188,7 @@ class MyModel(pl.LightningModule):
             # print("logits: {}".format(output_element["logits"].shape))
 
             mid = output_element["image"].shape[1] // 2  # midpoint on z-axis
+            print("loop start")
 
             if self.cfg.model.plot_argmax:
                 gt = output_element["y_true"][mid].argmax(dim=0)[None]
@@ -199,23 +200,23 @@ class MyModel(pl.LightningModule):
                 input_seg = output_element["image"][1, mid][None]
                 rendered_image = render_images(
                     [input_img, input_seg, gt, output_seg],
-                    autoshow=False, nrow=4)
+                    autoshow=False, nrow=1)
                 caption = f"image____mem____GT____output"
             else:
                 input_img = output_element["image"][0, mid][None]
                 rendered_image = render_images(
                     [input_img, gt, output_seg],
-                    autoshow=False, nrow=4)
+                    autoshow=False, nrow=1)
                 caption = f"image____GT____output"
-            print("logging image")
             images.append(
                 wandb.Image(
                     rendered_image,
                     caption=caption,
                 )
             )
+            print("loop end")
         self.logger.experiment.log(
-            {"Validation Images": images}, commit=False)
+            {"Validation Images": images})
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
