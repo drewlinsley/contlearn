@@ -19,6 +19,8 @@ from pytorch_lightning.callbacks import (
 )
 from pytorch_lightning.loggers import WandbLogger
 
+import wandb
+
 from src.common.utils import load_envs
 import torch
 torch.backends.cudnn.benchmark = True
@@ -150,6 +152,7 @@ def run(cfg: DictConfig) -> None:
     wandb_logger = None
     if "wandb" in cfg.logging:
         hydra.utils.log.info(f"Instantiating <WandbLogger>")
+        wandb.require(experiment="service")
         wandb_config = cfg.logging.wandb
         wandb_logger = WandbLogger(
             name=cfg.data.datamodule.use_train_dataset + "__" + cfg.model.name,
