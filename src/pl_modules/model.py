@@ -3,7 +3,7 @@ import os
 import hydra
 import pytorch_lightning as pl
 import torchmetrics
-import torchvision
+import torchvision.float()
 import torch
 import torch.nn.functional as F
 import wandb
@@ -202,10 +202,10 @@ class MyModel(pl.LightningModule):
                 print("creating image")
                 rendered_image = torchvision.utils.make_grid(
                     torch.cat([
-                        input_img,
-                        input_seg,
-                        gt,
-                        output_seg], 0).detach(),
+                        input_img.float(),
+                        input_seg.float(),
+                        gt.float(),
+                        output_seg.float()], 0).detach(),
                     nrow=4,
                     scale_each=True
                 )
