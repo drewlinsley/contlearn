@@ -149,10 +149,6 @@ class MyModel(pl.LightningModule):
                 "val_loss": out["loss"].mean(),
             },
         )
-        print("image: {}".format(out["x"].shape))
-        print("y_true: {}".format(out["y"].shape))
-        print("logits: {}".format(out["logits"].shape))
-        print("val_loss: {}".format(out["val_loss"].shape))
         return {
             "image": out["x"],
             "y_true": out["y"],
@@ -187,43 +183,41 @@ class MyModel(pl.LightningModule):
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
-            mid = output_element["image"].shape[-3] // 2
+            mid = output_element["image"].shape[2] // 2  # midpoint on z-axis
 
-            if len(output_element["image"]) == 2:
-                input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
-                input_seg = output_element["image"][1, mid, ...].unsqueeze(dim=0)
-                if self.cfg.model.plot_argmax:
-                    gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
-                    output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
-                else:
-                    gt = output_element["y_true"]
-                    gt = gt[mid][None]
-                    output_seg = output_element["logits"]
-                    output_seg = output_seg[:, mid].argmax(dim=0).unsqueeze(dim=0)
-                rendered_image = render_images([input_img, input_seg, gt, output_seg], autoshow=False, nrow=4)
-                caption = f"image____mem____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
+            if self.cfg.model.plot_argmax:
+                gt = output_element["y_true"][mid].argmax(dim=0)[None]
+                output_seg = output_element["logits"][:, mid].argmax(dim=0)[None]  # noqa
             else:
-                input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
-                if self.cfg.model.plot_argmax:
-                    gt = output_element["y_true"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
-                    output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
-                else:
-                    gt = output_element["y_true"]
-                    gt = gt[mid][None]
-                    output_seg = output_element["logits"]
-                    output_seg = output_seg[:, mid].argmax(dim=0).unsqueeze(dim=0)
-                rendered_image = render_images([input_img, gt, output_seg], autoshow=False, nrow=4)
-                caption = f"image____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
+                gt = output_element["y_true"]
+                gt = gt[mid][None]
+                output_seg = output_element["logits"]
+                output_seg = output_seg[:, mid].argmax(dim=0)[None]
+            if len(output_element["image"]) == 2:
+                input_img = output_element["image"][0, mid][None]
+                input_seg = output_element["image"][1, mid][None]
+                rendered_image = render_images(
+                    [input_img, input_seg, gt, output_seg],
+                    autoshow=False, nrow=4)
+                caption = f"image____mem____GT____output"
+            else:
+                input_img = output_element["image"][0, mid][None]
+                rendered_image = render_images(
+                    [input_img, gt, output_seg],
+                    autoshow=False, nrow=4)
+                caption = f"image____GT____output"
             images.append(
                 wandb.Image(
                     rendered_image,
                     caption=caption,
                 )
             )
-        if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores > 1:
-            pass
-        else:
-            self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
+        # if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and \
+        #         self.cfg.train.pl_trainer.tpu_cores > 1:
+        # else:
+        self.logger.experiment.log(
+            {"Validation Images": images},
+            step=self.global_step)
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
