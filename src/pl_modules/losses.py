@@ -8,7 +8,7 @@ def no_loss(input, target, maxval=None, weights=None):
     return torch.tensor([0.])
 
 
-def cce(input, target, maxval=None, maxval=None, weights=None):
+def cce(input, target, maxval=None, weights=None):
     """Categorical crossentropy loss. Assumes input is logits."""
     if weights and weights is not None:
         weights_len = len(weights)
