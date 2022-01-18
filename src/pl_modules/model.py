@@ -217,14 +217,14 @@ class MyModel(pl.LightningModule):
                     autoshow=False, nrow=1)
                 caption = f"image____GT____output"
             images.append(rendered_image)
-        print("loop end")
         wandb_image = wandb.Image(
             images[0].cpu().numpy(),
             caption=caption,
             mode="L")
         # wandb_image = [wandb.Image(x, caption=caption) for x in images]
         self.logger.experiment.log(
-            {"Validation Images": wandb_image})
+            {"Validation Images": wandb_image},
+            commit=False)
         print("posted")
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
