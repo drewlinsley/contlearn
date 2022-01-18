@@ -150,7 +150,7 @@ class MyModel(pl.LightningModule):
             },
         )
         print("image: {}".format(out["x"].shape))
-        print("y_true: {}".format(out["y_true"].shape))
+        print("y_true: {}".format(out["y"].shape))
         print("logits: {}".format(out["logits"].shape))
         print("val_loss: {}".format(out["val_loss"].shape))
         return {
