@@ -114,8 +114,6 @@ class MyModel(pl.LightningModule):
         return out
 
     def training_step_end(self, out):
-        print(out["logits"].shape)
-        print(out["y"].shape)
         # self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
         self.log_dict(
             {
@@ -211,7 +209,7 @@ class MyModel(pl.LightningModule):
         #     pass
         # else:
         #     # self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
-        self.logger.experiment.log({"Validation Images": images})
+        self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
