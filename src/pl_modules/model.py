@@ -183,6 +183,10 @@ class MyModel(pl.LightningModule):
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
+            print("image: {}".format(output_element["image"].shape))
+            print("y_true: {}".format(output_element["y_true"].shape))
+            print("logits: {}".format(output_element["logits"].shape))
+
             mid = output_element["image"].shape[2] // 2  # midpoint on z-axis
 
             if self.cfg.model.plot_argmax:
@@ -212,9 +216,6 @@ class MyModel(pl.LightningModule):
                     caption=caption,
                 )
             )
-        # if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and \
-        #         self.cfg.train.pl_trainer.tpu_cores > 1:
-        # else:
         self.logger.experiment.log(
             {"Validation Images": images},
             step=self.global_step)
