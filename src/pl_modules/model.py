@@ -217,18 +217,23 @@ class MyModel(pl.LightningModule):
                     autoshow=False, nrow=1)
                 caption = f"image____GT____output"
             images.append(rendered_image)
-        # wandb_image = wandb.Image(
-        #     images[0].cpu().numpy(),
-        #     caption=caption,
-        #     mode="L")
+        wandb_image = wandb.Image(
+            images[0].cpu().numpy(),
+            caption=caption,
+            mode="L")
         # wandb_image = [wandb.Image(x, caption=caption) for x in images]
         # self.logger.experiment.log(
         #     {"Validation Images": wandb_image},
         #     commit=False)
-        self.logger.experiment.log_image(
-            key="validation samples",
-            images=[images[0]])
+        # self.logger.experiment.log_image(
+        #     key="validation samples",
+        #     images=[images[0]])
         print("posted")
+        self.log_dict(
+            {
+                "validation_samples": wandb_image,
+            },
+        )
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
