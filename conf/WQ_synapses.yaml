@@ -17,7 +17,7 @@ train:
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
     # gpus: 8
-    tpu_cores: 1
+    tpu_cores: 8
     precision: bf16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
@@ -59,7 +59,7 @@ data:
   annotation_type: "nml"  # nml/volumetric/or "???"
   annotation_size: [7, 15, 15]  # z/y/x
   cube_size: [8, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
-  label_transpose_xyz_zyx: [2, 0, 1]
+  label_transpose_xyz_zyx: [2, 1, 0]
   image_transpose_xyz_zyx: False
   image_downsample: [1, 0.2430724356, 0.2430724356]
   label_downsample: False  # [1, 4.114, 4.114]
