@@ -34,6 +34,8 @@ def bce(input, target, weights=None):
         target.to(torch.int64),
         int(target_max + 1)).to(
         torch.uint8).permute(0, 4, 1, 2, 3)
+    print(input.shape)
+    print(target.shape)
     output = loss(input, target.float())
     return output
 
