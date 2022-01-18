@@ -102,7 +102,12 @@ class MyModel(pl.LightningModule):
         else:
             # loss = self.loss(logits, y, self.loss_weights)
             loss = self.loss(logits, y)
-        return {"logits": logits.detach(), "loss": loss, "y": y, "x": x}
+        return {
+            "logits": logits.detach(),
+            "loss": loss,
+            "y": y.detach(),
+            "x": x.detach()
+        }
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x, y = batch
