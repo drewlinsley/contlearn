@@ -32,7 +32,7 @@ def bce(input, target, maxval=None, weights=None):
     # One hot the labels
     target = F.one_hot(
         target.to(torch.int64),
-        maxval + 1).to(
+        maxval).to(
         torch.uint8).permute(0, 4, 1, 2, 3)
     output = loss(input, target.float())
     return output
