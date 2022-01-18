@@ -34,6 +34,7 @@ class MyModel(pl.LightningModule):
             loss_weights,
             ckpt,
             loss,
+            metric,
             in_channels,
             out_channels,
             force_2d,
@@ -41,15 +42,19 @@ class MyModel(pl.LightningModule):
             *args,
             **kwargs) -> None:
         super().__init__(*args, **kwargs)
+
+        # Dont save the cfg on tpus. Bug.
         self.cfg = cfg
         if hasattr(self.cfg.train.pl_trainer, "gpus"):
             self.save_hyperparameters(cfg)
         else:
             self.save_hyperparameters()
         self.name = name
+        import pdb;pdb.set_trace()
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)  # getattr(losses, loss)
+
         # self.loss = monai_losses.DiceLoss
         # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
@@ -70,6 +75,8 @@ class MyModel(pl.LightningModule):
 
         # metric_mod = import_module(torchmetrics)
         # metric = getattr(metric_mod, self.cfg.metric.name)()
+        import pdb;pdb.set_trace()
+        metric
         p, m = self.cfg.metric._target_.rsplit('.', 1)
         mod = import_module(p)
         metric = getattr(mod, m)
@@ -95,7 +102,7 @@ class MyModel(pl.LightningModule):
         else:
             # loss = self.loss(logits, y, self.loss_weights)
             loss = self.loss(logits, y)
-        return {"logits": logits, "loss": loss, "y": y, "x": x}
+        return {"logits": logits.detach(), "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x, y = batch
