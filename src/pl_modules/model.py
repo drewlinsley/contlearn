@@ -205,11 +205,11 @@ class MyModel(pl.LightningModule):
                     caption=caption,
                 )
             )
-        if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores > 1:
-            pass
-        else:
-            # self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
-            self.logger.experiment.log({"Validation Images": images})
+        # if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores > 1:
+        #     pass
+        # else:
+        #     # self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
+        self.logger.experiment.log({"Validation Images": images})
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
