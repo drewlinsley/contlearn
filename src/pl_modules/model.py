@@ -114,10 +114,12 @@ class MyModel(pl.LightningModule):
         return out
 
     def training_step_end(self, out):
-        self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
+        print(out["logits"].shape)
+        print(out["y"].shape)
+        # self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
         self.log_dict(
             {
-                "train_acc": self.train_accuracy,
+                # "train_acc": self.train_accuracy,
                 "train_loss": out["loss"].mean(),
             },
             on_step=False,
@@ -136,10 +138,10 @@ class MyModel(pl.LightningModule):
         return out
 
     def validation_step_end(self, out):
-        self.val_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
+        # self.val_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
         self.log_dict(
             {
-                "val_acc": self.val_accuracy,
+                # "val_acc": self.val_accuracy,
                 "val_loss": out["loss"].mean(),
             },
         )
