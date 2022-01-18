@@ -198,6 +198,7 @@ class MyModel(pl.LightningModule):
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
+                print("creating image")
                 rendered_image = render_images(
                     [input_img, input_seg, gt, output_seg],
                     autoshow=False, nrow=1)
@@ -208,6 +209,7 @@ class MyModel(pl.LightningModule):
                     [input_img, gt, output_seg],
                     autoshow=False, nrow=1)
                 caption = f"image____GT____output"
+            print("writing image")
             images.append(
                 wandb.Image(
                     rendered_image,
