@@ -221,6 +221,7 @@ class MyModel(pl.LightningModule):
         wandb_image = [wandb.Image(x, caption=caption) for x in images]
         self.logger.experiment.log(
             {"Validation Images": wandb_image})
+        print("posted")
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
