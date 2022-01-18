@@ -154,7 +154,7 @@ hydra:
       WANDB_START_METHOD: thread
 
 logging:
-  n_elements_to_log: 1  # Set to 1 if tpu=8
+  n_elements_to_log: 2  # Set to 1 if tpu=8s
   log_every_n_steps: 1
 
   # log frequency
