@@ -199,9 +199,15 @@ class MyModel(pl.LightningModule):
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
                 print("creating image")
-                rendered_image = render_images(
-                    [input_img, input_seg, gt, output_seg],
-                    autoshow=False, nrow=1)
+                rendered_image = torchvision.utils.make_grid(
+                    torch.cat([
+                        input_img,
+                        input_seg,
+                        gt,
+                        output_seg], 0).detach(),
+                    nrow=4,
+                    scale_each=True
+                )
                 caption = f"image____mem____GT____output"
             else:
                 input_img = output_element["image"][0, mid][None]
