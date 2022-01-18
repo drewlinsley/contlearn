@@ -151,7 +151,7 @@ hydra:
 
   job:
     env_set:
-      WANDB_START_METHOD: thread
+      WANDB_START_METHOD: spawn
 
 logging:
   n_elements_to_log: 2  # Set to 1 if tpu=8s
