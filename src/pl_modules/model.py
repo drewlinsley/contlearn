@@ -50,7 +50,6 @@ class MyModel(pl.LightningModule):
         else:
             self.save_hyperparameters()
         self.name = name
-        import pdb;pdb.set_trace()
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)  # getattr(losses, loss)
@@ -76,8 +75,7 @@ class MyModel(pl.LightningModule):
         # metric_mod = import_module(torchmetrics)
         # metric = getattr(metric_mod, self.cfg.metric.name)()
         import pdb;pdb.set_trace()
-        metric
-        p, m = self.cfg.metric._target_.rsplit('.', 1)
+        p, m = metric.rsplit('.', 1)
         mod = import_module(p)
         metric = getattr(mod, m)
         if self.cfg.metric.is_function:
@@ -118,17 +116,17 @@ class MyModel(pl.LightningModule):
         # opt.step()
         return out
 
-    # def training_step_end(self, out):
-    #     self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
-    #     self.log_dict(
-    #         {
-    #             "train_acc": self.train_accuracy,
-    #             "train_loss": out["loss"].mean(),
-    #         },
-    #         on_step=True,
-    #         on_epoch=False
-    #     )
-    #     return out["loss"].mean()
+    def training_step_end(self, out):
+        self.train_accuracy(torch.softmax(out["logits"], dim=1), out["y"])
+        self.log_dict(
+            {
+                "train_acc": self.train_accuracy,
+                "train_loss": out["loss"].mean(),
+            },
+            on_step=True,
+            on_epoch=False
+        )
+        return out["loss"].mean()
 
     def validation_step(
             self,
