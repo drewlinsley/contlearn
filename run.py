@@ -156,15 +156,15 @@ def run(cfg: DictConfig) -> None:
             project=wandb_config.project,
             entity=wandb_config.entity,
             tags=cfg.core.tags,
-            # log_model=True,
+            log_model=True,
         )
         hydra.utils.log.info(
             f"W&B is now watching <{wandb_config.watch.log}>!")
-        wandb_logger.watch(
-            model,
-            log=wandb_config.watch.log,
-            log_freq=wandb_config.watch.log_freq
-        )
+        # wandb_logger.watch(
+        #     model,
+        #     log=wandb_config.watch.log,
+        #     log_freq=wandb_config.watch.log_freq
+        # )
 
     hydra.utils.log.info(f"Instantiating the Trainer")
 
