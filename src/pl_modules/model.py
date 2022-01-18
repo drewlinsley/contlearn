@@ -198,16 +198,9 @@ class MyModel(pl.LightningModule):
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
-                rendered_image = torchvision.utils.make_grid(
-                    torch.cat([
-                        input_img.float(),
-                        input_seg.float(),
-                        gt.float(),
-                        output_seg.float()],
-                        0).detach(),
-                    nrow=4,
-                    scale_each=True
-                )
+                rendered_image = render_images(
+                    [input_img.float(), input_seg.float(), gt.float(), output_seg.float()],
+                    autoshow=False, nrow=4)
                 caption = f"image____mem____GT____output"
             else:
                 raise NotImplementedError("Needs to be tested.")
@@ -224,7 +217,6 @@ class MyModel(pl.LightningModule):
             wandb_image = [wandb.Image(x, caption=caption) for x in images]
             self.logger.experiment.log(
                 {"Validation Images": wandb_image})
-            print("posted")
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
