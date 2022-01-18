@@ -149,6 +149,10 @@ class MyModel(pl.LightningModule):
                 "val_loss": out["loss"].mean(),
             },
         )
+        print("image: {}".format(out["x"].shape))
+        print("y_true: {}".format(out["y_true"].shape))
+        print("logits: {}".format(out["logits"].shape))
+        print("val_loss: {}".format(out["val_loss"].shape))
         return {
             "image": out["x"],
             "y_true": out["y"],
@@ -184,9 +188,6 @@ class MyModel(pl.LightningModule):
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
             mid = output_element["image"].shape[-3] // 2
-            print(output_element["image"].shape)
-            print(output_element["logits"].shape)
-            print(output_element["y_true"].shape)
 
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid, ...].unsqueeze(dim=0)
