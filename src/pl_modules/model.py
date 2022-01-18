@@ -99,7 +99,6 @@ class MyModel(pl.LightningModule):
             # loss = self.loss(logits, y, self.loss_weights)
             # loss = self.loss(logits, y, maxval=self.maxval)
             loss = self.loss(logits, y)
-            print(loss.shape)
         return {
             "logits": logits.detach(),
             "loss": loss,
