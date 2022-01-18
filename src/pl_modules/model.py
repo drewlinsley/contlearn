@@ -187,10 +187,8 @@ class MyModel(pl.LightningModule):
                     output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
                 else:
                     gt = output_element["y_true"]
-                    print(gt.shape)
-                    gt = gt[mid]
+                    gt = gt[mid][None]
                     output_seg = output_element["logits"]
-                    print(output_seg.shape)
                     output_seg = output_seg[:, mid]
                 rendered_image = render_images([input_img, input_seg, gt, output_seg], autoshow=False, nrow=4)
                 caption = f"image____mem____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
@@ -201,10 +199,8 @@ class MyModel(pl.LightningModule):
                     output_seg = output_element["logits"][:, mid, ...].argmax(dim=0).unsqueeze(dim=0)
                 else:
                     gt = output_element["y_true"]
-                    print(gt.shape)
-                    gt = gt[mid]
+                    gt = gt[mid][None]
                     output_seg = output_element["logits"]
-                    print(output_seg.shape)
                     output_seg = output_seg[:, mid]
                 rendered_image = render_images([input_img, gt, output_seg], autoshow=False, nrow=4)
                 caption = f"image____GT____output"  # y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
