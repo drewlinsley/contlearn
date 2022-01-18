@@ -97,7 +97,8 @@ class MyModel(pl.LightningModule):
             loss = loss + penalty
         else:
             # loss = self.loss(logits, y, self.loss_weights)
-            loss = self.loss(logits, y, maxval=self.maxval)
+            # loss = self.loss(logits, y, maxval=self.maxval)
+            loss = self.loss(logits, y, to_onehot_y=True)
         return {
             "logits": logits.detach(),
             "loss": loss,
