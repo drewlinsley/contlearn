@@ -74,7 +74,6 @@ class MyModel(pl.LightningModule):
 
         # metric_mod = import_module(torchmetrics)
         # metric = getattr(metric_mod, self.cfg.metric.name)()
-        import pdb;pdb.set_trace()
         p, m = metric.rsplit('.', 1)
         mod = import_module(p)
         metric = getattr(mod, m)(mdmc_average="samplewise")
