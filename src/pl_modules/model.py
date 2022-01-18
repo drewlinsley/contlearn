@@ -77,9 +77,7 @@ class MyModel(pl.LightningModule):
         import pdb;pdb.set_trace()
         p, m = metric.rsplit('.', 1)
         mod = import_module(p)
-        metric = getattr(mod, m)
-        if self.cfg.metric.is_function:
-            metric = metric()
+        metric = getattr(mod, m)(mdmc_average="samplewise")
         self.train_accuracy = metric.clone().to(self.device)
         self.val_accuracy = metric.clone().to(self.device)
         self.test_accuracy = metric.clone().to(self.device)
