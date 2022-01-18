@@ -51,7 +51,7 @@ def render_images(
     """
     image = (
         torchvision.utils.make_grid(
-            [b.detach().cpu() for b in batch], nrow=nrow, padding=2, normalize=True, scale_each=True
+            [b.detach().cpu() for b in batch], nrow=nrow, padding=2, normalize=False, scale_each=True
         )
         .permute((1, 2, 0))
         .numpy()
