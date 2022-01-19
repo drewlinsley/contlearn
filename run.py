@@ -172,20 +172,26 @@ def run(cfg: DictConfig) -> None:
     hydra.utils.log.info(f"Instantiating the Trainer")
 
     # The Lightning core, the Trainer
-    trainer = pl.Trainer(
-        default_root_dir=hydra_dir,
-        logger=wandb_logger,
-        #callbacks=callbacks,
-        # deterministic=cfg.train.deterministic,
-        val_check_interval=cfg.logging.val_check_interval,
-        log_every_n_steps=cfg.logging.log_every_n_steps,
-        # progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
-        #auto_select_gpus=True,
-        # benchmark=True,
-        accelerator='dp',
-        plugins=[DDPPlugin(find_unused_parameters=False)],
-        **cfg.train.pl_trainer,
-    )
+    if hasattr(cfg.train.pl_trainer, "tpu_cores") and cfg.tran.pl_trainer.tpu_cores:
+        trainer = pl.Trainer(
+            default_root_dir=hydra_dir,
+            logger=wandb_logger,
+            val_check_interval=cfg.logging.val_check_interval,
+            log_every_n_steps=cfg.logging.log_every_n_steps,
+            auto_select_gpus=True,
+            **cfg.train.pl_trainer,
+        )
+    else:
+        trainer = pl.Trainer(
+            default_root_dir=hydra_dir,
+            logger=wandb_logger,
+            val_check_interval=cfg.logging.val_check_interval,
+            log_every_n_steps=cfg.logging.log_every_n_steps,
+            auto_select_gpus=True,
+            accelerator='dp',
+            plugins=[DDPPlugin(find_unused_parameters=False)],
+            **cfg.train.pl_trainer,
+        )
 
     hydra.utils.log.info(f"Starting training!")
     trainer.fit(model=model, datamodule=datamodule)
