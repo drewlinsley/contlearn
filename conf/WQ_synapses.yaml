@@ -16,9 +16,9 @@ train:
 
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
-    # gpus: 8
-    tpu_cores: 1
-    precision: bf16
+    gpus: 8
+    # tpu_cores: 1
+    precision: 32
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
     num_sanity_val_steps: 0
@@ -57,9 +57,9 @@ data:
   token: UTUOQJvbbyRFbD_NSnTMig
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
-  annotation_size: [7, 15, 15]  # z/y/x
-  cube_size: [8, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
-  label_transpose_xyz_zyx: [2, 1, 0]
+  annotation_size: [7, 25, 25]  # z/y/x
+  cube_size: [12, 96, 96]  # After transpose if requested. This is the cube size for the dataset  # noqa
+  label_transpose_xyz_zyx: [2, 0, 1]
   image_transpose_xyz_zyx: False
   image_downsample: [1, 0.2430724356, 0.2430724356]
   label_downsample: False  # [1, 4.114, 4.114]
@@ -117,9 +117,9 @@ data:
       test: 1
 
     batch_size:
-      train: ${mult:8,2}
-      val: ${mult:8,2}
-      test: ${mult:8,2}
+      train: ${mult:8,4}
+      val: ${mult:8,4}
+      test: ${mult:8,4}
 
 optim:
   optimizer:

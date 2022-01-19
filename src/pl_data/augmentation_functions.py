@@ -130,15 +130,17 @@ def randomrotate(volume, label, params):
     """Apply random crop to both volume and label."""
     vol_shape = volume.shape
     label_shape = label.shape
-    combined = torch.cat((volume, label), 0)
+    # combined = torch.cat((volume, label), 0)
 
     # Params tells us which dimensions to rotate over
     for dim in params:
         k = torch.randint(low=0, high=3, size=(1,)).item()
         if k:
-            combined = torch.rot90(combined, k=k, dims=dim)
-    volume = combined[:vol_shape[0]]
-    label = combined[vol_shape[0]:]
+            # combined = torch.rot90(combined, k=k, dims=dim)
+            volume = torch.rot90(volume, k=k, dims=dim)
+            label = torch.rot90(label, k=k, dims=dim)
+    # volume = combined[:vol_shape[0]]
+    # label = combined[vol_shape[0]:]
     return volume, label
 
 
@@ -146,7 +148,7 @@ def randomflip(volume, label, params):
     """Apply random flip to both volume and label."""
     vol_shape = volume.shape
     label_shape = label.shape
-    combined = torch.cat((volume, label), 0)
+    # combined = torch.cat((volume, label), 0)
 
     # Params tells us which dimensions to rotate over
     flips = []
@@ -154,9 +156,11 @@ def randomflip(volume, label, params):
         flip = random.random() > 0.5
         if flip:
             flips.append(dim)
-    combined = torch.flip(combined, dims=flips)
-    volume = combined[:vol_shape[0]]
-    label = combined[vol_shape[0]:]
+    # combined = torch.flip(combined, dims=flips)
+    # volume = combined[:vol_shape[0]]
+    # label = combined[vol_shape[0]:]
+    volume = torch.flip(volume, dims=flips)
+    label = torch.flip(label, dims=flips)
     return volume, label
 
 

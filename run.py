@@ -11,7 +11,7 @@ import pytorch_lightning as pl
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback, seed_everything
-#from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
@@ -182,8 +182,8 @@ def run(cfg: DictConfig) -> None:
         # progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
         #auto_select_gpus=True,
         # benchmark=True,
-        # accelerator='dp',
-        #plugins=[DDPPlugin(find_unused_parameters=True)],
+        accelerator='dp',
+        plugins=[DDPPlugin(find_unused_parameters=False)],
         **cfg.train.pl_trainer,
     )
 

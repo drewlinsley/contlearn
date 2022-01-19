@@ -143,11 +143,11 @@ class GetData():
                     dtype = volume.dtype
                     # label_vol = np.zeros((label_shape), dtype=dtype)
                     volume_list, label_list = [], []  # noqa Create a list of the processed label cubes
-                    res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
                     if self.label_transpose_xyz_zyx:
-                        res_coords = res_coords[
+                        coords = coords[
                             :,
                             self.label_transpose_xyz_zyx]
+                    res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
                     for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
@@ -173,7 +173,7 @@ class GetData():
 
                     # Transpose images if requested
                     volume = np.asarray(volume_list)
-                    label = np.asarray(label_list)
+                    label = np.asarray(label_list)[..., None]
                     # if self.image_transpose_xyz_zyx:
                     #     volume = volume.transpose(
                     #         self.image_transpose_xyz_zyx)
@@ -206,6 +206,7 @@ class GetData():
                     #     volume = np.asarray(res_volume)
                     #     volume = volume.transpose(3, 0, 1, 2)  # Channels first
                     volume = volume.transpose(0, 4, 1, 2, 3)
+                    label = label.transpose(0, 4, 1, 2, 3)
                     # label = label[:, None]  # Add singleton channel
                     return volume, label
 

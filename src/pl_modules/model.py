@@ -100,7 +100,7 @@ class MyModel(pl.LightningModule):
             # loss = self.loss(logits, y, self.loss_weights)
             # loss = self.loss(logits, y, maxval=self.maxval)
             onehot_y = F.one_hot(
-                y.to(torch.int64),
+                y.squeeze(1).to(torch.int64),
                 self.maxval).to(
                 logits.dtype).permute(0, 4, 1, 2, 3)
             loss = self.loss(logits, onehot_y)
@@ -184,17 +184,15 @@ class MyModel(pl.LightningModule):
         for output_element in iterate_elements_in_batches(
             outputs, batch_size, self.cfg.logging.n_elements_to_log
         ):
-            # print("image: {}".format(output_element["image"].shape))
-            # print("y_true: {}".format(output_element["y_true"].shape))
-            # print("logits: {}".format(output_element["logits"].shape))
-
             mid = output_element["image"].shape[1] // 2  # midpoint on z-axis
 
             if self.cfg.model.plot_argmax:
-                gt = output_element["y_true"][mid].argmax(dim=0)[None]
+                gt = output_element["y_true"][:, mid].argmax(dim=0)[None]
             else:
-                gt = output_element["y_true"][mid][None]
-            output_seg = output_element["logits"].argmax(dim=0)[mid][None]
+                gt = output_element["y_true"].float().mean((0, 1))[None]
+                # gt = output_element["y_true"][mid][None]
+            # output_seg = output_element["logits"].argmax(dim=0)[mid][None]
+            output_seg = output_element["logits"].mean((0, 1))[None]
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]

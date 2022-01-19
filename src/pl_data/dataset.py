@@ -197,7 +197,7 @@ class Volumetric(Dataset):
         # Add augs here
         volume, label = augment3d(
             volume=volume,
-            label=label,
+            label=label,  # [:, None],
             augmentations=self.augmentations)
         # # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
         # if self.force_2d:
@@ -205,7 +205,7 @@ class Volumetric(Dataset):
         #     label = label.squeeze(1)
         # else:
         #     volume = volume[0][None]
-        return volume, label
+        return volume, label  # .squeeze(1)
 
     def __repr__(self) -> str:
         return f"MyDataset({self.name}, {self.path})"
