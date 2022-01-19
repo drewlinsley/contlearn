@@ -16,6 +16,6 @@ unset LD_PRELOAD
 
 
 # python run.py --config-name=celltype_gcp_tpu_1.yaml
-python run.py --config-name=WQ_synapses.yaml
+python run.py --config-name=WQ_synapses_tpu.yaml
 # gsutil -m cp -r results/* gs://serrelab/connectomics/results/
 # gsutil -m cp -r results/*/*/*/*/results/*/*/*/*/* gs://serrelab/connectomics/results/
