@@ -192,7 +192,8 @@ class MyModel(pl.LightningModule):
                 gt = output_element["y_true"].float().mean((0, 1))[None]
                 # gt = output_element["y_true"][mid][None]
             # output_seg = output_element["logits"].argmax(dim=0)[mid][None]
-            output_seg = output_element["logits"].mean((0, 1))[None]
+            output_seg = F.softmax(output_element["logits"], dim=1)
+            output_seg = output_seg.mean((0, 1))[None]
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
