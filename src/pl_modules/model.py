@@ -197,16 +197,20 @@ class MyModel(pl.LightningModule):
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
                 rendered_image = render_images(
-                    [input_img.float(), input_seg.float(), gt.float(), output_seg.float()],
+                    [
+                        input_img.float(),
+                        input_seg.float(),
+                        gt.float(),
+                        output_seg.float()],
                     autoshow=False, nrow=4)
-                caption = f"image____mem____GT____output"
+                caption = f"image____membranes____labels____predictions"
             else:
                 raise NotImplementedError("Needs to be tested.")
                 input_img = output_element["image"][0, mid][None]
                 rendered_image = render_images(
                     [input_img.float(), gt.float(), output_seg.float()],
                     autoshow=False, nrow=1)
-                caption = f"image____GT____output"
+                caption = f"image____labels____predictions"
             images.append(rendered_image)
         if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and \
                 self.cfg.train.pl_trainer.tpu_cores > 1:
@@ -214,7 +218,7 @@ class MyModel(pl.LightningModule):
         else:
             wandb_image = [wandb.Image(x, caption=caption) for x in images]
             self.logger.experiment.log(
-                {"Validation Images": wandb_image})
+                {"Validation performance": wandb_image})
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
         # batch_size = self.cfg.data.datamodule.batch_size.test
