@@ -57,7 +57,7 @@ data:
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
   annotation_size: [7, 25, 25]  # z/y/x
-  cube_size: [12, 96, 96]  # After transpose if requested. This is the cube size for the dataset  # noqa
+  cube_size: [15, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
   label_transpose_xyz_zyx: [2, 0, 1]
   image_transpose_xyz_zyx: False
   image_downsample: [1, 0.2430724356, 0.2430724356]
@@ -82,7 +82,7 @@ data:
           # len: 97
           len: 128
           trim_dims: [[0, 384], [0, 384], [340, 768]]
-          shape: "${data.cube_size}"
+          shape: [12, 96, 96]  # "${data.cube_size}"
           force_2d: "${model.force_2d}"
           selected_label: False  
           # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
@@ -96,7 +96,8 @@ data:
           len: 10
           # trim_dims: [[34, 52], [156, 384], [156, 384]]
           trim_dims: [[140, 180], [0, 384], [0, 340]]
-          shape: "${data.cube_size}"
+          # shape: "${data.cube_size}"
+          shape: [12, 96, 96]  # "${data.cube_size}"
           force_2d: "${model.force_2d}"
           selected_label: False  
         test:

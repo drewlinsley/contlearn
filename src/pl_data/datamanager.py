@@ -8,6 +8,7 @@ from webknossos.geometry import Mag, BoundingBox
 import fastremap
 from tqdm import tqdm
 from joblib import Parallel, delayed
+from src.pl_data.augmentation_functions import randomcrop
 
 
 def draw_cube(start, label_size, shape, label, dtype):
@@ -148,6 +149,7 @@ class GetData():
                             :,
                             self.label_transpose_xyz_zyx]
                     res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
+                    # full_cube_size = (cube_size * 1.5).astype(int)
                     for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
@@ -167,6 +169,10 @@ class GetData():
                             startc[0]: endc[0],
                             startc[1]: endc[1],
                             startc[2]: endc[2]]
+
+                        # # Now random crop cube/vol
+                        # vol, cube = randomcrop(vol[None], cube[None], cube_size)
+                        # vol, cube = vol.squeeze(0), cube.squeeze(0)
                         if np.all(np.asarray(vol.shape)[:-1] == self.cube_size):  # noqa
                             label_list.append(cube)
                             volume_list.append(vol)

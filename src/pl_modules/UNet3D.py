@@ -136,7 +136,7 @@ class ResidualUNet3D(Abstract3DUNet):
     """
 
     def __init__(self, in_channels, out_channels, final_sigmoid=False, f_maps=128, layer_order='gcr',
-                 num_groups=8, num_levels=3, is_segmentation=False, conv_padding=3//2, **kwargs):
+                 num_groups=16, num_levels=3, is_segmentation=False, conv_padding=3//2, **kwargs):
         super(ResidualUNet3D, self).__init__(in_channels=in_channels,
                                              out_channels=out_channels,
                                              final_sigmoid=final_sigmoid,

@@ -13,7 +13,7 @@ def cce(input, target, maxval=None, weights=None):
     # if weights and weights is not None:
     #     weights_len = len(weights)
     #     weights = weights.reshape(1, weights_len, 1, 1)
-    loss = nn.CrossEntropyLoss(weight=weights)
+    loss = nn.CrossEntropyLoss()
     # target = torch.argmax(target, 1)
     output = loss(input.float(), target.float().squeeze(1))
     return output
