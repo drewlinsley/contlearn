@@ -172,7 +172,8 @@ def run(cfg: DictConfig) -> None:
     hydra.utils.log.info(f"Instantiating the Trainer")
 
     # The Lightning core, the Trainer
-    if hasattr(cfg.train.pl_trainer, "tpu_cores") and cfg.tran.pl_trainer.tpu_cores:
+    if hasattr(cfg.train.pl_trainer, "tpu_cores") and \
+            cfg.train.pl_trainer.tpu_cores:
         trainer = pl.Trainer(
             default_root_dir=hydra_dir,
             logger=wandb_logger,
