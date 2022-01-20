@@ -16,7 +16,7 @@ train:
 
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
-    tpu_cores: 8
+    tpu_cores: 1
     precision: bf16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
@@ -116,9 +116,9 @@ data:
       test: 1
 
     batch_size:
-      train: ${mult:8,4}
-      val: ${mult:8,4}
-      test: ${mult:8,4}
+      train: ${mult:8,2}
+      val: ${mult:8,2}
+      test: ${mult:8,2}
 
 optim:
   optimizer:
