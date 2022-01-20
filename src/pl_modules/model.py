@@ -53,9 +53,9 @@ class MyModel(pl.LightningModule):
         self.name = name
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
-        # self.loss = getattr(mod, m)  # getattr(losses, loss)
+        self.loss = getattr(mod, m)  # getattr(losses, loss)
 
-        self.loss = monai_losses.DiceLoss()
+        # self.loss = monai_losses.DiceLoss()
         # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)

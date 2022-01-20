@@ -10,12 +10,12 @@ def no_loss(input, target, maxval=None, weights=None):
 
 def cce(input, target, maxval=None, weights=None):
     """Categorical crossentropy loss. Assumes input is logits."""
-    if weights and weights is not None:
-        weights_len = len(weights)
-        weights = weights.reshape(1, weights_len, 1, 1)
+    # if weights and weights is not None:
+    #     weights_len = len(weights)
+    #     weights = weights.reshape(1, weights_len, 1, 1)
     loss = nn.CrossEntropyLoss(weight=weights)
-    target = torch.argmax(target, 1)
-    output = loss(input, target)
+    # target = torch.argmax(target, 1)
+    output = loss(input.float(), target.float().squeeze(1))
     return output
 
 
