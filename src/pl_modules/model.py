@@ -99,11 +99,11 @@ class MyModel(pl.LightningModule):
         else:
             # loss = self.loss(logits, y, self.loss_weights)
             # loss = self.loss(logits, y, maxval=self.maxval)
-            onehot_y = F.one_hot(
-                y.squeeze(1).to(torch.int64),
-                self.maxval).to(
-                logits.dtype).permute(0, 4, 1, 2, 3)
-            loss = self.loss(logits, onehot_y)
+            # onehot_y = F.one_hot(
+            #     y.squeeze(1).to(torch.int64),
+            #     self.maxval).to(
+            #     logits.dtype).permute(0, 4, 1, 2, 3)
+            loss = self.loss(logits, y)  # onehot_y)
         return {
             "logits": logits.detach(),
             "loss": loss,
