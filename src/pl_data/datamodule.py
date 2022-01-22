@@ -144,7 +144,6 @@ class MyDataModule(pl.LightningDataModule):
                 self.train_dataset = plank_train
                 self.val_dataset = plank_val
             else:
-                import pdb;pdb.set_trace()
                 train_length = int(len(plank_train) * (1 - self.val_proportion))  # noqa
                 val_length = len(plank_train) - train_length
                 self.train_dataset, self.val_dataset = continuous_random_split(
