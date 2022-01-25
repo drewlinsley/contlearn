@@ -47,8 +47,8 @@ model:
   loss: src.pl_modules.losses.cce
   metric: torchmetrics.F1
   loss_weights: False  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
-  # ckpt: False
-  ckpt: "../gcp_models/results/2022-01-22/16-18-39/results/2022-01-22/16-18-39/cont-learn/1ehapwge/checkpoints/epoch=569-step=569.ckpt"
+  ckpt: False
+  # ckpt: "../gcp_models/results/2022-01-22/16-18-39/results/2022-01-22/16-18-39/cont-learn/1ehapwge/checkpoints/epoch=569-step=569.ckpt"
   # ckpt: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2  # Image/Membrane inputs
   out_channels: 3  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
