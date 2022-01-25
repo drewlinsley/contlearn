@@ -12,6 +12,7 @@ from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Callback, seed_everything
 from pytorch_lightning.plugins import DDPPlugin
+# from pytorch_lightning.plugins import DataParallelPlugin as DDPPlugin
 from pytorch_lightning.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
@@ -21,7 +22,7 @@ from pytorch_lightning.loggers import WandbLogger
 
 import wandb
 
-from src.common.utils import load_envs
+from src.common.utils import load_envs, weights_update
 import torch
 torch.backends.cudnn.benchmark = True
 # Set the cwd to the project root
@@ -72,17 +73,6 @@ def build_callbacks(cfg: DictConfig) -> List[Callback]:
         )
 
     return callbacks
-
-
-def weights_update(model, checkpoint):
-    model_dict = model.state_dict()
-    pretrained_dict = {
-        k: v
-        for k, v in checkpoint['state_dict'].items()
-        if k in model_dict}
-    model_dict.update(pretrained_dict)
-    model.load_state_dict(model_dict)
-    return model
 
 
 def run(cfg: DictConfig) -> None:
@@ -186,9 +176,10 @@ def run(cfg: DictConfig) -> None:
         trainer = pl.Trainer(
             default_root_dir=hydra_dir,
             logger=wandb_logger,
-            val_check_interval=cfg.logging.val_check_interval,
+            # val_check_interval=cfg.logging.val_check_interval,
+            check_val_every_n_epoch=cfg.logging.check_val_every_n_epoch,
             log_every_n_steps=cfg.logging.log_every_n_steps,
-            auto_select_gpus=True,
+            # auto_select_gpus=True,
             accelerator='dp',
             plugins=[DDPPlugin(find_unused_parameters=False)],
             **cfg.train.pl_trainer,

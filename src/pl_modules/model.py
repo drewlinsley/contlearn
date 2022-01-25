@@ -20,7 +20,7 @@ from captum.attr import visualization as viz
 
 from monai import losses as monai_losses
 
-from src.common.utils import iterate_elements_in_batches, render_images
+from src.common.utils import iterate_elements_in_batches, render_images, weights_update
 
 from src.pl_modules import UNet3D, unet
 from src.pl_modules import losses
@@ -72,6 +72,10 @@ class MyModel(pl.LightningModule):
                 in_channels=self.cfg.model.in_channels,
                 out_channels=self.cfg.model.out_channels)
         self.ckpt = ckpt
+        if self.ckpt:
+            pass
+            # self.net = weights_update(self.net, self.ckpt)
+
         self.maxval = out_channels
 
         # metric_mod = import_module(torchmetrics)

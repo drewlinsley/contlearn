@@ -59,6 +59,7 @@ class Abstract3DUNet(nn.Module):
                                         num_groups, pool_kernel_size)
 
         # create decoder path
+        basic_module = DoubleConv  # Force upsample instead of transpose conv
         self.decoders = create_decoders(f_maps, basic_module, conv_kernel_size, conv_padding, layer_order, num_groups,
                                         upsample=True)
 
@@ -135,8 +136,8 @@ class ResidualUNet3D(Abstract3DUNet):
     Since the model effectively becomes a residual net, in theory it allows for deeper UNet.
     """
 
-    def __init__(self, in_channels, out_channels, final_sigmoid=False, f_maps=128, layer_order='gcr',
-                 num_groups=16, num_levels=3, is_segmentation=False, conv_padding=3//2, **kwargs):
+    def __init__(self, in_channels, out_channels, final_sigmoid=False, f_maps=64, layer_order='gcr',
+                 num_groups=8, num_levels=5, is_segmentation=False, conv_padding=3//2, **kwargs):
         super(ResidualUNet3D, self).__init__(in_channels=in_channels,
                                              out_channels=out_channels,
                                              final_sigmoid=final_sigmoid,
