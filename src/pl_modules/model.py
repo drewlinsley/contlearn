@@ -55,7 +55,7 @@ class MyModel(pl.LightningModule):
         mod = import_module(p)
         self.loss = getattr(mod, m)  # getattr(losses, loss)
 
-        # self.loss = monai_losses.DiceLoss()
+        self.loss = monai_losses.DiceLoss(softmax=True)
         # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
@@ -107,7 +107,7 @@ class MyModel(pl.LightningModule):
             #     y.squeeze(1).to(torch.int64),
             #     self.maxval).to(
             #     logits.dtype).permute(0, 4, 1, 2, 3)
-            loss = self.loss(logits, y, self.loss_weights)  # onehot_y)
+            loss = self.loss(logits, y)  # onehot_y)
         return {
             "logits": logits.detach(),
             "loss": loss,

@@ -2,10 +2,17 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
+from monai import losses as monai_losses
+
 
 def no_loss(input, target, maxval=None, weights=None):
     """Dummy function."""
     return torch.tensor([0.])
+
+
+def dice_loss(input, target, weights):
+    """Wrapper for dice loss."""
+    monai_losses.DiceLoss()
 
 
 def cce(input, target, maxval=None, weights=None):
@@ -39,9 +46,9 @@ def bce(input, target, maxval=None, weights=None):
     return output
 
 
-def dice_loss(input, target, maxval=None, smooth=1., weights=None):
-    """Dice loss. Assumes input is logits."""
-    iflat = input.view(-1)
-    tflat = target.view(-1)
-    intersection = (iflat * tflat).sum()
-    return 1 - ((2. * intersection + smooth) / (iflat.sum() + tflat.sum() + smooth))  # noqa
+# def dice_loss(input, target, maxval=None, smooth=1., weights=None):
+#     """Dice loss. Assumes input is logits."""
+#     iflat = input.view(-1)
+#     tflat = target.view(-1)
+#     intersection = (iflat * tflat).sum()
+#     return 1 - ((2. * intersection + smooth) / (iflat.sum() + tflat.sum() + smooth))  # noqa
