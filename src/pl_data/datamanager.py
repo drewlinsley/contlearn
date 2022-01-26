@@ -239,7 +239,7 @@ class GetData():
                         for l in uni_labels:
                             if l not in self.keep_labels.keys():
                                 remap_to_0[l] = 0
-                        keep_labels = self.keep_labels
+                        keep_labels = dict(self.keep_labels)
                         remap_to_0.update(keep_labels)
                         label = fastremap.remap(label, keep_labels)
                     import pdb;pdb.set_trace()
