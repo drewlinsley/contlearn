@@ -221,10 +221,29 @@ class GetData():
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
                     annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
-                    if hasattr(self, "bounding_box"):
-                        bbox = self.bounding_box
-                    else:
-                        bbox = annotation_layer.bounding_box
+                    if self."bounding_box" is not None:
+                        annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
+                    label = annotation_layer.mags[wk.Mag(1)].get_view().read()
+                    if self.keep_labels is not None:
+                        uni_labels = np.unique(label)
+                        remap_to_0 = {}
+                        for l in uni_labels:
+                            if l not in keep_labels.keys():
+                                remap_to_0[l] = 0
+                        import pdb;pdb.set_trace()
+                        keep_labels = remap_to_0.update(keep_labels)
+                        label = fastremap.remap(label, keep_labels)
                     import pdb;pdb.set_trace()
-
+                    # Then get the dataset images
+                    ims = wk.download_dataset(
+                        original_dataset_name,
+                        original_dataset_org,
+                        bbox=bbox,
+                        layers=[self.image_layer_name],  # , "Volume Layer"],
+                        mags=[Mag("1")],
+                        path="../{}".format(new_dataset_name),
+                    )
+                    image_layer = ims.get_layer(self.image_layer_name)
+                    image_mag = image_layer.get_mag(Mag("1"))
+                    volume = image_mag.read().squeeze(0)
                     return volume, label_vol
