@@ -242,17 +242,22 @@ class GetData():
                         keep_labels = dict(self.keep_labels)
                         remap_to_0.update(keep_labels)
                         label = fastremap.remap(label, remap_to_0, preserve_missing_labels=True)
+
+                    # # Then get the dataset images
+                    # ims = wk.download_dataset(
+                    #     original_dataset_name,
+                    #     original_dataset_org,
+                    #     bbox=annotation_layer.bounding_box,
+                    #     layers=[self.image_layer_name],  # , "Volume Layer"],
+                    #     mags=[Mag("1")],
+                    #     path="../{}".format(new_dataset_name),
+                    # )
+                    # image_layer = ims.get_layer(self.image_layer_name)
+                    # image_mag = image_layer.get_mag(Mag("1"))
+                    # volume = image_mag.read().squeeze(0)
+                    volume = read_gcs(self.image_path)
+
+                    # Split volume/label into cubes then transpose
                     import pdb;pdb.set_trace()
-                    # Then get the dataset images
-                    ims = wk.download_dataset(
-                        original_dataset_name,
-                        original_dataset_org,
-                        bbox=annotation_layer.bounding_box,
-                        layers=[self.image_layer_name],  # , "Volume Layer"],
-                        mags=[Mag("1")],
-                        path="../{}".format(new_dataset_name),
-                    )
-                    image_layer = ims.get_layer(self.image_layer_name)
-                    image_mag = image_layer.get_mag(Mag("1"))
-                    volume = image_mag.read().squeeze(0)
-                    return volume, label_vol
+
+                    return volume, label
