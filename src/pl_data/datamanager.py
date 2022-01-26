@@ -57,6 +57,7 @@ class GetData():
         self.image_layer_name = cfg.image_layer_name
         self.cube_size = cfg.cube_size
         self.bounding_box = cfg.bounding_box
+        self.keep_labels = cfg.keep_labels
 
     def load(self):
         if self.data_type == "GCS":
