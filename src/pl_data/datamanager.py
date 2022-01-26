@@ -241,7 +241,7 @@ class GetData():
                                 remap_to_0[l] = 0
                         keep_labels = dict(self.keep_labels)
                         remap_to_0.update(keep_labels)
-                        label = fastremap.remap(label, keep_labels)
+                        label = fastremap.remap(label, remap_to_0, preserve_missing_labels=True)
                     import pdb;pdb.set_trace()
                     # Then get the dataset images
                     ims = wk.download_dataset(
