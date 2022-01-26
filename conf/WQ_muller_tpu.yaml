@@ -63,6 +63,7 @@ data:
   image_downsample: [1, 0.2430724356, 0.2430724356]
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
+  bounding_box: [[50, 1700, 20], [2400, 1300, 200]]
   annotation_path: https://webknossos.org/annotations/Explorational/61f196060100002700165706
   image_path: False
   wkdataset: https://webknossos.org/datasets/4fd6473e68256c0a/W-Q_x0_y0_z0_2022-01-02_00-43-18  # set to "???" if not using
