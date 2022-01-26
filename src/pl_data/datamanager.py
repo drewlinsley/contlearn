@@ -221,6 +221,9 @@ class GetData():
                     import pdb;pdb.set_trace()
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
                     annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
-                    bbox = annotation_layer.bounding_box
+                    if hasattr(self, "bounding_box"):
+                        bbox = self.bounding_box
+                    else:
+                        bbox = annotation_layer.bounding_box
                     raise NotImplementedError("Need to finish this")
                     return volume, label_vol
