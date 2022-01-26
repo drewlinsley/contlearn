@@ -247,7 +247,7 @@ class GetData():
                     ims = wk.download_dataset(
                         original_dataset_name,
                         original_dataset_org,
-                        bbox=bbox,
+                        bbox=annotation_layer.bounding_box,
                         layers=[self.image_layer_name],  # , "Volume Layer"],
                         mags=[Mag("1")],
                         path="../{}".format(new_dataset_name),
