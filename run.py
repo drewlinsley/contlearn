@@ -169,7 +169,6 @@ def run(cfg: DictConfig) -> None:
             logger=wandb_logger,
             val_check_interval=cfg.logging.val_check_interval,
             log_every_n_steps=cfg.logging.log_every_n_steps,
-            auto_select_gpus=True,
             **cfg.train.pl_trainer,
         )
     else:

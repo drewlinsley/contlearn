@@ -1,5 +1,5 @@
 TPUNAME=pytorch-tpu1
-ZONE=us-central1-f  # europe-west4-a
+ZONE=us-central1-a  # europe-west4-a
 # ZONE=europe-west4-a
 # ZONE=us-east1-d
 TPU=v3-8  # 8
