@@ -51,16 +51,21 @@ class MyModel(pl.LightningModule):
         else:
             self.save_hyperparameters()
         self.name = name
-        p, m = loss.rsplit('.', 1)
-        mod = import_module(p)
-        self.loss = getattr(mod, m)  # getattr(losses, loss)
 
-        self.loss = monai_losses.DiceLoss(softmax=True, to_onehot_y=True)
+
+        # self.loss = monai_losses.DiceLoss(softmax=True, to_onehot_y=True)
         # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
         else:
             self.loss_weights = None
+
+
+        p, m = loss.rsplit('.', 1)
+        mod = import_module(p)
+        self.loss = getattr(mod, m)  # getattr(losses, loss)
+        self.loss = nn.CrossEntropyLoss(weight=self.loss_weights)
+
 
         if force_2d:
             self.net = unet.UNet(
@@ -107,7 +112,8 @@ class MyModel(pl.LightningModule):
             #     y.squeeze(1).to(torch.int64),
             #     self.maxval).to(
             #     logits.dtype).permute(0, 4, 1, 2, 3)
-            loss = self.loss(logits, y)  # onehot_y)
+            # loss = self.loss(logits, y)  # onehot_y)
+            loss = self.loss(logits.float(), y.squeeze(1).long())  # onehot_y)
         return {
             "logits": logits.detach(),
             "loss": loss,
