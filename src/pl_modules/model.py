@@ -1,15 +1,17 @@
 from typing import Any, Dict, List, Sequence, Tuple, Union
 import os
+import wandb
+from omegaconf import DictConfig
+from importlib import import_module
+
+import torch
+import torch.nn.functional as F
+from torch.optim import Optimizer
+from torch import nn
 import hydra
 import pytorch_lightning as pl
 import torchmetrics
 import torchvision
-import torch
-import torch.nn.functional as F
-import wandb
-from omegaconf import DictConfig
-from torch.optim import Optimizer
-from importlib import import_module
 
 import numpy as np
 import matplotlib.pyplot as plt
