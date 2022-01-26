@@ -56,6 +56,7 @@ class GetData():
         self.label_downsample = cfg.label_downsample
         self.image_layer_name = cfg.image_layer_name
         self.cube_size = cfg.cube_size
+        self.bounding_box = cfg.bounding_box
 
     def load(self):
         if self.data_type == "GCS":
@@ -218,7 +219,6 @@ class GetData():
 
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
-                    import pdb;pdb.set_trace()
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
                     annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
                     if hasattr(self, "bounding_box"):
@@ -226,4 +226,6 @@ class GetData():
                     else:
                         bbox = annotation_layer.bounding_box
                     raise NotImplementedError("Need to finish this")
+                    import pdb;pdb.set_trace()
+
                     return volume, label_vol
