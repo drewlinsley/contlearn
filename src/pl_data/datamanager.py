@@ -222,7 +222,7 @@ class GetData():
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
                     annotation_layer = None
-                    max_tries = 10
+                    max_tries, count = 10, 0
                     while annotation_layer is None or count > max_tries:
                         try:
                             annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
