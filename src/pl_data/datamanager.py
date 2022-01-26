@@ -229,7 +229,7 @@ class GetData():
                         uni_labels = np.unique(label)
                         remap_to_0 = {}
                         for l in uni_labels:
-                            if l not in keep_labels.keys():
+                            if l not in self.keep_labels.keys():
                                 remap_to_0[l] = 0
                         import pdb;pdb.set_trace()
                         keep_labels = remap_to_0.update(keep_labels)
