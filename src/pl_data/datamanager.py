@@ -221,7 +221,15 @@ class GetData():
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
-                    annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
+                    annotation_layer = None
+                    max_tries = 10
+                    while annotation_layer is None or count > max_tries:
+                        try:
+                            annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
+                        except:
+                            print("Failed to download annotations, trying again ({} / {}).".format(count + 1, max_tries))
+                            max_tries += 1
+
                     if self.bounding_box is not None:
                         annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read()
