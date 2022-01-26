@@ -225,7 +225,6 @@ class GetData():
                         bbox = self.bounding_box
                     else:
                         bbox = annotation_layer.bounding_box
-                    raise NotImplementedError("Need to finish this")
                     import pdb;pdb.set_trace()
 
                     return volume, label_vol
