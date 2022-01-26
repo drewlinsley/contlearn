@@ -221,7 +221,7 @@ class GetData():
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
                     annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
-                    if self."bounding_box" is not None:
+                    if self.bounding_box is not None:
                         annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read()
                     if self.keep_labels is not None:
