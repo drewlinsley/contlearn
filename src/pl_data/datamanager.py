@@ -234,9 +234,8 @@ class GetData():
                     if self.volume_size is not None:
                         # Get the whole annotation
                         annotation_layer.bounding_box = BoundingBox(self.volume_size[0], self.volume_size[1])
-                    import pdb;pdb.set_trace()
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
-                    label = label.transpose(2, 1, 0)
+                    label = label.transpose(2, 0, 1)
                     if self.keep_labels is not None:
                         uni_labels = np.unique(label)
                         remap_to_0 = {}
@@ -262,6 +261,12 @@ class GetData():
                     volume = read_gcs(self.image_path)
 
                     # Downsample images if requested.
+                    from matplotlib import pyplot as plt
+                    plt.subplot(121)
+                    plt.imshow(volume[40, ..., 0], cmap="Greys_r")
+                    plt.subplot(122)
+                    plt.imshow(label[40])
+                    plt.savefig("tmp.png")
                     import pdb;pdb.set_trace()
                     if self.label_downsample:
                         # label = resize(
