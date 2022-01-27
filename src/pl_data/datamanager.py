@@ -58,6 +58,7 @@ class GetData():
         self.cube_size = cfg.cube_size
         self.bounding_box = cfg.bounding_box
         self.keep_labels = cfg.keep_labels
+        self.volume_size = cfg.volume_size
 
     def load(self):
         if self.data_type == "GCS":
