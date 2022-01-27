@@ -1,3 +1,4 @@
+import os
 import webknossos as wk
 from io import BytesIO
 import numpy as np
@@ -261,12 +262,20 @@ class GetData():
                     volume = read_gcs(self.image_path)
 
                     # Downsample images if requested.
-                    # from matplotlib import pyplot as plt
-                    # plt.subplot(121)
-                    # plt.imshow(volume[40, ..., 0], cmap="Greys_r")
-                    # plt.subplot(122)
-                    # plt.imshow(label[40])
-                    # plt.savefig("tmp.png")
+from matplotlib import pyplot as plt
+fn = "tmp.png"
+f = plt.figure(figsize=(10, 10))
+plt.subplot(121)
+plt.imshow(volume[0, ..., 0], cmap="Greys_r")
+plt.subplot(122)
+plt.imshow(label[0] == 18)
+plt.savefig(fn)
+plt.close(f)
+path = os.path.join(os.getcwd(), fn)
+cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
+os.system(cmd)
+
+
                     if self.label_downsample:
                         # label = resize(
                         #     label,
@@ -303,13 +312,13 @@ class GetData():
                                 "Resizing images",
                                 total=len(volume)))
                         volume = np.asarray(res_volume)
-                        volume = volume.transpose(3, 0, 1, 2)  # Channels first
+                        volume = volume.transpose(3, 0, 2, 1)  # Channels first
 
                     if self.bounding_box is not None:
                         # Crop the labels
                         if self.label_downsample:
                             res_bounding_box = np.asarray(self.bounding_box)[:, [2, 1, 0]] * np.asarray(self.label_downsample)[None]  # noqa
-                            res_bounding_box = np.floor(res_bounding_box).astype(int)
+                            res_bounding_box = np.floor(res_bounding_box).astype(int)[:, [0, 2, 1]]
                         volume = volume[
                             res_bounding_box[0][0]: res_bounding_box[0][0] + res_bounding_box[1][0],
                             res_bounding_box[0][1]: res_bounding_box[0][1] + res_bounding_box[1][1],
