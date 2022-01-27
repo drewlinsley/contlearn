@@ -233,7 +233,7 @@ class GetData():
                     if self.bounding_box is not None:
                         annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
-                    label = label.transpose(2, 1, 0)
+                    label = label.transpose(2, 0, 1)
                     if self.keep_labels is not None:
                         uni_labels = np.unique(label)
                         remap_to_0 = {}
