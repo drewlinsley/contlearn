@@ -262,20 +262,18 @@ class GetData():
                     volume = read_gcs(self.image_path)
 
                     # Downsample images if requested.
-from matplotlib import pyplot as plt
-fn = "tmp.png"
-f = plt.figure(figsize=(10, 10))
-plt.subplot(121)
-plt.imshow(volume[0, ..., 0], cmap="Greys_r")
-plt.subplot(122)
-plt.imshow(label[0] == 18)
-plt.savefig(fn)
-plt.close(f)
-path = os.path.join(os.getcwd(), fn)
-cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
-os.system(cmd)
-
-
+                    # from matplotlib import pyplot as plt
+                    # fn = "tmp.png"
+                    # f = plt.figure(figsize=(10, 10))
+                    # plt.subplot(121)
+                    # plt.imshow(volume[0, ..., 0], cmap="Greys_r")
+                    # plt.subplot(122)
+                    # plt.imshow(label[0] == 18)
+                    # plt.savefig(fn)
+                    # plt.close(f)
+                    # path = os.path.join(os.getcwd(), fn)
+                    # cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
+                    # os.system(cmd)
                     if self.label_downsample:
                         # label = resize(
                         #     label,
