@@ -230,10 +230,10 @@ class GetData():
                             print("Failed to download annotations, trying again ({} / {}).".format(count + 1, max_tries))
                             max_tries += 1
 
-                    if self.bounding_box is not None:
-                        annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
+                    # if self.bounding_box is not None:
+                    #     annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
-                    label = label.transpose(2, 0, 1)
+                    label = label.transpose(2, 1, 0)
                     if self.keep_labels is not None:
                         uni_labels = np.unique(label)
                         remap_to_0 = {}
@@ -296,6 +296,7 @@ class GetData():
                                 total=len(volume)))
                         volume = np.asarray(res_volume)
                         volume = volume.transpose(3, 0, 1, 2)  # Channels first
+                    import pdb;pdb.set_trace()
 
                     if self.bounding_box is not None:
                         # Crop the labels
