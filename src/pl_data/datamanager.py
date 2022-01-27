@@ -230,8 +230,10 @@ class GetData():
                             print("Failed to download annotations, trying again ({} / {}).".format(count + 1, max_tries))
                             max_tries += 1
 
-                    # if self.bounding_box is not None:
-                    #     annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
+                    if self.volume_size is not None:
+                        # Get the whole annotation
+                        annotation_layer.bounding_box = BoundingBox(self.volume_size[0], self.volume_size[1])
+                    import pdb;pdb.set_trace()
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
                     label = label.transpose(2, 1, 0)
                     if self.keep_labels is not None:
@@ -259,6 +261,7 @@ class GetData():
                     volume = read_gcs(self.image_path)
 
                     # Downsample images if requested.
+                    import pdb;pdb.set_trace()
                     if self.label_downsample:
                         # label = resize(
                         #     label,
