@@ -261,13 +261,12 @@ class GetData():
                     volume = read_gcs(self.image_path)
 
                     # Downsample images if requested.
-                    from matplotlib import pyplot as plt
-                    plt.subplot(121)
-                    plt.imshow(volume[40, ..., 0], cmap="Greys_r")
-                    plt.subplot(122)
-                    plt.imshow(label[40])
-                    plt.savefig("tmp.png")
-                    import pdb;pdb.set_trace()
+                    # from matplotlib import pyplot as plt
+                    # plt.subplot(121)
+                    # plt.imshow(volume[40, ..., 0], cmap="Greys_r")
+                    # plt.subplot(122)
+                    # plt.imshow(label[40])
+                    # plt.savefig("tmp.png")
                     if self.label_downsample:
                         # label = resize(
                         #     label,
@@ -305,7 +304,6 @@ class GetData():
                                 total=len(volume)))
                         volume = np.asarray(res_volume)
                         volume = volume.transpose(3, 0, 1, 2)  # Channels first
-                    import pdb;pdb.set_trace()
 
                     if self.bounding_box is not None:
                         # Crop the labels
@@ -315,11 +313,13 @@ class GetData():
                         volume = volume[
                             res_bounding_box[0][0]: res_bounding_box[0][0] + res_bounding_box[1][0],
                             res_bounding_box[0][1]: res_bounding_box[0][1] + res_bounding_box[1][1],
-                            res_bounding_box[0][2]: res_bounding_box[0][2] + res_bounding_box[1][2],
-                            :]
+                            res_bounding_box[0][2]: res_bounding_box[0][2] + res_bounding_box[1][2]]
+                        label = label[
+                            res_bounding_box[0][0]: res_bounding_box[0][0] + res_bounding_box[1][0],
+                            res_bounding_box[0][1]: res_bounding_box[0][1] + res_bounding_box[1][1],
+                            res_bounding_box[0][2]: res_bounding_box[0][2] + res_bounding_box[1][2]]
 
                     # Split volume/label into cubes then transpose
                     volume = volume.transpose(3, 0, 1, 2)
-                    import pdb;pdb.set_trace()
                     label = label[None]
                     return volume, label
