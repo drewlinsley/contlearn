@@ -268,6 +268,7 @@ class GetData():
                         #     preserve_range=True,
                         #     order=1).astype(dtype)
                         res_label_shape = np.asarray(label.shape) * self.label_downsample
+                        res_label_shape = res_label_shape.astype(int)
                         res_label = Parallel(n_jobs=-1)(
                             delayed(
                                 lambda x, y: resize(
