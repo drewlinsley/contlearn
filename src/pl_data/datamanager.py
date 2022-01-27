@@ -275,9 +275,9 @@ class GetData():
                                     y,
                                     anti_aliasing=True,
                                     preserve_range=True,
-                                    order=True))(lab, label_vol.shape[1:]) for lab in tqdm(  # noqa
+                                    order=True))(lab, label.shape[1:]) for lab in tqdm(  # noqa
                                 label,
-                                "Resizing images",
+                                "Resizing labels",
                                 total=len(label)))
                         label = np.asarray(res_label)
 
