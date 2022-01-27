@@ -320,6 +320,6 @@ class GetData():
                             res_bounding_box[0][2]: res_bounding_box[0][2] + res_bounding_box[1][2]]
 
                     # Split volume/label into cubes then transpose
-                    volume = volume.transpose(3, 0, 1, 2)
-                    label = label[None]
+                    volume = volume.transpose(3, 0, 1, 2)[None]
+                    label = label[None, None]
                     return volume, label
