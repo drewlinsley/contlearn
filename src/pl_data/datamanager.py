@@ -233,7 +233,7 @@ class GetData():
                     if self.bounding_box is not None:
                         annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
-                    label = label.transpose(2, 0, 1)
+                    label = label.transpose(2, 1, 0)
                     if self.keep_labels is not None:
                         uni_labels = np.unique(label)
                         remap_to_0 = {}
@@ -276,7 +276,7 @@ class GetData():
                                     y,
                                     anti_aliasing=True,
                                     preserve_range=True,
-                                    order=True))(lab, res_label_shape[1:]) for lab in tqdm(  # noqa
+                                    order=0))(lab, res_label_shape[1:]) for lab in tqdm(  # noqa
                                 label,
                                 "Resizing labels",
                                 total=len(label)))
@@ -291,22 +291,26 @@ class GetData():
                                     y,
                                     anti_aliasing=True,
                                     preserve_range=True,
-                                    order=True))(vol, label_vol.shape[1:]) for vol in tqdm(  # noqa
+                                    order=1))(vol, label_vol.shape[1:]) for vol in tqdm(  # noqa
                                 volume,
                                 "Resizing images",
                                 total=len(volume)))
                         volume = np.asarray(res_volume)
                         volume = volume.transpose(3, 0, 1, 2)  # Channels first
-                    import pdb;pdb.set_trace()
 
                     if self.bounding_box is not None:
                         # Crop the labels
-                        label = label[
-                            self.bounding_box[0][0]: self.bounding_box[0][0] + self.bounding_box[1][0],
-                            self.bounding_box[0][1]: self.bounding_box[0][1] + self.bounding_box[1][1],
-                            self.bounding_box[0][2]: self.bounding_box[0][2] + self.bounding_box[1][2],
-                            ]
+                        if self.label_downsample:
+                            res_bounding_box = np.asarray(self.bounding_box)[:, [2, 1, 0]] * np.asarray(self.label_downsample)[None]  # noqa
+                            res_bounding_box = np.floor(res_bounding_box).astype(int)
+                        volume = volume[
+                            res_bounding_box[0][0]: res_bounding_box[0][0] + res_bounding_box[1][0],
+                            res_bounding_box[0][1]: res_bounding_box[0][1] + res_bounding_box[1][1],
+                            res_bounding_box[0][2]: res_bounding_box[0][2] + res_bounding_box[1][2],
+                            :]
 
                     # Split volume/label into cubes then transpose
-
+                    volume = volume.transpose(3, 0, 1, 2)
+                    import pdb;pdb.set_trace()
+                    label = label[None]
                     return volume, label
