@@ -267,7 +267,7 @@ class GetData():
                         #     anti_aliasing=True,
                         #     preserve_range=True,
                         #     order=1).astype(dtype)
-                        res_label = []
+                        res_label_shape = np.asarray(label.shape) * self.label_downsample
                         res_label = Parallel(n_jobs=-1)(
                             delayed(
                                 lambda x, y: resize(
@@ -275,7 +275,7 @@ class GetData():
                                     y,
                                     anti_aliasing=True,
                                     preserve_range=True,
-                                    order=True))(lab, label.shape[1:]) for lab in tqdm(  # noqa
+                                    order=True))(lab, res_label_shape[1:]) for lab in tqdm(  # noqa
                                 label,
                                 "Resizing labels",
                                 total=len(label)))
