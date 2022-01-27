@@ -232,7 +232,8 @@ class GetData():
 
                     if self.bounding_box is not None:
                         annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
-                    label = annotation_layer.mags[wk.Mag(1)].get_view().read()
+                    label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
+                    label = label.transpose(2, 0, 1)
                     if self.keep_labels is not None:
                         uni_labels = np.unique(label)
                         remap_to_0 = {}
@@ -260,12 +261,25 @@ class GetData():
                     # Downsample images if requested.
                     import pdb;pdb.set_trace()
                     if self.label_downsample:
-                        label = resize(
-                            label,
-                            self.label_downsample,
-                            anti_aliasing=True,
-                            preserve_range=True,
-                            order=1).astype(dtype)
+                        # label = resize(
+                        #     label,
+                        #     self.label_downsample,
+                        #     anti_aliasing=True,
+                        #     preserve_range=True,
+                        #     order=1).astype(dtype)
+                        res_label = []
+                        res_label = Parallel(n_jobs=-1)(
+                            delayed(
+                                lambda x, y: resize(
+                                    x,
+                                    y,
+                                    anti_aliasing=True,
+                                    preserve_range=True,
+                                    order=True))(lab, label_vol.shape[1:]) for lab in tqdm(  # noqa
+                                label,
+                                "Resizing images",
+                                total=len(label)))
+                        label = np.asarray(res_label)
 
                     if self.image_downsample:
                         res_volume = []
