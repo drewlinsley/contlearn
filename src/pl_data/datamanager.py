@@ -259,7 +259,6 @@ class GetData():
                     volume = read_gcs(self.image_path)
 
                     # Downsample images if requested.
-                    import pdb;pdb.set_trace()
                     if self.label_downsample:
                         # label = resize(
                         #     label,
