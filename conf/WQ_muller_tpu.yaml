@@ -60,8 +60,8 @@ data:
   cube_size: [20, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
   label_transpose_xyz_zyx: [2, 0, 1]
   image_transpose_xyz_zyx: False
-  image_downsample: [1, 0.2430724356, 0.2430724356]
-  label_downsample: False  # [1, 4.114, 4.114]
+  image_downsample: False
+  label_downsample: [1, 0.2430724356, 0.2430724356]
   image_layer_name: "images"  # Depreciated
   bounding_box: [[50, 1700, 20], [2400, 1300, 200]]
   keep_labels: {18: 1, 7847: 2}  # remap everything else to 0

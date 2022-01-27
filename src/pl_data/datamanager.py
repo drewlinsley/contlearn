@@ -255,10 +255,43 @@ class GetData():
                     # image_layer = ims.get_layer(self.image_layer_name)
                     # image_mag = image_layer.get_mag(Mag("1"))
                     # volume = image_mag.read().squeeze(0)
-                    import pdb;pdb.set_trace()
                     volume = read_gcs(self.image_path)
 
-                    # Split volume/label into cubes then transpose
+                    # Downsample images if requested.
                     import pdb;pdb.set_trace()
+                    if self.label_downsample:
+                        label = resize(
+                            label,
+                            self.label_downsample,
+                            anti_aliasing=True,
+                            preserve_range=True,
+                            order=1).astype(dtype)
+
+                    if self.image_downsample:
+                        res_volume = []
+                        res_volume = Parallel(n_jobs=-1)(
+                            delayed(
+                                lambda x, y: resize(
+                                    x,
+                                    y,
+                                    anti_aliasing=True,
+                                    preserve_range=True,
+                                    order=True))(vol, label_vol.shape[1:]) for vol in tqdm(  # noqa
+                                volume,
+                                "Resizing images",
+                                total=len(volume)))
+                        volume = np.asarray(res_volume)
+                        volume = volume.transpose(3, 0, 1, 2)  # Channels first
+                    import pdb;pdb.set_trace()
+
+                    if self.bounding_box is not None:
+                        # Crop the labels
+                        label = label[
+                            self.bounding_box[0][0]: self.bounding_box[0][0] + self.bounding_box[1][0],
+                            self.bounding_box[0][1]: self.bounding_box[0][1] + self.bounding_box[1][1],
+                            self.bounding_box[0][2]: self.bounding_box[0][2] + self.bounding_box[1][2],
+                            ]
+
+                    # Split volume/label into cubes then transpose
 
                     return volume, label
