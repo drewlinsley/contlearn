@@ -5,7 +5,7 @@ from torch.nn import functional as F
 from monai import losses as monai_losses
 
 
-class dice_loss():
+class dice_loss:
     def __init__(self, weights=None):
         """Generalized monai loss. Assumes input is logits."""
         self.loss_fun = monai_losses.DiceLoss(
@@ -13,11 +13,11 @@ class dice_loss():
             to_onehot_y=True)
 
     def forward(self, input, target):
-        output = self.loss_fun.forward(input.float(), target.float())
+        output = self.loss_fun(input.float(), target.float())
         return output
 
 
-class dice_loss_mask_background():
+class dice_loss_mask_background:
     def __init__(self, weights=None):
         """Generalized monai loss. Assumes input is logits."""
         self.loss_fun = monai_losses.DiceLoss(
@@ -26,11 +26,11 @@ class dice_loss_mask_background():
             include_background=False)
 
     def forward(self, input, target):
-        output = self.loss_fun.forward(input.float(), target.float())
+        output = self.loss_fun(input.float(), target.float())
         return output
 
 
-class cce_mask_background():
+class cce_mask_background:
     def __init__(self, weights=None):
         """Categorical crossentropy loss. Assumes input is logits."""
         self.loss_fun = nn.CrossEntropyLoss(weight=weights, reduction="none")
@@ -43,7 +43,7 @@ class cce_mask_background():
         return output
 
 
-class cce():
+class cce:
     def __init__(self, weights=None):
         """Categorical crossentropy loss. Assumes input is logits."""
         self.loss_fun = nn.CrossEntropyLoss(weight=weights)
@@ -54,7 +54,7 @@ class cce():
         return output
 
 
-class bce():
+class bce:
     def __init__(self, weights=None):
         """Categorical crossentropy loss. Assumes input is logits."""
         if weights and weights is not None:
