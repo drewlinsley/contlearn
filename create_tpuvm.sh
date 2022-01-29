@@ -1,12 +1,22 @@
 ZONE=us-central1-f  # europe-west4-a us-east1-d
 TPU=v3-8  # 8
 
-echo "Enter the name of your tpu on GCP:"
-read TPUNAME
-# pytorch-tpu1, muller-tpu-1
+TPUNAME=$1
+SCRIPT=$2
 
-echo "Enter the name of the script you want to run on GCP:"
-read SCRIPT
+
+if [ -n "$TPUNAME" ]
+then
+  echo "Enter the name of your tpu on GCP:"
+  read TPUNAME
+  # pytorch-tpu1, muller-tpu-1
+fi
+
+if [ -n "$SCRIPT" ]
+then
+  echo "Enter the name of the script you want to run on GCP:"
+  read SCRIPT
+fi
 
 if [ -f "$SCRIPT" ]; then
     echo "$SCRIPT exists."
