@@ -62,7 +62,6 @@ class MyModel(pl.LightningModule):
         else:
             self.loss_weights = None
 
-
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)  # getattr(losses, loss)
