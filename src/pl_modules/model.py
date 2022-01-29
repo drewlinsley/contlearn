@@ -64,7 +64,7 @@ class MyModel(pl.LightningModule):
 
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
-        self.loss = getattr(mod, m)  # getattr(losses, loss)
+        self.loss = getattr(mod, m)(weights=self.loss_weights)  # getattr(losses, loss)
 
         if force_2d:
             self.net = unet.UNet(

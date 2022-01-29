@@ -25,7 +25,7 @@ class dice_loss_mask_background:
             to_onehot_y=True,
             include_background=False)
 
-    def forward(self, input, target):
+    def __call__(self, input, target):
         output = self.loss_fun(input.float(), target.float())
         return output
 

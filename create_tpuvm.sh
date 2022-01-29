@@ -8,6 +8,14 @@ read TPUNAME
 echo "Enter the name of the script you want to run on GCP:"
 read SCRIPT
 
+if [ -f "$SCRIPT" ]; then
+    echo "$SCRIPT exists."
+else 
+    echo "$SCRIPT does not exist, exiting."
+    exit 0
+fi
+
+
 gcloud alpha compute tpus tpu-vm delete $TPUNAME --zone=$ZONE --quiet
 gcloud alpha compute tpus tpu-vm create $TPUNAME \
 --zone=$ZONE \
