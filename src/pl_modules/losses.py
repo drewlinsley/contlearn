@@ -13,7 +13,7 @@ class dice_loss():
             to_onehot_y=True)
 
     def forward(self, input, target):
-        output = self.loss(input.float(), target.float())
+        output = self.loss.forward(input.float(), target.float())
         return output
 
 
@@ -26,7 +26,7 @@ class dice_loss_mask_background():
             include_background=False)
 
     def forward(self, input, target):
-        output = self.loss(input.float(), target.float())
+        output = self.loss.forward(input.float(), target.float())
         return output
 
 
