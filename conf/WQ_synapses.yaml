@@ -66,6 +66,8 @@ data:
   image_downsample: [1, 0.2430724356, 0.2430724356]
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
+  volume_size: False
+  keep_labels: False
   bounding_box: False
   annotation_path: https://webknossos.org/annotations/Explorational/61d2f118010000ba00ed3a8a
   image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_mag1_x0_y0_z0.npy
