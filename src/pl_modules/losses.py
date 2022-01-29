@@ -8,36 +8,36 @@ from monai import losses as monai_losses
 class dice_loss():
     def __init__(self, weights=None):
         """Generalized monai loss. Assumes input is logits."""
-        self.loss = monai_losses.DiceLoss(
+        self.loss_fun = monai_losses.DiceLoss(
             softmax=True,
             to_onehot_y=True)
 
     def forward(self, input, target):
-        output = self.loss.forward(input.float(), target.float())
+        output = self.loss_fun.forward(input.float(), target.float())
         return output
 
 
 class dice_loss_mask_background():
     def __init__(self, weights=None):
         """Generalized monai loss. Assumes input is logits."""
-        self.loss = monai_losses.DiceLoss(
+        self.loss_fun = monai_losses.DiceLoss(
             softmax=True,
             to_onehot_y=True,
             include_background=False)
 
     def forward(self, input, target):
-        output = self.loss.forward(input.float(), target.float())
+        output = self.loss_fun.forward(input.float(), target.float())
         return output
 
 
 class cce_mask_background():
     def __init__(self, weights=None):
         """Categorical crossentropy loss. Assumes input is logits."""
-        self.loss = nn.CrossEntropyLoss(weight=weights, reduction="none")
+        self.loss_fun = nn.CrossEntropyLoss(weight=weights, reduction="none")
 
     def forward(self, input, target):
         target = target.squeeze(1)
-        output = self.loss(input.float(), target.long())
+        output = self.loss_fun(input.float(), target.long())
         bgmask = (target == 0).type(output.dtype)
         output = (output * bgmask).mean()
         return output
@@ -46,11 +46,11 @@ class cce_mask_background():
 class cce():
     def __init__(self, weights=None):
         """Categorical crossentropy loss. Assumes input is logits."""
-        self.loss = nn.CrossEntropyLoss(weight=weights)
+        self.loss_fun = nn.CrossEntropyLoss(weight=weights)
 
     def forward(self, input, target):
         target = target.squeeze(1)
-        output = self.loss(input.float(), target.long())
+        output = self.loss_fun(input.float(), target.long())
         return output
 
 
@@ -62,14 +62,14 @@ class bce():
             weights = weights.reshape(1, weights_len, 1, 1, 1)
         else:
             weights = None
-        self.loss = nn.BCEWithLogitsLoss(weights=weights)
+        self.loss_fun = nn.BCEWithLogitsLoss(weights=weights)
 
     def forward(self, input, target):
         target = F.one_hot(
             target.to(torch.int64),
             maxval).to(
             torch.uint8).permute(0, 4, 1, 2, 3)
-        output = loss(input, target.float())
+        output = self.loss_fun(input, target.float())
         return output
 
 
