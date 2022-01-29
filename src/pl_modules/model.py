@@ -102,7 +102,7 @@ class MyModel(pl.LightningModule):
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = self.loss(logits, y, self.loss_weights, maxval=self.maxval)
+            loss = self.loss.forward(logits, y)
             # loss = self.loss.forward(logits, y, self.loss_weights)
             loss = loss + penalty
         else:
@@ -113,7 +113,7 @@ class MyModel(pl.LightningModule):
             #     self.maxval).to(
             #     logits.dtype).permute(0, 4, 1, 2, 3)
             # loss = self.loss(logits, y)  # onehot_y)
-            loss = self.loss(logits.float(), y.squeeze(1).long())  # onehot_y)
+            loss = self.loss.forward(logits, y)  # onehot_y)
         return {
             "logits": logits.detach(),
             "loss": loss,
