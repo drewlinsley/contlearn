@@ -274,6 +274,8 @@ class GetData():
                     # path = os.path.join(os.getcwd(), fn)
                     # cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
                     # os.system(cmd)
+
+
                     if self.label_downsample:
                         # label = resize(
                         #     label,

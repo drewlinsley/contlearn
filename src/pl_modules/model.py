@@ -66,8 +66,7 @@ class MyModel(pl.LightningModule):
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
         self.loss = getattr(mod, m)  # getattr(losses, loss)
-        self.loss = nn.CrossEntropyLoss(weight=self.loss_weights)
-
+        # self.loss = nn.CrossEntropyLoss(weight=self.loss_weights)
 
         if force_2d:
             self.net = unet.UNet(
@@ -205,9 +204,9 @@ class MyModel(pl.LightningModule):
                 # gt = output_element["y_true"][mid][None]
             # output_seg = output_element["logits"].argmax(dim=0)[mid][None]
             # print(output_element["logits"].shape)  # 3,12,96,96
-            output_seg = F.softmax(output_element["logits"], dim=0)
+            # output_seg = F.softmax(output_element["logits"], dim=0)
             # output_seg = output_seg.mean((0))[mid][None]
-            output_seg = output_seg[1, mid][None]
+            output_seg = torch.argmax(output_seg, 0)[mid][None]
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]

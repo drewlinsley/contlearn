@@ -27,6 +27,29 @@ def cce(input, target, maxval=None, weights=None):
     return output
 
 
+def thresh_cce(input, target, maxval=None, weights=None):
+    """Categorical crossentropy loss. 
+
+    Only evaluate the supra-threshold losses
+
+    Assumes input is logits."""
+    # if weights and weights is not None:
+    #     weights_len = len(weights)
+    #     weights = weights.reshape(1, weights_len, 1, 1)
+    loss = nn.CrossEntropyLoss(weight=weights, reduction="none")
+    # target = torch.argmax(target, 1)
+    # output = loss(input.float(), target.float().squeeze(1))
+    output = loss(input.float(), target.long().squeeze(1))
+
+    # Grab + locations
+    mask = target > 0
+    pos_vals = output[mask]
+    thresh = torch.median(pos_vals)
+    pos_vals[pos_vals < thresh] = 0
+    output[mask] = pos_vals
+    return output
+
+
 def bce(input, target, maxval=None, weights=None):
     """Binary crossentropy loss. Assumes input is logits."""
     assert maxval is not None, "Loss needs a maxval for the target."
