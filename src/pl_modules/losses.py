@@ -5,41 +5,72 @@ from torch.nn import functional as F
 from monai import losses as monai_losses
 
 
-def no_loss(input, target, maxval=None, weights=None):
-    """Dummy function."""
-    return torch.tensor([0.])
+class dice_loss():
+    def __init__(self, weights=None):
+        """Generalized monai loss. Assumes input is logits."""
+        self.loss = monai_losses.DiceLoss(
+            softmax=True,
+            to_onehot_y=True)
+
+    def forward(self, input, target):
+        output = self.loss(input.float(), target.float())
+        return output
 
 
-def dice_loss(input, target, weights):
-    """Wrapper for dice loss."""
-    monai_losses.DiceLoss()
+class dice_loss_mask_background():
+    def __init__(self, weights=None):
+        """Generalized monai loss. Assumes input is logits."""
+        self.loss = monai_losses.DiceLoss(
+            softmax=True,
+            to_onehot_y=True,
+            include_background=False)
+
+    def forward(self, input, target):
+        output = self.loss(input.float(), target.float())
+        return output
 
 
-def cce(input, target, maxval=None, weights=None):
-    """Categorical crossentropy loss. Assumes input is logits."""
-    # if weights and weights is not None:
-    #     weights_len = len(weights)
-    #     weights = weights.reshape(1, weights_len, 1, 1)
-    loss = nn.CrossEntropyLoss(weight=weights)
-    # target = torch.argmax(target, 1)
-    # output = loss(input.float(), target.float().squeeze(1))
-    output = loss(input.float(), target.long().squeeze(1))
-    return output
+class cce_mask_background():
+    def __init__(self, weights=None):
+        """Categorical crossentropy loss. Assumes input is logits."""
+        self.loss = nn.CrossEntropyLoss(weight=weights, reduction="none")
+
+    def forward(self, input, target):
+        target = target.squeeze(1)
+        output = self.loss(input.float(), target.long())
+        bgmask = (target == 0).type(output.dtype)
+        output = (output * bgmask).mean()
+        return output
 
 
-def cce_mask_background(input, target, maxval=None, weights=None):
-    """Categorical crossentropy loss. Assumes input is logits."""
-    # if weights and weights is not None:
-    #     weights_len = len(weights)
-    #     weights = weights.reshape(1, weights_len, 1, 1)
-    loss = nn.CrossEntropyLoss(weight=weights, reduction="none")
-    # target = torch.argmax(target, 1)
-    # output = loss(input.float(), target.float().squeeze(1))
-    target = target.squeeze(1)
-    output = loss(input.float(), target.long())
-    bgmask = (target == 0).type(output.dtype)
-    output = (output * bgmask).mean()
-    return output
+class cce():
+    def __init__(self, weights=None):
+        """Categorical crossentropy loss. Assumes input is logits."""
+        self.loss = nn.CrossEntropyLoss(weight=weights)
+
+    def forward(self, input, target):
+        target = target.squeeze(1)
+        output = self.loss(input.float(), target.long())
+        return output
+
+
+class bce():
+    def __init__(self, weights=None):
+        """Categorical crossentropy loss. Assumes input is logits."""
+        if weights and weights is not None:
+            weights_len = len(weights)
+            weights = weights.reshape(1, weights_len, 1, 1, 1)
+        else:
+            weights = None
+        self.loss = nn.BCEWithLogitsLoss(weights=weights)
+
+    def forward(self, input, target):
+        target = F.one_hot(
+            target.to(torch.int64),
+            maxval).to(
+            torch.uint8).permute(0, 4, 1, 2, 3)
+        output = loss(input, target.float())
+        return output
 
 
 def thresh_cce(input, target, maxval=None, weights=None):
@@ -63,30 +94,3 @@ def thresh_cce(input, target, maxval=None, weights=None):
     pos_vals[pos_vals < thresh] = 0
     output[mask] = pos_vals
     return output
-
-
-def bce(input, target, maxval=None, weights=None):
-    """Binary crossentropy loss. Assumes input is logits."""
-    assert maxval is not None, "Loss needs a maxval for the target."
-    if weights and weights is not None:
-        weights_len = len(weights)
-        weights = weights.reshape(1, weights_len, 1, 1, 1)
-    else:
-        weights = None
-    loss = nn.BCEWithLogitsLoss()  # weight=weights)
-
-    # One hot the labels
-    target = F.one_hot(
-        target.to(torch.int64),
-        maxval).to(
-        torch.uint8).permute(0, 4, 1, 2, 3)
-    output = loss(input, target.float())
-    return output
-
-
-# def dice_loss(input, target, maxval=None, smooth=1., weights=None):
-#     """Dice loss. Assumes input is logits."""
-#     iflat = input.view(-1)
-#     tflat = target.view(-1)
-#     intersection = (iflat * tflat).sum()
-#     return 1 - ((2. * intersection + smooth) / (iflat.sum() + tflat.sum() + smooth))  # noqa
