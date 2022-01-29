@@ -56,16 +56,16 @@ class MyModel(pl.LightningModule):
 
 
         # self.loss = monai_losses.DiceLoss(softmax=True, to_onehot_y=True)
-        self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
+        # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
         else:
             self.loss_weights = None
 
 
-        # p, m = loss.rsplit('.', 1)
-        # mod = import_module(p)
-        # self.loss = getattr(mod, m)  # getattr(losses, loss)
+        p, m = loss.rsplit('.', 1)
+        mod = import_module(p)
+        self.loss = getattr(mod, m)  # getattr(losses, loss)
 
         if force_2d:
             self.net = unet.UNet(

@@ -27,6 +27,21 @@ def cce(input, target, maxval=None, weights=None):
     return output
 
 
+def cce_mask_background(input, target, maxval=None, weights=None):
+    """Categorical crossentropy loss. Assumes input is logits."""
+    # if weights and weights is not None:
+    #     weights_len = len(weights)
+    #     weights = weights.reshape(1, weights_len, 1, 1)
+    loss = nn.CrossEntropyLoss(weight=weights, reduction="none")
+    # target = torch.argmax(target, 1)
+    # output = loss(input.float(), target.float().squeeze(1))
+    target = target.squeeze(1)
+    output = loss(input.float(), target.long())
+    bgmask = (target == 0).type(output.dtype)
+    output = (output * bgmask).mean()
+    return output
+
+
 def thresh_cce(input, target, maxval=None, weights=None):
     """Categorical crossentropy loss. 
 

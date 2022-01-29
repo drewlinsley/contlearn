@@ -42,7 +42,7 @@ train:
 model:
   _target_: src.pl_modules.model.MyModel
   name: ResidualUNet3D
-  loss: src.pl_modules.losses.cce
+  loss: src.pl_modules.losses.cce_mask_background
   metric: torchmetrics.F1
   loss_weights: [0.5, 3, 3]  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
   ckpt: False
