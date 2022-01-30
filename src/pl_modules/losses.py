@@ -30,16 +30,34 @@ class dice_loss_mask_background:
         return output
 
 
-class cce_mask_background:
+class cce_thresh:
     def __init__(self, weights=None):
         """Categorical crossentropy loss. Assumes input is logits."""
         self.loss_fun = nn.CrossEntropyLoss(weight=weights, reduction="none")
 
     def forward(self, input, target):
-        target = target.squeeze(1)
-        output = self.loss_fun(input.float(), target.long())
-        bgmask = (target == 0).type(output.dtype)
-        output = (output * bgmask).mean()
+        output = self.loss_fun(input.float(), target.squeeze(1)long())
+        mask = target > 0
+        pos_vals = output[mask]
+        thresh = torch.median(pos_vals)
+        raise NotImplementedError("Cant figure this out")
+        pos_vals[pos_vals < thresh] = 0  # Fudge factor to ignore 
+
+
+    loss = nn.CrossEntropyLoss(weight=weights, reduction="none")
+    # target = torch.argmax(target, 1)
+    # output = loss(input.float(), target.float().squeeze(1))
+    output = loss(input.float(), target.long().squeeze(1))
+
+    # Grab + locations
+    mask = target > 0
+    pos_vals = output[mask]
+    thresh = torch.median(pos_vals)
+    pos_vals[pos_vals < thresh] = 0
+    output[mask] = pos_vals
+
+
+
         return output
 
 
