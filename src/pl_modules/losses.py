@@ -35,7 +35,7 @@ class cce_thresh:
         """Categorical crossentropy loss. Assumes input is logits."""
         self.loss_fun = nn.CrossEntropyLoss(weight=weights, reduction="none")
 
-    def forward(self, input, target):
+    def __call__(self, input, target):
         output = self.loss_fun(input.float(), target.squeeze(1).long())
         mask = target > 0
         pos_vals = output[mask]
@@ -50,7 +50,7 @@ class cce:
         """Categorical crossentropy loss. Assumes input is logits."""
         self.loss_fun = nn.CrossEntropyLoss(weight=weights)
 
-    def forward(self, input, target):
+    def __call__(self, input, target):
         target = target.squeeze(1)
         output = self.loss_fun(input.float(), target.long())
         return output
@@ -66,7 +66,7 @@ class bce:
             weights = None
         self.loss_fun = nn.BCEWithLogitsLoss(weights=weights)
 
-    def forward(self, input, target):
+    def __call__(self, input, target, maxval):
         target = F.one_hot(
             target.to(torch.int64),
             maxval).to(
