@@ -154,32 +154,53 @@ class GetData():
                             self.label_transpose_xyz_zyx]
                     res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
                     # full_cube_size = (cube_size * 1.5).astype(int)
+
+                    # First build the label volume
+                    label_vol = np.zeros_like(volume)[..., 0]
+                    filtered_coords = []
                     for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
                         endc = np.minimum(startc + cube_size, label_shape)
                         label_cube_size = endc - startc
-                        cube = draw_cube(
-                            cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
-                            annotation_size,  # label size
-                            label_cube_size,  # volume shape
-                            dtype=dtype,
-                            label=label)
-                        # label_vol[
-                        #     startc[0]: endc[0],
-                        #     startc[1]: endc[1],
-                        #     startc[2]: endc[2]] = cube
-                        vol = volume[
-                            startc[0]: endc[0],
-                            startc[1]: endc[1],
-                            startc[2]: endc[2]]
+                        try:
+                            cube = draw_cube(
+                                cube_size // 2 - annotation_size // 2,  # top-left edge of label  # noqa
+                                annotation_size,  # label size
+                                label_cube_size,  # volume shape
+                                dtype=dtype,
+                                label=label)
+                        except:
+                            import pdb;pdb.set_trace()
 
-                        # # Now random crop cube/vol
-                        # vol, cube = randomcrop(vol[None], cube[None], cube_size)
-                        # vol, cube = vol.squeeze(0), cube.squeeze(0)
-                        if np.all(np.asarray(vol.shape)[:-1] == self.cube_size):  # noqa
-                            label_list.append(cube)
-                            volume_list.append(vol)
+                        # Check if the annotation size fits into the volume
+                        vol = volume[startc[0]: endc[0],startc[1]: endc[1],startc[2]: endc[2]]
+                        vol_shape = np.asarray(vol.shape[:-1])
+                        if np.all(self.cube_size == vol_shape):
+                            label_vol[
+                                startc[0]: endc[0],
+                                startc[1]: endc[1],
+                                startc[2]: endc[2]] = np.maximum(
+                                    cube,
+                                    label_vol[
+                                        startc[0]: endc[0],
+                                        startc[1]: endc[1],
+                                        startc[2]: endc[2]])
+                            filtered_coords.append(coord)
+                    labels_max = labels.max()
+                    label_vol_max = label_vol.max()
+                    assert labels_max == label_vol_max, \
+                        "label_vol {} and labels {} have different max values.".format(label_vol_max, labels_max)
+
+                    # Now build lists of vols/labels
+                    for coord in filtered_coords:
+                        startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
+                        startc = startc.astype(int)
+                        endc = np.minimum(startc + cube_size, label_shape)
+                        vol = volume[startc[0]: endc[0],startc[1]: endc[1],startc[2]: endc[2]]
+                        cube = label_vol[startc[0]: endc[0],startc[1]: endc[1],startc[2]: endc[2]]
+                        volume_list.append(vol)
+                        label_list.append(cube)
 
                     # Transpose images if requested
                     volume = np.asarray(volume_list)
