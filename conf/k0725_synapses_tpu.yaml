@@ -50,7 +50,7 @@ model:
   in_channels: 2  # Image/Membrane inputs
   out_channels: 3  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
   force_2d: False  # Use a 2d model
-  plot_argmax: False  # Plot the argmax prediction per voxel on tensorboard
+  plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
 
 data:
   token: UTUOQJvbbyRFbD_NSnTMig

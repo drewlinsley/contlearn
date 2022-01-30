@@ -44,19 +44,19 @@ model:
   name: ResidualUNet3D
   loss: src.pl_modules.losses.cce  # cce
   metric: torchmetrics.F1
-  loss_weights: [0.2, 2, 2]  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
+  loss_weights: [0.2, 10, 10]  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
   ckpt: False
   # ckpt: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2  # Image/Membrane inputs
   out_channels: 3  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
   force_2d: False  # Use a 2d model
-  plot_argmax: False  # Plot the argmax prediction per voxel on tensorboard
+  plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
 
 data:
   token: UTUOQJvbbyRFbD_NSnTMig
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
-  annotation_size: [5, 15, 15]  # [7, 19, 19]  # z/y/x
+  annotation_size: [5, 13, 13]  # [7, 19, 19]  # z/y/x
   cube_size: [20, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
   label_transpose_xyz_zyx: [2, 0, 1]
   image_transpose_xyz_zyx: False
