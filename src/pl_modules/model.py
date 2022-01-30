@@ -1,17 +1,15 @@
 from typing import Any, Dict, List, Sequence, Tuple, Union
 import os
-import wandb
-from omegaconf import DictConfig
-from importlib import import_module
-
-import torch
-import torch.nn.functional as F
-from torch.optim import Optimizer
-from torch import nn
 import hydra
 import pytorch_lightning as pl
 import torchmetrics
 import torchvision
+import torch
+import torch.nn.functional as F
+import wandb
+from omegaconf import DictConfig
+from torch.optim import Optimizer
+from importlib import import_module
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +20,7 @@ from captum.attr import visualization as viz
 
 from monai import losses as monai_losses
 
-from src.common.utils import iterate_elements_in_batches, render_images, weights_update
+from src.common.utils import iterate_elements_in_batches, render_images
 
 from src.pl_modules import UNet3D, unet
 from src.pl_modules import losses
@@ -53,18 +51,16 @@ class MyModel(pl.LightningModule):
         else:
             self.save_hyperparameters()
         self.name = name
+        p, m = loss.rsplit('.', 1)
+        mod = import_module(p)
+        self.loss = getattr(mod, m)  # getattr(losses, loss)
 
-
-        # self.loss = monai_losses.DiceLoss(softmax=True, to_onehot_y=True)
+        # self.loss = monai_losses.DiceLoss()
         # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
         else:
             self.loss_weights = None
-
-        p, m = loss.rsplit('.', 1)
-        mod = import_module(p)
-        self.loss = getattr(mod, m)(weights=self.loss_weights)  # getattr(losses, loss)
 
         if force_2d:
             self.net = unet.UNet(
@@ -76,10 +72,6 @@ class MyModel(pl.LightningModule):
                 in_channels=self.cfg.model.in_channels,
                 out_channels=self.cfg.model.out_channels)
         self.ckpt = ckpt
-        if self.ckpt:
-            pass
-            # self.net = weights_update(self.net, self.ckpt)
-
         self.maxval = out_channels
 
         # metric_mod = import_module(torchmetrics)
@@ -101,9 +93,7 @@ class MyModel(pl.LightningModule):
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = self.loss(
-                input=logits,
-                target=y)
+            loss = self.loss(logits, y, self.loss_weights, maxval=self.maxval)
             # loss = self.loss.forward(logits, y, self.loss_weights)
             loss = loss + penalty
         else:
@@ -113,10 +103,7 @@ class MyModel(pl.LightningModule):
             #     y.squeeze(1).to(torch.int64),
             #     self.maxval).to(
             #     logits.dtype).permute(0, 4, 1, 2, 3)
-            # loss = self.loss(logits, y)  # onehot_y)
-            loss = self.loss(
-                input=logits,
-                target=y)  # onehot_y)
+            loss = self.loss(logits, y)  # onehot_y)
         return {
             "logits": logits.detach(),
             "loss": loss,
@@ -205,10 +192,8 @@ class MyModel(pl.LightningModule):
                 gt = output_element["y_true"].float().mean((0, 1))[None]
                 # gt = output_element["y_true"][mid][None]
             # output_seg = output_element["logits"].argmax(dim=0)[mid][None]
-            # print(output_element["logits"].shape)  # 3,12,96,96
-            # output_seg = F.softmax(output_element["logits"], dim=0)
-            # output_seg = output_seg.mean((0))[mid][None]
-            output_seg = torch.argmax(output_element["logits"], 0)[mid][None]
+            output_seg = F.softmax(output_element["logits"], dim=0)
+            output_seg = output_seg[1].mean(0)[None]
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
