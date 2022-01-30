@@ -42,22 +42,6 @@ class cce_thresh:
         thresh = torch.median(pos_vals)
         raise NotImplementedError("Cant figure this out")
         pos_vals[pos_vals < thresh] = 0  # Fudge factor to ignore 
-
-
-    loss = nn.CrossEntropyLoss(weight=weights, reduction="none")
-    # target = torch.argmax(target, 1)
-    # output = loss(input.float(), target.float().squeeze(1))
-    output = loss(input.float(), target.long().squeeze(1))
-
-    # Grab + locations
-    mask = target > 0
-    pos_vals = output[mask]
-    thresh = torch.median(pos_vals)
-    pos_vals[pos_vals < thresh] = 0
-    output[mask] = pos_vals
-
-
-
         return output
 
 
