@@ -36,7 +36,7 @@ class cce_thresh:
         self.loss_fun = nn.CrossEntropyLoss(weight=weights, reduction="none")
 
     def forward(self, input, target):
-        output = self.loss_fun(input.float(), target.squeeze(1)long())
+        output = self.loss_fun(input.float(), target.squeeze(1).long())
         mask = target > 0
         pos_vals = output[mask]
         thresh = torch.median(pos_vals)

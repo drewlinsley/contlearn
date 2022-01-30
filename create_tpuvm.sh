@@ -1,4 +1,4 @@
-ZONE=us-central1-f  # europe-west4-a us-east1-d
+ZONE=us-central1-a  # europe-west4-a us-east1-d
 TPU=v3-8  # 8
 
 TPUNAME=$1
