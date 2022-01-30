@@ -63,11 +63,11 @@ data:
   image_downsample: [1, 0.2430724356, 0.2430724356]
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
-  bounding_box: [[774, 4750, 2980], [3200, 1100, 1100]]
+  bounding_box: [[1967, 4872, 3276], [1152, 1152, 240]]
   volume_size: False
   keep_labels: False
   annotation_path: https://webknossos.org/annotations/Explorational/61f582aa0100003401165a34
-  image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_mag1_x0_y0_z0.npy
+  image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_mag1_x1967_y4872_z3276.npy
   wkdataset: "???"
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
