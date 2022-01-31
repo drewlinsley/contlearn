@@ -13,12 +13,12 @@ run init to set up your account
 
 - examples
 
-bash create_tpuvm.sh muller-tpu-1 conf/WQ_muller_tpu.yaml
-bash create_tpuvm.sh synapse-tpu-1 conf/WQ_synapses_tpu.yaml
-bash create_tpuvm.sh pytorch-tpu-1 conf/WQ_synapses_tpu.yaml
-bash create_tpuvm.sh synapse-k0725-tpu-1 conf/k0725_synapses_tpu.yaml
-bash create_tpuvm.sh bloodvessels-k0725-tpu-1 conf/k0725_bloodvessels_tpu.yaml
-bash create_tpuvm.sh bpts-k0725-tpu-1 conf/k0725_bpts_tpu.yaml
+bash create_tpuvm.sh muller-tpu-1 WQ_muller_tpu.yaml
+bash create_tpuvm.sh synapse-tpu-1 WQ_synapses_tpu.yaml
+bash create_tpuvm.sh pytorch-tpu-1 WQ_synapses_tpu.yaml
+bash create_tpuvm.sh synapse-k0725-tpu-1 k0725_synapses_tpu.yaml
+bash create_tpuvm.sh bloodvessels-k0725-tpu-1 k0725_bloodvessels_tpu.yaml
+bash create_tpuvm.sh bpts-k0725-tpu-1 k0725_bpts_tpu.yaml
 
 # Run on GPU
 

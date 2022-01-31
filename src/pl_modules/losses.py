@@ -61,10 +61,11 @@ class bce:
         """Categorical crossentropy loss. Assumes input is logits."""
         if weights and weights is not None:
             weights_len = len(weights)
-            weights = weights.reshape(1, weights_len, 1, 1, 1)
+            self.weights = weights.reshape(1, weights_len, 1, 1, 1)
+            self.loss_fun = nn.BCEWithLogitsLoss(reduction="none")
         else:
-            weights = None
-        self.loss_fun = nn.BCEWithLogitsLoss(weights=weights)
+            self.weights = False
+            self.loss_fun = nn.BCEWithLogitsLoss()
         self.out_channels = out_channels
 
     def __call__(self, input, target):
@@ -73,6 +74,8 @@ class bce:
             self.out_channels).to(
             torch.uint8).permute(0, 4, 1, 2, 3)
         output = self.loss_fun(input, target.float())
+        if self.weights:
+            output = output * self.weights  # Weight the logits
         return output
 
 
