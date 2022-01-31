@@ -163,7 +163,8 @@ class GetData():
                         np.asarray([0, 0, 0]))
                     label_vol = np.zeros_like(volume)[..., 0]
                     filtered_coords = []
-                    res_coords = res_coords - min_coords
+                    if self.bounding_box:
+                        res_coords = res_coords - min_coords
                     res_coords = res_coords[:, [2, 1, 0]]
                     for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
