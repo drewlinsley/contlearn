@@ -59,7 +59,9 @@ class MyModel(pl.LightningModule):
 
         p, m = loss.rsplit('.', 1)
         mod = import_module(p)
-        self.loss = getattr(mod, m)(self.loss_weights)  # getattr(losses, loss)
+        self.loss = getattr(mod, m)(
+            weights=self.loss_weights,
+            out_channels=self.cfg.model.out_channels)  # getattr(losses, loss)
 
         if force_2d:
             self.net = unet.UNet(
@@ -186,7 +188,7 @@ class MyModel(pl.LightningModule):
             mid = output_element["image"].shape[1] // 2  # midpoint on z-axis
 
             if self.cfg.model.plot_argmax:
-                gt = output_element["y_true"][:, mid].argmax(dim=0)[None]
+                gt = output_element["y_true"].argmax(dim=1).mean(0)[None]
             else:
                 gt = output_element["y_true"].float().mean((0, 1))[None]
                 # gt = output_element["y_true"][mid][None]

@@ -1,4 +1,4 @@
-ZONE=us-central1-f  # europe-west4-a us-east1-d
+ZONE=us-central1-a  # europe-west4-a us-east1-d
 TPU=v3-8  # 8
 
 TPUNAME=$1
@@ -11,16 +11,16 @@ then
   # pytorch-tpu1, muller-tpu-1
 fi
 
-if [ -z "$SCRIPT" ]
+if [ -z "$CONFIG" ]
 then
-  echo "Enter the name of the script you want to run on GCP:"
-  read SCRIPT
+  echo "Enter the name of the config you want to run on GCP:"
+  read CONFIG
 fi
 
-if [ -f "$SCRIPT" ]; then
-    echo "$SCRIPT exists."
+if [ -f "$CONFIG" ]; then
+    echo "$CONFIG exists."
 else 
-    echo "$SCRIPT does not exist, exiting."
+    echo "$CONFIG does not exist, exiting."
     exit 0
 fi
 
@@ -41,7 +41,8 @@ gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
 while True
 do
   gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
-    --command "cd contlearn && bash ${SCRIPT}"
+    # --command "cd contlearn && bash ${SCRIPT}"
+    --command "cd contlearn && bash scripts/run_tpu_vm_job.sh ${CONFIG}"
 done
 
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE  --ssh-flag="-X"

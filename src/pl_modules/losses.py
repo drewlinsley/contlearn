@@ -6,7 +6,7 @@ from monai import losses as monai_losses
 
 
 class dice_loss:
-    def __init__(self, weights=None):
+    def __init__(self, weights=None, out_channels=None):
         """Generalized monai loss. Assumes input is logits."""
         self.loss_fun = monai_losses.DiceLoss(
             softmax=True,
@@ -18,7 +18,7 @@ class dice_loss:
 
 
 class dice_loss_mask_background:
-    def __init__(self, weights=None):
+    def __init__(self, weights=None, out_channels=None):
         """Generalized monai loss. Assumes input is logits."""
         self.loss_fun = monai_losses.DiceLoss(
             softmax=True,
@@ -31,7 +31,7 @@ class dice_loss_mask_background:
 
 
 class cce_thresh:
-    def __init__(self, weights=None):
+    def __init__(self, weights=None, out_channels=None):
         """Categorical crossentropy loss. Assumes input is logits."""
         self.loss_fun = nn.CrossEntropyLoss(weight=weights, reduction="none")
 
@@ -46,7 +46,7 @@ class cce_thresh:
 
 
 class cce:
-    def __init__(self, weights=None):
+    def __init__(self, weights=None, out_channels=None):
         """Categorical crossentropy loss. Assumes input is logits."""
         self.loss_fun = nn.CrossEntropyLoss(weight=weights)
 
@@ -57,7 +57,7 @@ class cce:
 
 
 class bce:
-    def __init__(self, weights=None):
+    def __init__(self, weights=None, out_channels=None):
         """Categorical crossentropy loss. Assumes input is logits."""
         if weights and weights is not None:
             weights_len = len(weights)
@@ -65,11 +65,12 @@ class bce:
         else:
             weights = None
         self.loss_fun = nn.BCEWithLogitsLoss(weights=weights)
+        self.out_channels = out_channels
 
-    def __call__(self, input, target, maxval):
+    def __call__(self, input, target):
         target = F.one_hot(
             target.to(torch.int64),
-            maxval).to(
+            self.out_channels).to(
             torch.uint8).permute(0, 4, 1, 2, 3)
         output = self.loss_fun(input, target.float())
         return output

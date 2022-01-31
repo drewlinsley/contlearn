@@ -1,0 +1,178 @@
+# metadata specialised for each experiment
+core:
+  version: 0.0.1
+  tags:
+    - connectomics
+
+#defaults:
+#  - override hydra/launcher: joblib
+eval_only: False
+train:
+  # reproducibility
+  deterministic: False
+  random_seed: 42
+
+  # training
+
+  pl_trainer:
+    fast_dev_run: False # Enable this for debug purposes
+    tpu_cores: 1
+    precision: bf16
+    max_steps: 60000  # 30000
+    # accumulate_grad_batches: 1
+    num_sanity_val_steps: 0
+    gradient_clip_val: 10000000.0  # 10.
+
+  monitor_metric: 'val_loss'
+  monitor_metric_mode: 'min'
+
+  early_stopping:
+    patience: 42
+    verbose: False
+
+  model_checkpoints:
+    save_top_k: 1
+    verbose: False
+
+# TPU Tensor Dimension Rules:
+# The total batch size should be a multiple of 64 (8 per TPU core), and feature dimension sizes should be a multiple of 128.
+# The total batch size should be a multiple of 1024 (128 per TPU core), and feature dimension sizes should be a multiple of 8.
+# Using a batch size of 1024 and feature dimensions that are a multiple of 128 results in the best efficiency, although this may not be possible for all models.
+
+model:
+  _target_: src.pl_modules.model.MyModel
+  name: ResidualUNet3D
+  loss: src.pl_modules.losses.bce  # cce
+  metric: torchmetrics.F1
+  loss_weights: False  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
+  ckpt: False
+  # ckpt: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
+  in_channels: 2  # Image/Membrane inputs
+  out_channels: 1  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
+  force_2d: False  # Use a 2d model
+  plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
+
+data:
+  token: UTUOQJvbbyRFbD_NSnTMig
+  scale: [5, 5, 50]
+  annotation_type: "nml"  # nml/volumetric/or "???"
+  annotation_size: [7, 19, 19]  # z/y/x
+  cube_size: [20, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
+  label_transpose_xyz_zyx: [2, 0, 1]
+  image_transpose_xyz_zyx: False
+  image_downsample: [1, 0.2430724356, 0.2430724356]
+  label_downsample: False  # [1, 4.114, 4.114]
+  image_layer_name: "images"  # Depreciated
+  bounding_box: [[2122, 14257, 500], [1152, 1152, 240]]
+  volume_size: False
+  keep_labels: False
+  annotation_path: https://webknossos.org/annotations/Explorational/61f80b470100001901c41b88
+  image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_bpts_mag1_x2122_y14257_z500.npy
+  wkdataset: https://webknossos.org/datasets/Demo_Organization/110629_k0725
+  datamodule:
+    _target_: src.pl_data.datamodule.MyDataModule
+    val_proportion: 0.2
+    use_train_dataset: Celltype_Prediction
+    use_val_dataset: Celltype_Prediction
+    shape: "${data.cube_size}"
+    datasets:
+      Celltype_Prediction:
+        train:
+          _target_: src.pl_data.dataset.Volumetric
+          train: True
+          path: "${data.image_path}"
+          # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
+          # len: 97
+          len: 128
+          trim_dims: [[0, 384], [0, 384], [340, 768]]
+          shape: [16, 96, 96]  # "${data.cube_size}"
+          force_2d: "${model.force_2d}"
+          selected_label: False  
+          # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
+        val:
+          _target_: src.pl_data.dataset.Volumetric
+          train: False
+          # path: gs://serrelab/connectomics/npy/celltype/cells_1.npz
+          path: "${data.image_path}"
+          # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
+          # len: 11
+          len: 10
+          # trim_dims: [[34, 52], [156, 384], [156, 384]]
+          trim_dims: [[140, 180], [0, 384], [0, 340]]
+          # shape: "${data.cube_size}"
+          shape: [16, 96, 96]  # "${data.cube_size}"
+          force_2d: "${model.force_2d}"
+          selected_label: False  
+        test:
+          _target_: src.pl_data.dataset.VolumetricTF
+          train: False
+          # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_val.tfrecords
+          path: "${data.image_path}"
+          len: 11
+          trim_dims: [[140, 180], [0, 384], [0, 340]]
+          shape: "${data.cube_size}"
+          force_2d: "${model.force_2d}"
+          selected_label: False  
+
+    num_workers:
+      train: 48
+      val: 48
+      test: 1
+
+    batch_size:
+      train: ${mult:8,1}
+      val: ${mult:8,1}
+      test: ${mult:8,1}
+
+optim:
+  optimizer:
+    #  Adam-oriented deep learning
+    _target_: torch.optim.Adam
+    #  These are all default parameters for the Adam optimizer
+    lr: 3e-4  # 0.001
+    betas: [ 0.9, 0.999 ]
+    eps: 1e-08
+    # weight_decay: 1e-7
+
+  use_lr_scheduler: False
+  lr_scheduler:
+    _target_: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
+    T_0: 10
+    T_mult: 2
+    eta_min: 0 # min value for the lr
+    last_epoch: -1
+
+hydra:
+  run:
+    dir: results/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    # dir: gs://serrelab/connectomics/results/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+  sweep:
+    dir: results/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}/
+    # dir: gs://serrelab/connectomics/results/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}/
+    subdir: ${hydra.job.num}_${hydra.job.id}
+
+  job:
+    env_set:
+      WANDB_START_METHOD: spawn
+
+logging:
+  n_elements_to_log: 2  # Set to 1 if tpu=8s
+  log_every_n_steps: 1
+
+  # log frequency
+  val_check_interval: 1.  # Float is epochs, int is steps
+  # progress_bar_refresh_rate: 20
+
+  wandb:
+    project: cont-learn
+    entity: serrelab
+
+    watch:
+      log: 'all'
+      log_freq: 1
+
+  lr_monitor:
+    logging_interval: "step"
+    log_momentum: False
+
