@@ -2,7 +2,7 @@ ZONE=us-central1-a  # europe-west4-a us-east1-d
 TPU=v3-8  # 8
 
 TPUNAME=$1
-SCRIPT=$2
+CONFIG=$2
 
 if [ -z "$TPUNAME" ]
 then
