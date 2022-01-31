@@ -65,7 +65,7 @@ data:
   image_layer_name: "images"  # Depreciated
   bounding_box: [[2122, 14257, 500], [1152, 1152, 240]]
   volume_size: False
-  keep_labels: False
+  keep_labels: {2: 1}
   annotation_path: https://webknossos.org/annotations/Explorational/61f80b470100001901c41b88
   image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_bpts_mag1_x2122_y14257_z500.npy
   wkdataset: https://webknossos.org/datasets/Demo_Organization/110629_k0725

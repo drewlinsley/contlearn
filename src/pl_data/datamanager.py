@@ -266,7 +266,7 @@ class GetData():
                         annotation_layer.bounding_box = BoundingBox(self.volume_size[0], self.volume_size[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
                     label = label.transpose(2, 0, 1)
-                    if self.keep_labels is not None:
+                    if self.keep_labels:
                         uni_labels = np.unique(label)
                         remap_to_0 = {}
                         for l in uni_labels:
