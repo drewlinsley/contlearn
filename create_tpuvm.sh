@@ -1,4 +1,5 @@
 ZONE=us-central1-a  # europe-west4-a us-east1-d
+# ZONE=europe-west4-a  #  us-east1-d
 TPU=v3-8  # 8
 
 TPUNAME=$1
@@ -18,7 +19,7 @@ then
 fi
 
 if [ -f "$CONFIG" ]; then
-    echo "$CONFIG exists."
+    echo "Check for $CONFIG passed. Building TPU and running job."
 else 
     echo "$CONFIG does not exist, exiting."
     exit 0
@@ -29,8 +30,7 @@ gcloud alpha compute tpus tpu-vm delete $TPUNAME --zone=$ZONE --quiet
 gcloud alpha compute tpus tpu-vm create $TPUNAME \
 --zone=$ZONE \
 --accelerator-type=$TPU \
---version=v2-alpha \
-# --version=tpu-vm-pt-1.10  # v2-alpha \
+--version=v2-alpha  # --version=tpu-vm-pt-1.10  # v2-alpha \
 # --boot-disk-size=200GB \
 
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
@@ -41,8 +41,8 @@ gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
 while True
 do
   gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
-    # --command "cd contlearn && bash ${SCRIPT}"
     --command "cd contlearn && bash scripts/run_tpu_vm_job.sh ${CONFIG}"
+    # --command "cd contlearn && bash ${SCRIPT}"
 done
 
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE  --ssh-flag="-X"
