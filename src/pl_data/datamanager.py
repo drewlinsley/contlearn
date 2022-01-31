@@ -165,7 +165,7 @@ class GetData():
                     filtered_coords = []
                     if self.bounding_box:
                         res_coords = res_coords - min_coords
-                        res_coords = res_coords[:, [2, 1, 0]]
+                        # res_coords = res_coords[:, [2, 1, 0]]
                     for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)
