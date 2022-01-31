@@ -115,9 +115,10 @@ class GetData():
                     coords = np.asarray(coords)
 
                     # Now prune coords so that we only keep those in self.bounding_box
-                    coord_max = np.asarray(self.bounding_box[0]) + np.asarray(self.bounding_box[1])
-                    coord_mask = np.all(coords < coord_max, 1)
-                    coords = coords[coord_mask]
+                    if self.bounding_box:
+                        coord_max = np.asarray(self.bounding_box[0]) + np.asarray(self.bounding_box[1])
+                        coord_mask = np.all(coords < coord_max, 1)
+                        coords = coords[coord_mask]
                     # max_coords = coords.max(0) + self.annotation_size
                     # diffs = max_coords - min_coords
                     # min_coords = min_coords.astype(int)
