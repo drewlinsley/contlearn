@@ -40,7 +40,6 @@ while True
 do
   gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
     --command "cd contlearn && bash scripts/run_tpu_vm_job.sh ${CONFIG}"
-    # --command "cd contlearn && bash ${SCRIPT}"
 done
 
 # gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE  --ssh-flag="-X"
