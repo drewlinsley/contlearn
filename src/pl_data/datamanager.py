@@ -54,6 +54,8 @@ class GetData():
         self.image_transpose_xyz_zyx = cfg.image_transpose_xyz_zyx
         self.label_transpose_xyz_zyx = cfg.label_transpose_xyz_zyx
         self.image_downsample = cfg.image_downsample
+        if not self.image_downsample:
+            self.image_downsample = [1, 1, 1]
         self.label_downsample = cfg.label_downsample
         self.image_layer_name = cfg.image_layer_name
         self.cube_size = cfg.cube_size
@@ -305,7 +307,7 @@ class GetData():
                     # os.system(cmd)
 
 
-                    if self.label_downsample:
+                    if self.label_downsample and not np.all(np.asarray(self.label_downsample) == 1):
                         # label = resize(
                         #     label,
                         #     self.label_downsample,
@@ -327,7 +329,7 @@ class GetData():
                                 total=len(label)))
                         label = np.asarray(res_label)
 
-                    if self.image_downsample:
+                    if self.image_downsample and not np.all(np.asarray(self.image_downsample) == 1):
                         res_volume = []
                         res_volume = Parallel(n_jobs=-1)(
                             delayed(
@@ -336,7 +338,7 @@ class GetData():
                                     y,
                                     anti_aliasing=True,
                                     preserve_range=True,
-                                    order=1))(vol, label_vol.shape[1:]) for vol in tqdm(  # noqa
+                                    order=1))(vol, label.shape[1:]) for vol in tqdm(  # noqa
                                 volume,
                                 "Resizing images",
                                 total=len(volume)))
