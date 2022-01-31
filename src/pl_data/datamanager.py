@@ -114,14 +114,15 @@ class GetData():
                         in_place=True)
                     coords = np.asarray(coords)
 
-                    min_coords = np.maximum(
-                        coords.min(0) - self.annotation_size,
-                        np.asarray([0, 0, 0]))
-                    max_coords = coords.max(0) + self.annotation_size
-                    diffs = max_coords - min_coords
-                    min_coords = min_coords.astype(int)
-                    diffs = diffs.astype(int)
-                    bbox = BoundingBox(min_coords.tolist(), diffs.tolist())
+                    # Now prune coords so that we only keep those in self.bounding_box
+                    coord_max = np.asarray(self.bounding_box[0]) + np.asarray(self.bounding_box[1])
+                    coord_mask = np.all(coords < coord_max, 1)
+                    coords = coords[coord_mask]
+                    # max_coords = coords.max(0) + self.annotation_size
+                    # diffs = max_coords - min_coords
+                    # min_coords = min_coords.astype(int)
+                    # diffs = diffs.astype(int)
+                    # bbox = BoundingBox(min_coords.tolist(), diffs.tolist())
 
                     # The below WK loading works, but is missing
                     # the extra membrane prediction layer.
@@ -156,8 +157,13 @@ class GetData():
                     # full_cube_size = (cube_size * 1.5).astype(int)
 
                     # First build the label volume
+                    min_coords = np.maximum(
+                        res_coords.min(0) - np.asarray(self.annotation_size),
+                        np.asarray([0, 0, 0]))
                     label_vol = np.zeros_like(volume)[..., 0]
                     filtered_coords = []
+                    res_coords = res_coords - min_coords
+                    res_coords = res_coords[:, [2, 1, 0]]
                     for label, coord in zip(labels, res_coords):
                         startc = np.maximum(coord - (cube_size // 2), np.zeros_like(coord))  # noqa
                         startc = startc.astype(int)

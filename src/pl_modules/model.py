@@ -51,16 +51,15 @@ class MyModel(pl.LightningModule):
         else:
             self.save_hyperparameters()
         self.name = name
-        p, m = loss.rsplit('.', 1)
-        mod = import_module(p)
-        self.loss = getattr(mod, m)  # getattr(losses, loss)
 
-        # self.loss = monai_losses.DiceLoss()
-        # self.loss = dice_loss.SoftDiceLoss()  # getattr(mod, m)  # getattr(losses, loss)
         if loss_weights:
             self.loss_weights = torch.tensor(loss_weights)
         else:
             self.loss_weights = None
+
+        p, m = loss.rsplit('.', 1)
+        mod = import_module(p)
+        self.loss = getattr(mod, m)(self.loss_weights)  # getattr(losses, loss)
 
         if force_2d:
             self.net = unet.UNet(
