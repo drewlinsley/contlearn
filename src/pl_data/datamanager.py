@@ -261,7 +261,7 @@ class GetData():
                             print("Failed to download annotations, trying again ({} / {}).".format(count + 1, max_tries))
                             max_tries += 1
 
-                    if self.volume_size is not None:
+                    if self.volume_size:
                         # Get the whole annotation
                         annotation_layer.bounding_box = BoundingBox(self.volume_size[0], self.volume_size[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
