@@ -61,7 +61,7 @@ class GetData():
         self.cube_size = cfg.cube_size
         self.bounding_box = cfg.bounding_box
         self.keep_labels = cfg.keep_labels
-        self.volume_size = cfg.volume_size
+        # self.volume_size = cfg.volume_size
 
     def load(self):
         if self.data_type == "GCS":
@@ -273,9 +273,11 @@ class GetData():
                             print("Failed to download annotations, trying again ({} / {}).".format(count + 1, max_tries))
                             max_tries += 1
 
-                    if self.volume_size:
-                        # Get the whole annotation
-                        annotation_layer.bounding_box = BoundingBox(self.volume_size[0], self.volume_size[1])
+                    if self.bounding_box:  # self.volume_size:
+                        # Get the bbox annotation
+                        self.bounding_box = np.asarray(self.bounding_box)
+                        annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
+                        # self.volume_size[0], self.volume_size[1])
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
                     label = label.transpose(2, 0, 1)
                     if self.keep_labels:
