@@ -69,10 +69,11 @@ class bce:
         self.out_channels = out_channels
 
     def __call__(self, input, target):
-        target = F.one_hot(
-            target.to(torch.int64),
-            self.out_channels).to(
-            torch.uint8).permute(0, 4, 1, 2, 3)
+        if self.out_channels > 1:
+            target = F.one_hot(
+                target.to(torch.int64),
+                self.out_channels).to(
+                torch.uint8).permute(0, 4, 1, 2, 3)
         output = self.loss_fun(input, target.float())
         if self.weights:
             output = output * self.weights  # Weight the logits
