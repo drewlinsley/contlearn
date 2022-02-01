@@ -356,6 +356,8 @@ class GetData():
                         if self.label_downsample:
                             res_bounding_box = np.asarray(self.bounding_box) * np.asarray(self.label_downsample)[None]  # noqa
                             res_bounding_box = np.floor(res_bounding_box).astype(int)[:, [0, 2, 1]]
+                        else:
+                            res_bounding_box = np.asarray(self.bounding_box).astype(int)[:, [0, 2, 1]]
                         volume = volume[
                             res_bounding_box[0][0]: res_bounding_box[0][0] + res_bounding_box[1][0],
                             res_bounding_box[0][1]: res_bounding_box[0][1] + res_bounding_box[1][1],
