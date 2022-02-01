@@ -160,12 +160,13 @@ class GetData():
                     # full_cube_size = (cube_size * 1.5).astype(int)
 
                     # First build the label volume
-                    min_coords = np.maximum(
-                        res_coords.min(0) - np.asarray(self.annotation_size),
-                        np.asarray([0, 0, 0]))
+                    # min_coords = np.maximum(
+                    #     res_coords.min(0) - np.asarray(self.annotation_size),
+                    #     np.asarray([0, 0, 0]))
                     label_vol = np.zeros_like(volume)[..., 0]
                     filtered_coords = []
                     if self.bounding_box:
+                        min_coords = self.bounding_box[0]
                         res_coords = res_coords - min_coords
                         # res_coords = res_coords[:, [2, 1, 0]]
                     for label, coord in zip(labels, res_coords):

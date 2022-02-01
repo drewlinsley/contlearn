@@ -34,7 +34,7 @@ gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
 
 
 KEEPTRYING=true
-while KEEPTRYING
+while $KEEPTRYING
 do
   STATUS=`gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
     --command "cd contlearn && bash scripts/run_tpu_vm_job.sh ${CONFIG}"`
