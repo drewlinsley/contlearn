@@ -156,6 +156,7 @@ class GetData():
                         coords = coords[
                             :,
                             self.label_transpose_xyz_zyx]
+                        self.bounding_box = np.asarray(self.bounding_box)
                         self.bounding_box[0] = self.bounding_box[0, self.label_transpose_xyz_zyx]
                         self.bounding_box[1] = self.bounding_box[1, self.label_transpose_xyz_zyx]
                     res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
@@ -167,7 +168,7 @@ class GetData():
                     #     np.asarray([0, 0, 0]))
                     label_vol = np.zeros_like(volume)[..., 0]
                     filtered_coords = []
-                    if self.bounding_box:
+                    if np.any(self.bounding_box):
                         min_coords = self.bounding_box[0]
                         res_coords = res_coords - min_coords
                         res_coords = res_coords[(res_coords < 0).sum(1) == 0]
