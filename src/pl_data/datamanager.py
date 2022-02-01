@@ -121,6 +121,7 @@ class GetData():
                         coord_max = np.asarray(self.bounding_box[0]) + np.asarray(self.bounding_box[1])
                         coord_mask = np.all(coords < coord_max, 1)
                         coords = coords[coord_mask]
+                        labels = labels[mask]
                     # max_coords = coords.max(0) + self.annotation_size
                     # diffs = max_coords - min_coords
                     # min_coords = min_coords.astype(int)
