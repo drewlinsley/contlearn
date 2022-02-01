@@ -371,5 +371,5 @@ class GetData():
 
                     # Split volume/label into cubes then transpose
                     volume = volume.transpose(3, 0, 1, 2)[None]
-                    label = label[None, None]
+                    label = label[None, None].astype(np.uint8)
                     return volume, label
