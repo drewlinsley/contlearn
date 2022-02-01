@@ -171,7 +171,9 @@ class GetData():
                     if np.any(self.bounding_box):
                         min_coords = self.bounding_box[0]
                         res_coords = res_coords - min_coords
-                        res_coords = res_coords[(res_coords < 0).sum(1) == 0]
+                        mask = (res_coords < 0).sum(1) == 0
+                        res_coords = res_coords[mask]
+                        labels = labels[mask]
                         # res_coords = res_coords[:, [2, 1, 0]]
 
                     for label, coord in zip(labels, res_coords):
@@ -303,16 +305,12 @@ class GetData():
                     # from matplotlib import pyplot as plt
                     # fn = "tmp.png"
                     # f = plt.figure(figsize=(10, 10))
-                    # plt.subplot(121)
-                    # plt.imshow(volume[0, ..., 0], cmap="Greys_r")
-                    # plt.subplot(122)
-                    # plt.imshow(label[0] == 18)
+                    # plt.imshow(volume[0, ..., 0].T, cmap="Greys_r")
                     # plt.savefig(fn)
                     # plt.close(f)
                     # path = os.path.join(os.getcwd(), fn)
                     # cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
-                    # os.system(cmd)
-
+                    # _ = os.system(cmd)
 
                     if self.label_downsample and not np.all(np.asarray(self.label_downsample) == 1):
                         # label = resize(
