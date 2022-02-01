@@ -157,9 +157,10 @@ class GetData():
                         coords = coords[
                             :,
                             self.label_transpose_xyz_zyx]
-                        self.bounding_box = np.asarray(self.bounding_box)
-                        self.bounding_box[0] = self.bounding_box[0, self.label_transpose_xyz_zyx]
-                        self.bounding_box[1] = self.bounding_box[1, self.label_transpose_xyz_zyx]
+                        if self.bounding_box:
+                            self.bounding_box = np.asarray(self.bounding_box)
+                            self.bounding_box[0] = self.bounding_box[0, self.label_transpose_xyz_zyx]
+                            self.bounding_box[1] = self.bounding_box[1, self.label_transpose_xyz_zyx]
                     res_coords = np.ceil(coords * self.image_downsample)  # noqa Resize the coordinates
                     # full_cube_size = (cube_size * 1.5).astype(int)
 
