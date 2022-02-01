@@ -63,7 +63,7 @@ data:
   image_downsample: False
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
-  bounding_box: [[2450, 4750, 2980], [240, 1152, 1152]]
+  bounding_box: [[2000, 4750, 3180], [1152, 1152, 240]]
   volume_size: False
   keep_labels: False
   annotation_path: https://webknossos.org/annotations/Explorational/61f582aa0100003401165a34
