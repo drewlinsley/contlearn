@@ -20,7 +20,7 @@ train:
     precision: bf16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
-    num_sanity_val_steps: 0
+    num_sanity_val_steps: 1
     gradient_clip_val: 10000000.0  # 10.
 
   monitor_metric: 'val_loss'
