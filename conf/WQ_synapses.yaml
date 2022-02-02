@@ -56,7 +56,7 @@ model:
   plot_argmax: False  # Plot the argmax prediction per voxel on tensorboard
 
 data:
-  token: UTUOQJvbbyRFbD_NSnTMig
+  token: yWeTFbARG6kWX9X4N804hA
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
   annotation_size: [7, 19, 19]  # z/y/x
