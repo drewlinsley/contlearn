@@ -188,13 +188,14 @@ class MyModel(pl.LightningModule):
             mid = output_element["image"].shape[1] // 2  # midpoint on z-axis
 
             if self.cfg.model.plot_argmax:
-                gt = output_element["y_true"].argmax(dim=1).mean(0)[None]
+                gt = output_element["y_true"].argmax(dim=0).float().mean(0)[None]
             else:
                 gt = output_element["y_true"].float().mean((0, 1))[None]
                 # gt = output_element["y_true"][mid][None]
             # output_seg = output_element["logits"].argmax(dim=0)[mid][None]
-            output_seg = F.softmax(output_element["logits"], dim=0)
-            output_seg = output_seg[1].mean(0)[None]
+            # output_seg = F.softmax(output_element["logits"], dim=0)
+            # output_seg = output_seg[1].mean(0)[None]
+            output_seg = output_element["logits"].argmax(dim=0).float().mean(0)[None]
             if len(output_element["image"]) == 2:
                 input_img = output_element["image"][0, mid][None]
                 input_seg = output_element["image"][1, mid][None]
