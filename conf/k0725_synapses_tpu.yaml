@@ -16,11 +16,11 @@ train:
 
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
-    tpu_cores: 1
+    tpu_cores: 8
     precision: bf16
     max_steps: 60000  # 30000
     # accumulate_grad_batches: 1
-    num_sanity_val_steps: 1
+    num_sanity_val_steps: 0
     gradient_clip_val: 10000000.0  # 10.
 
   monitor_metric: 'val_loss'
@@ -50,7 +50,7 @@ model:
   in_channels: 2  # Image/Membrane inputs
   out_channels: 3  # noqa Must match the max of the dataset. TODO: get this automatically via iterpolation in omegaconf.
   force_2d: False  # Use a 2d model
-  plot_argmax: True  # Plot the argmax prediction per voxel on tensorboard
+  plot_argmax: False  # Plot the argmax prediction per voxel on tensorboard
 
 data:
   token: yWeTFbARG6kWX9X4N804hA
@@ -120,9 +120,9 @@ data:
       test: 1
 
     batch_size:
-      train: ${mult:8,1}
-      val: ${mult:8,1}
-      test: ${mult:8,1}
+      train: ${mult:8,8}
+      val: ${mult:8,8}
+      test: ${mult:8,8}
 
 optim:
   optimizer:
@@ -157,11 +157,11 @@ hydra:
       WANDB_START_METHOD: spawn
 
 logging:
-  n_elements_to_log: 2  # Set to 1 if tpu=8s
+  n_elements_to_log: 1  # Set to 1 if tpu=8s
   log_every_n_steps: 1
 
   # log frequency
-  val_check_interval: 1.  # Float is epochs, int is steps
+  val_check_interval: 5.  # Float is epochs, int is steps
   # progress_bar_refresh_rate: 20
 
   wandb:
