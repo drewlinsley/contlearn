@@ -120,9 +120,9 @@ data:
       test: 1
 
     batch_size:
-      train: ${mult:8,8}
-      val: ${mult:8,8}
-      test: ${mult:8,8}
+      train: ${mult:8,1}
+      val: ${mult:8,1}
+      test: ${mult:8,1}
 
 optim:
   optimizer:
