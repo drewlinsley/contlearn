@@ -71,7 +71,7 @@ data:
   wkdataset: "https://webknossos.org/datasets/4fd6473e68256c0a/W-Q_x0_y0_z0_2022-01-02_00-43-18"  # set to "???" if not using
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
-    val_proportion: 0.1
+    val_proportion: 0.15
     use_train_dataset: Celltype_Prediction
     use_val_dataset: Celltype_Prediction
     shape: "${data.cube_size}"
