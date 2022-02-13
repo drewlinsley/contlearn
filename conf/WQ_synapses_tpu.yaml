@@ -44,7 +44,7 @@ model:
   name: ResidualUNet3D
   loss: src.pl_modules.losses.cce  # cce
   metric: torchmetrics.F1
-  loss_weights: [1, 1, 1]  # [0.2, 5, 5]  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
+  loss_weights: False  # [0.2, 5, 5]  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
   ckpt: False
   # ckpt: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2  # Image/Membrane inputs
@@ -56,7 +56,7 @@ data:
   token: yWeTFbARG6kWX9X4N804hA
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
-  annotation_size: [5, 13, 13]  # [7, 19, 19]  # z/y/x
+  annotation_size: [3, 5 , 5]  # z/y/x
   cube_size: [20, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
   label_transpose_xyz_zyx: [2, 0, 1]
   image_transpose_xyz_zyx: False
@@ -71,7 +71,7 @@ data:
   wkdataset: "https://webknossos.org/datasets/4fd6473e68256c0a/W-Q_x0_y0_z0_2022-01-02_00-43-18"  # set to "???" if not using
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
-    val_proportion: 0.20
+    val_proportion: 0.1
     use_train_dataset: Celltype_Prediction
     use_val_dataset: Celltype_Prediction
     shape: "${data.cube_size}"

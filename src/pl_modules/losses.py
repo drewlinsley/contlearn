@@ -33,6 +33,8 @@ class dice_loss_mask_background:
 class cce_thresh:
     def __init__(self, weights=None, out_channels=None):
         """Categorical crossentropy loss. Assumes input is logits."""
+        if not weights:
+            weights = None
         self.loss_fun = nn.CrossEntropyLoss(weight=weights, reduction="none")
 
     def __call__(self, input, target):
@@ -48,6 +50,8 @@ class cce_thresh:
 class cce:
     def __init__(self, weights=None, out_channels=None):
         """Categorical crossentropy loss. Assumes input is logits."""
+        if not weights:
+            weights = None
         self.loss_fun = nn.CrossEntropyLoss(weight=weights)
 
     def __call__(self, input, target):
