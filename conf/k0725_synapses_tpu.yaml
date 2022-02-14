@@ -56,7 +56,7 @@ data:
   token: yWeTFbARG6kWX9X4N804hA
   scale: [5, 5, 50]
   annotation_type: "nml"  # nml/volumetric/or "???"
-  annotation_size: [7, 19, 19]  # z/y/x
+  annotation_size: [3, 5, 5]  # z/y/x
   cube_size: [20, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
   label_transpose_xyz_zyx: [2, 0, 1]
   image_transpose_xyz_zyx: False
