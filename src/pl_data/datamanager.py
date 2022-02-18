@@ -265,20 +265,14 @@ class GetData():
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
-                    annotation_layer = None
-                    max_tries, count = 10, 0
-                    while annotation_layer is None or count > max_tries:
-                        try:
-                            annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
-                        except:
-                            print("Failed to download annotations, trying again ({} / {}).".format(count + 1, max_tries))
-                            max_tries += 1
+                    annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
 
                     if self.bounding_box:  # self.volume_size:
                         # Get the bbox annotation
                         self.bounding_box = np.asarray(self.bounding_box)
                         annotation_layer.bounding_box = BoundingBox(self.bounding_box[0], self.bounding_box[1])
                         # self.volume_size[0], self.volume_size[1])
+
                     label = annotation_layer.mags[wk.Mag(1)].get_view().read().squeeze(0)
                     label = label.transpose(2, 0, 1)
                     if self.keep_labels:
@@ -375,7 +369,7 @@ class GetData():
                         volume = volume.transpose(3, 0, 1, 2)
 
                     # Match # z slices between volume and label
-                    zslices = volume.shape[0]
+                    zslices = volume.shape[1]
                     label = label[:zslices]
 
                     # Add dims for handling data on tpus
