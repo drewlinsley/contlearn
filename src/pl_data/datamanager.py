@@ -371,6 +371,14 @@ class GetData():
                     #         res_bounding_box[0][2]: res_bounding_box[0][2] + res_bounding_box[1][2]]
 
                     # Split volume/label into cubes then transpose
-                    volume = volume.transpose(3, 0, 1, 2)[None]
+                    if self.image_transpose_xyz_zyx:
+                        volume = volume.transpose(3, 0, 1, 2)
+
+                    # Match # z slices between volume and label
+                    zslices = volume.shape[0]
+                    label = label[:zslices]
+
+                    # Add dims for handling data on tpus
+                    volume = volume[None]
                     label = label[None, None].astype(np.uint8)
                     return volume, label
