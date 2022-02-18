@@ -269,7 +269,7 @@ class GetData():
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
                     if self.source_volume_name:
-                        annotation_layer = annotation.save_volume_annotation(source_volume_name=self.source_volume_name)
+                        annotation_layer = annotation.save_volume_annotation(dataset, source_volume_name=self.source_volume_name)
                     else:
                         annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
 
