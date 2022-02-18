@@ -44,7 +44,7 @@ model:
   name: ResidualUNet3D
   loss: src.pl_modules.losses.cce
   metric: torchmetrics.F1
-  loss_weights: [0., 1, 1]  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
+  loss_weights: False  # [0.41164063, 8.16566361, 2.23098494]  # [1, 1, 1, 1, 4.76, 1]  # Set to False to not have weights
   ckpt: False
   # ckpt: /cifs/data/tserre/CLPS_Serre_Lab/projects/prj_connectomics/contlearn/checkpoints/epoch=51-step=3327.ckpt
   in_channels: 2  # Image/Membrane inputs
