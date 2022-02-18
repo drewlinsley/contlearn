@@ -87,7 +87,8 @@ class GetData():
             assert self.source_volume_name is not None, "You must specify a source_volume_name or set this to False"
             with wk.webknossos_context(
                     url="https://webknossos.org",
-                    token=self.token):
+                    token=self.token,
+                    timeout=7200):
                 annotation = wk.Annotation.download(self.annotation_path)
                 original_dataset_name = self.wkdataset.split("/")[-1]
                 original_dataset_org = self.wkdataset.split("/")[-2]
