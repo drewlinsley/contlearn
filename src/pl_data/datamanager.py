@@ -61,6 +61,7 @@ class GetData():
         self.cube_size = cfg.cube_size
         self.bounding_box = cfg.bounding_box
         self.keep_labels = cfg.keep_labels
+        self.source_volume_name = cfg.source_volume_name
         # self.volume_size = cfg.volume_size
 
     def load(self):
@@ -83,6 +84,7 @@ class GetData():
             assert self.wkdataset is not None, "You must specify the original dataset."  # noqa
             assert self.image_layer_name is not None, "You must specify an image layer name. (images? color?)"  # noqa
             assert self.cube_size is not None, "You must specify an image cube size"  # noqa
+            assert self.source_volume_name is not None, "You must specify a source_volume_name or set this to False"
             with wk.webknossos_context(
                     url="https://webknossos.org",
                     token=self.token):
@@ -265,7 +267,10 @@ class GetData():
                 elif self.annotation_type == "volumetric":
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
-                    annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
+                    if self.source_volume_name:
+                        annotation_layer = annotation.save_volume_annotation(source_volume_name=self.source_volume_name)
+                    else:
+                        annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
 
                     if self.bounding_box:  # self.volume_size:
                         # Get the bbox annotation

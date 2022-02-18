@@ -63,6 +63,7 @@ data:
   image_downsample: [1, 0.2430724356, 0.2430724356]
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
+  source_volume_name: False
   bounding_box: [[50, 1700, 20], [2400, 1300, 200]]
   keep_labels: {18: 1, 7847: 2}  # remap everything else to 0
   annotation_path: https://webknossos.org/annotations/Explorational/61e0474d010000e000c2f485

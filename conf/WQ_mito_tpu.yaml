@@ -63,6 +63,7 @@ data:
   image_downsample: False
   label_downsample: [1, 0.2430724356, 0.2430724356]
   image_layer_name: "images"  # Depreciated
+  source_volume_name: "Mitochondria"
   bounding_box: [[5700, 5321, 231], [1000, 1000, 50]]
   volume_size: [[0, 0, 0], [4740, 4740, 240]]
   keep_labels: {2: 1}  # remap everything else to 0

@@ -63,6 +63,7 @@ data:
   image_downsample: [1, 0.2430724356, 0.2430724356]
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
+  source_volume_name: False
   bounding_box: False
   volume_size: False
   keep_labels: False
