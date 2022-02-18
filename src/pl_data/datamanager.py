@@ -375,8 +375,15 @@ class GetData():
                         volume = volume.transpose(3, 0, 1, 2)
 
                     # Match # z slices between volume and label
-                    zslices = volume.shape[1]
+                    zslices = min(volume.shape[1], label.shape[0])
                     label = label[:zslices]
+                    volume = volume[:, :zslices]
+
+                    # Match H/W between volume and label
+                    vh, vw = volume.shape[-2:]
+                    lh, lw = label.shape[-2:]
+                    volume = volume[..., :lh, :lw]
+                    label = label[..., :vh, :vw]
 
                     # Add dims for handling data on tpus
                     volume = volume[None]
