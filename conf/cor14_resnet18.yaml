@@ -11,21 +11,21 @@ data:
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
     val_proportion: 0.15
-    dataset_name: CIFAR10  # Label for experiment
+    dataset_name: COR14  # Label for experiment
     datasets:
       "${data.dataset_name}":
         train:
           _target_: src.pl_data.dataset.CIFAR10
           train: True
-          path: False
+          path: /content/drive/MyDrive/genentech_data/BackgroundSubtractionByPanelBatch/COR14
         val:
           _target_: src.pl_data.dataset.CIFAR10
           train: False
-          path: False
+          path: /content/drive/MyDrive/genentech_data/BackgroundSubtractionByPanelBatch/COR14
         test:
           _target_: src.pl_data.dataset.CIFAR10
           train: False
-          path: False
+          path: /content/drive/MyDrive/genentech_data/BackgroundSubtractionByPanelBatch/COR14
     num_workers:
       train: 1
       val: 1
