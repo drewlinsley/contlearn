@@ -27,6 +27,7 @@ class MyDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.val_proportion = val_proportion
         self.dataset_name = dataset_name
+        self.datasets = datasets
 
 
         self.train_dataset: Optional[Dataset] = None
