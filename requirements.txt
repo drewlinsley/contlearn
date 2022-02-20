@@ -1,6 +1,9 @@
+torch>=1.6, <1.9
+lightning-bolts
 pytorch-lightning
+torchmetrics>=0.3
+torchvision
 hydra-core
 wandb
 dvc
 python-dotenv
-# hydra-joblib-launcher

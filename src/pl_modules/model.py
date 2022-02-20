@@ -18,7 +18,7 @@ from captum.attr import visualization as viz
 
 from src.common.utils import iterate_elements_in_batches, render_images
 
-from . import BasePaperNet, hConvGRU, resnet18, FFhGRU
+from . import resnets
 
 
 class MyModel(pl.LightningModule):
@@ -28,26 +28,11 @@ class MyModel(pl.LightningModule):
         self.save_hyperparameters(cfg)
         self.name = name
         # self.automatic_optimization = False
+        self.num_classes = num_classes
+        self.loss = F.nll_loss  # Add this to the config
 
-        if cfg.data.datamodule.datasets.PF14.train.rand_color_invert_p > 0:
-            input_size = 2
-            output_size = 2
-        else:
-            input_size = 1
-            output_size = 2
-
-        if self.name == "baseline_paper":
-            self.net = BasePaperNet()
-        elif self.name == "hgru":
-            self.net = hConvGRU(timesteps=8, filt_size=15)
-        elif self.name == "resnet18":
-            self.net = resnet18(pretrained=False)
-        elif self.name == "int":
-            # self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
-            self.net = FFhGRU(32, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size, output_size=output_size, l1=0.)  # softplus
-        elif self.name == "int_crbp":
-            # self.net = FFhGRU(25, timesteps=8, kernel_size=15, nl=F.softplus, input_size=input_size)  # softplus
-            self.net = FFhGRU(32, timesteps=20, kernel_size=11, LCP=0.9, nl=F.softplus, input_size=input_size, output_size=output_size, grad_method="rbp")  # softplus
+        if self.name == "resnet18":
+            self.net = resnets.resnet18(pretrained=False, num_classes=num_classes)
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
 
@@ -64,10 +49,10 @@ class MyModel(pl.LightningModule):
         if isinstance(logits, dict):
             penalty = logits["penalty"]
             logits = logits["logits"]
-            loss = F.cross_entropy(logits, y)
+            loss = self.loss(logits, y)
             loss = loss + penalty
         else:
-            loss = F.cross_entropy(logits, y)
+            loss = self.loss(logits, y)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:

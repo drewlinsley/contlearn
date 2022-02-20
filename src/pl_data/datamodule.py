@@ -5,7 +5,9 @@ import pytorch_lightning as pl
 from omegaconf import DictConfig, ValueNode
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
+from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
 from PIL import Image
+
 
 class MyDataModule(pl.LightningDataModule):
     def __init__(
@@ -23,7 +25,7 @@ class MyDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.batch_size = batch_size
         self.val_percentage = val_percentage
-        self.use_train_dataset = use_train_dataset
+        self.dataset = dataset
 
         self.train_dataset: Optional[Dataset] = None
         self.val_dataset: Optional[Dataset] = None
@@ -31,20 +33,27 @@ class MyDataModule(pl.LightningDataModule):
 
     def setup(self, stage: Optional[str] = None):
         # transforms
-        transform = transforms.Compose(
+        train_transform = transforms.Compose(
             [
-                transforms.Resize((100, 100)),
-                transforms.RandomHorizontalFlip(p=0.5),
-                transforms.RandomVerticalFlip(p=0.5),
-                transforms.ToTensor(),
+                torchvision.transforms.RandomCrop(32, padding=4),
+                torchvision.transforms.RandomHorizontalFlip(),
+                torchvision.transforms.ToTensor(),
+                cifar10_normalization(),
             ]
         )
 
-        # split dataset
+        test_transforms = torchvision.transforms.Compose(
+            [
+                torchvision.transforms.ToTensor(),
+                cifar10_normalization(),
+            ]
+        )
 
+
+        # split dataset
         if stage is None or stage == "fit":
             plank_train = hydra.utils.instantiate(
-                self.datasets[self.use_train_dataset].train, cfg=self.cfg, transform=transform,
+                self.datasets[self.dataset].train, cfg=self.cfg, transform=train_transform,
                 _recursive_=False
             )
             train_length = int(len(plank_train) * (1 - self.val_percentage))
@@ -54,8 +63,8 @@ class MyDataModule(pl.LightningDataModule):
             )
         if stage is None or stage == "test":
             self.test_datasets = [
-                hydra.utils.instantiate(x, cfg=self.cfg, transform=transform, _recursive_=False)
-                for x in self.datasets[self.use_train_dataset].test
+                hydra.utils.instantiate(x, cfg=self.cfg, transform=test_transforms, _recursive_=False)
+                for x in self.datasets[self.dataset].test
             ]
 
     def train_dataloader(self) -> DataLoader:

@@ -38,6 +38,30 @@ def colour(img, ch=0, num_ch=3):
     return torch.cat(colimg)
 
 
+class CIFAR10(Dataset):
+    def __init__(
+        self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
+    ):
+        super().__init__()
+        self.cfg = cfg
+        self.path = path
+        self.train = train
+        self.transform = transform
+
+        self.dataset = CIFAR10(data_dir="data/", download=True)
+        self.data_len = len(self.dataset)
+
+    def __len__(self) -> int:
+        return self.data_len
+
+    def __getitem__(self, index: int):
+        img, label = self.dataset[index]
+        return img, label
+
+    def __repr__(self) -> str:
+        return f"MyDataset({self.name}, {self.path})"
+
+
 class DeadRect(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs
