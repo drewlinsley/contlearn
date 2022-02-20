@@ -21,6 +21,7 @@ class MyDataModule(pl.LightningDataModule):
     ):
         super().__init__()
         self.cfg = cfg
+        import pdb;pdb.set_trace()
         self.datasets = datasets
         self.num_workers = num_workers
         self.batch_size = batch_size
