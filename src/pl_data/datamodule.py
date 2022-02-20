@@ -63,14 +63,14 @@ class MyDataModule(pl.LightningDataModule):
             plank_train = hydra.utils.instantiate(
                 self.datasets[self.dataset_name].train,
                 cfg=self.cfg,
-                transform=transform,
+                transform=train_transform,
                 _recursive_=False
             )
             if self.val_proportion == 0:
                 plank_val = hydra.utils.instantiate(
                     self.datasets[self.dataset_name].val,
                     cfg=self.cfg,
-                    transform=transform,
+                    transform=val_transform,
                     _recursive_=False
                 )
                 self.train_dataset = plank_train
