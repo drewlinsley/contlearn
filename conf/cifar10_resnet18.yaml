@@ -10,7 +10,7 @@ core:
 data:
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
-    val_percentage: 0.15
+    val_proportion: 0.15
     dataset_name: CIFAR10  # Label for experiment
     datasets:
       CIFAR10:
