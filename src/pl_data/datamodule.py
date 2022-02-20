@@ -10,6 +10,34 @@ from PIL import Image
 from importlib import import_module
 from src.pl_data import dataset
 
+from typing import (
+    TypeVar,
+    List,
+)
+
+T = TypeVar('T')
+
+
+def continuous_random_split(dataset: Dataset[T], lengths: Sequence[int],
+                 generator: Optional[Generator] = default_generator) -> List[Subset[T]]:
+    r"""
+    Randomly split a dataset into non-overlapping new datasets of given lengths.
+    Optionally fix the generator for reproducible results, e.g.:
+
+    >>> random_split(range(10), [3, 7], generator=torch.Generator().manual_seed(42))
+
+    Args:
+        dataset (Dataset): Dataset to be split
+        lengths (sequence): lengths of splits to be produced
+        generator (Generator): Generator used for the random permutation.
+    """
+    # Cannot verify that dataset is Sized
+    if sum(lengths) != len(dataset):
+        raise ValueError("Sum of input lengths does not equal the length of the input dataset!")
+    indices = torch.arange(sum(lengths)).tolist()
+    return [Subset(dataset, indices[offset - length : offset]) for offset, length in zip(_accumulate(lengths), lengths)]
+
+
 
 class MyDataModule(pl.LightningDataModule):
     def __init__(
