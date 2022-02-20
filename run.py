@@ -108,7 +108,7 @@ def run(cfg: DictConfig) -> None:
         hydra.utils.log.info(f"Instantiating <WandbLogger>")
         wandb_config = cfg.logging.wandb
         wandb_logger = WandbLogger(
-            name=cfg.data.datamodule.use_train_dataset + "__" + cfg.model.name,
+            name=cfg.data.datamodule.dataset_name + "__" + cfg.model.name,
             project=wandb_config.project,
             entity=wandb_config.entity,
             tags=cfg.core.tags,
