@@ -58,6 +58,7 @@ class MyModel(pl.LightningModule):
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x, y = batch
         out = self.step(x, y)
+        out = F.log_softmax(out)
         # opt = self.optimizers()
         # opt.zero_grad()
         # self.manual_backward(out["loss"])
