@@ -101,7 +101,7 @@ train:
 
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
-    gpus: 0
+    gpus: 1
     precision: 32
     max_steps: 200
     # accumulate_grad_batches: 1
