@@ -119,7 +119,7 @@ class MyDataModule(pl.LightningDataModule):
                 hydra.utils.instantiate(
                     self.datasets[self.dataset_name].test,
                     cfg=self.cfg,
-                    transform=transform,
+                    transform=test_transforms,
                     _recursive_=False)
             ]
         else:
