@@ -6,7 +6,10 @@ from os.path import isfile, join
 from PIL import Image
 import csv
 from torchvision import transforms
-from pl_bolts.datamodules.cifar10_dataset import CIFAR10 as cifar10_data
+from torchvision.datasets.cifar import CIFAR10 as cifar10_data
+
+
+DATADIR = "data/"
 
 
 def load_image(directory):
@@ -49,7 +52,7 @@ class CIFAR10(Dataset):
         self.train = train
         self.transform = transform
 
-        self.dataset = cifar10_data(data_dir="data/", download=True)
+        self.dataset = cifar10_data(data_dir=DATADIR, download=True)
         self.data_len = len(self.dataset)
 
     def __len__(self) -> int:
