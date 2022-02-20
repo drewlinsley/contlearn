@@ -7,30 +7,32 @@ from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
 from PIL import Image
+from importlib import import_module
 
 
 class MyDataModule(pl.LightningDataModule):
     def __init__(
         self,
-        datasets: DictConfig,
         num_workers: DictConfig,
         batch_size: DictConfig,
         val_percentage: float,
         cfg: DictConfig,
-        dataset: str,
+        dataset_name: str,
     ):
         super().__init__()
         self.cfg = cfg
-        import pdb;pdb.set_trace()
-        self.datasets = datasets
         self.num_workers = num_workers
         self.batch_size = batch_size
         self.val_percentage = val_percentage
-        self.dataset = dataset
+        self.dataset_name = dataset_name
 
         self.train_dataset: Optional[Dataset] = None
         self.val_dataset: Optional[Dataset] = None
         self.test_datasets: Optional[Sequence[Dataset]] = None
+        import pdb;pdb.set_trace()
+        p, m = self.dataset_name.rsplit('.', 1)
+        self.dataset = import_module(p)
+
 
     def setup(self, stage: Optional[str] = None):
         # transforms
@@ -54,7 +56,7 @@ class MyDataModule(pl.LightningDataModule):
         # split dataset
         if stage is None or stage == "fit":
             plank_train = hydra.utils.instantiate(
-                self.datasets[self.dataset].train, cfg=self.cfg, transform=train_transform,
+                self.dataset, cfg=self.cfg, transform=train_transform,
                 _recursive_=False
             )
             train_length = int(len(plank_train) * (1 - self.val_percentage))
