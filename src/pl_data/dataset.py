@@ -64,9 +64,8 @@ class CIFAR10(Dataset):
         img, label = self.dataset[index]
         img = np.asarray(img)
         label = np.asarray(label)
-        print("CIFAR SHAPE")
-        print(img.shape)
-        print("*" * 60)
+        # Transpose shape from H,W,C to C,H,W
+        img = img.transpose(2, 0, 1)
         # img = F.to_tensor(img)
         # label = F.to_tensor(label)
         return img, label
