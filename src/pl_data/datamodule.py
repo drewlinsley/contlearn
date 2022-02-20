@@ -17,7 +17,7 @@ class MyDataModule(pl.LightningDataModule):
         batch_size: DictConfig,
         val_percentage: float,
         cfg: DictConfig,
-        use_train_dataset: str,
+        dataset: str,
     ):
         super().__init__()
         self.cfg = cfg
