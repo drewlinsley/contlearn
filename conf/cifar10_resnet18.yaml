@@ -11,7 +11,21 @@ data:
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
     val_percentage: 0.15
-    dataset_name: CIFAR10
+    dataset_name: CIFAR10  # Label for experiment
+    datasets:
+      CIFAR10:
+        train:
+          _target_: src.pl_data.dataset.CIFAR10
+          train: True
+          path: False
+        val:
+          _target_: src.pl_data.dataset.CIFAR10
+          train: False
+          path: False
+        test:
+          _target_: src.pl_data.dataset.CIFAR10
+          train: False
+          path: False
     num_workers:
       train: 1
       val: 1

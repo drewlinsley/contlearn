@@ -14,6 +14,7 @@ from src.pl_data import dataset
 class MyDataModule(pl.LightningDataModule):
     def __init__(
         self,
+        datasets: DictConfig,
         num_workers: DictConfig,
         batch_size: DictConfig,
         val_percentage: float,
@@ -26,6 +27,7 @@ class MyDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.val_percentage = val_percentage
         self.dataset_name = dataset_name
+
 
         self.train_dataset: Optional[Dataset] = None
         self.val_dataset: Optional[Dataset] = None
@@ -54,19 +56,41 @@ class MyDataModule(pl.LightningDataModule):
 
         # split dataset
         if stage is None or stage == "fit":
+            assert self.val_proportion >= 0 and self.val_proportion < 1., \
+                "val_proportion must be 1 > x >= 0"
+            print(self.datasets)
             plank_train = hydra.utils.instantiate(
-                self.dataset,
+                self.datasets.train,
+                cfg=self.cfg,
+                transform=transform,
+                _recursive_=False
             )
-            train_length = int(len(plank_train) * (1 - self.val_percentage))
-            val_length = len(plank_train) - train_length
-            self.train_dataset, self.val_dataset = random_split(
-                plank_train, [train_length, val_length]
-            )
-        if stage is None or stage == "test":
+            if self.val_proportion == 0:
+                plank_val = hydra.utils.instantiate(
+                    self.datasets.val,
+                    cfg=self.cfg,
+                    transform=transform,
+                    _recursive_=False
+                )
+                self.train_dataset = plank_train
+                self.val_dataset = plank_val
+            else:
+                train_length = int(len(plank_train) * (1 - self.val_proportion))  # noqa
+                val_length = len(plank_train) - train_length
+                self.train_dataset, self.val_dataset = continuous_random_split(
+                    plank_train, [train_length, val_length]
+                )
+
+        elif stage == "test":
             self.test_datasets = [
-                hydra.utils.instantiate(x, cfg=self.cfg, transform=test_transforms, _recursive_=False)
-                for x in self.datasets[self.dataset].test
+                hydra.utils.instantiate(
+                    self.datasets[self.use_train_dataset].test,
+                    cfg=self.cfg,
+                    transform=transform,
+                    _recursive_=False)
             ]
+        else:
+            raise NotImplementedError("stage: {}".format(stage))
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
