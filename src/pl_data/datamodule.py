@@ -61,14 +61,14 @@ class MyDataModule(pl.LightningDataModule):
                 "val_proportion must be 1 > x >= 0"
             print(self.datasets)
             plank_train = hydra.utils.instantiate(
-                self.datasets.train,
+                self.datasets[self.dataset_name].train,
                 cfg=self.cfg,
                 transform=transform,
                 _recursive_=False
             )
             if self.val_proportion == 0:
                 plank_val = hydra.utils.instantiate(
-                    self.datasets.val,
+                    self.datasets[self.dataset_name].val,
                     cfg=self.cfg,
                     transform=transform,
                     _recursive_=False
