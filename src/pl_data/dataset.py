@@ -10,6 +10,7 @@ from torchvision.datasets.cifar import CIFAR10 as cifar10_data
 from torch.nn import functional as F
 import numpy as np
 from glob2 import glob
+from skimage import io
 
 
 DATADIR = "data/"
@@ -84,23 +85,17 @@ class COR14(Dataset):
         self.path = path
         self.train = train
         self.transform = transform
-
         self.files = glob(os.path.join(self.path, "**", "**", "*.tif"))
-
-        self.dataset = cifar10_data(root=DATADIR, download=True)
-        self.data_len = len(self.dataset)
+        self.data_len = len(self.files)
 
     def __len__(self) -> int:
         return self.data_len
 
     def __getitem__(self, index: int):
-        img, label = self.dataset[index]
-        img = np.asarray(img)
-        label = np.asarray(label)
-        # Transpose shape from H,W,C to C,H,W
+        img = self.dataset[index]
+        img = io.imread(img)
         img = img.transpose(2, 0, 1).astype(np.float32)
-        # img = F.to_tensor(img)
-        # label = F.to_tensor(label)
+        label = 0  # Set a fixed label for now. Dummy.
         return img, label
 
     def __repr__(self) -> str:
