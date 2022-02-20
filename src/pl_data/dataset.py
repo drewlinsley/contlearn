@@ -52,7 +52,7 @@ class CIFAR10(Dataset):
         self.train = train
         self.transform = transform
 
-        self.dataset = cifar10_data(data_dir=DATADIR, download=True)
+        self.dataset = cifar10_data(root=DATADIR, download=True)
         self.data_len = len(self.dataset)
 
     def __len__(self) -> int:
