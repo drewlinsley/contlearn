@@ -1,6 +1,5 @@
-torch>=1.6, <1.9
-lightning-bolts
 pytorch-lightning
+lightning-bolts
 torchmetrics>=0.3
 torchvision
 hydra-core
