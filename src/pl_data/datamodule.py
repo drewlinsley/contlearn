@@ -72,9 +72,9 @@ class MyDataModule(pl.LightningDataModule):
         # transforms
         train_transform = transforms.Compose(
             [
+                transforms.ToTensor(),
                 transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
                 cifar10_normalization(),
             ]
         )

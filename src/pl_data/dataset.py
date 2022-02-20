@@ -61,7 +61,7 @@ class CIFAR10(Dataset):
 
     def __getitem__(self, index: int):
         img, label = self.dataset[index]
-        img = F.to_tensor(img)
+        # img = F.to_tensor(img)
         # label = F.to_tensor(label)
         return img, label
 
