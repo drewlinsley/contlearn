@@ -11,7 +11,7 @@ data:
   datamodule:
     _target_: src.pl_data.datamodule.MyDataModule
     val_percentage: 0.15
-    dataset_name: src.pl_data.dataset.CIFAR10
+    dataset_name: CIFAR10
     num_workers:
       train: 48
       val: 8

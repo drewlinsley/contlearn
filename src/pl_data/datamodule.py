@@ -8,6 +8,7 @@ from torchvision import transforms
 from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
 from PIL import Image
 from importlib import import_module
+from src.pl_data import dataset
 
 
 class MyDataModule(pl.LightningDataModule):
@@ -29,11 +30,7 @@ class MyDataModule(pl.LightningDataModule):
         self.train_dataset: Optional[Dataset] = None
         self.val_dataset: Optional[Dataset] = None
         self.test_datasets: Optional[Sequence[Dataset]] = None
-        import pdb
-        pdb.set_trace()
-        pdb.set_trace()
-        p, m = self.dataset_name.rsplit('.', 1)
-        self.dataset = import_module(p)
+        self.dataset = getattr(dataset, self.dataset_name)
 
 
     def setup(self, stage: Optional[str] = None):

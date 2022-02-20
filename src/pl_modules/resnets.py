@@ -1,5 +1,5 @@
 import torchvision
-
+from torch import nn
 
 def resnet18(pretrained=False, num_classes=None):
     assert num_classes is not None, "You must pass the number of classes to your model."

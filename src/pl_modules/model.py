@@ -18,11 +18,11 @@ from captum.attr import visualization as viz
 
 from src.common.utils import iterate_elements_in_batches, render_images
 
-from . import resnets
+from src.pl_modules import resnets
 
 
 class MyModel(pl.LightningModule):
-    def __init__(self, cfg: DictConfig, name, *args, **kwargs) -> None:
+    def __init__(self, cfg: DictConfig, name, num_classes, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cfg = cfg
         self.save_hyperparameters(cfg)
