@@ -37,16 +37,16 @@ class MyDataModule(pl.LightningDataModule):
         # transforms
         train_transform = transforms.Compose(
             [
-                torchvision.transforms.RandomCrop(32, padding=4),
-                torchvision.transforms.RandomHorizontalFlip(),
-                torchvision.transforms.ToTensor(),
+                transforms.RandomCrop(32, padding=4),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
                 cifar10_normalization(),
             ]
         )
 
-        test_transforms = torchvision.transforms.Compose(
+        test_transforms = transforms.Compose(
             [
-                torchvision.transforms.ToTensor(),
+                transforms.ToTensor(),
                 cifar10_normalization(),
             ]
         )
