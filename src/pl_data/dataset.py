@@ -8,6 +8,7 @@ import csv
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10 as cifar10_data
 from torch.nn import functional as F
+import numpy as np
 
 
 DATADIR = "data/"
