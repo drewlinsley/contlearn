@@ -131,7 +131,7 @@ def run(cfg: DictConfig) -> None:
         log_every_n_steps=10,
         progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
         #auto_select_gpus=True,
-        benchmark=True,
+        # benchmark=True,
         accelerator='dp',
         #plugins=[DDPPlugin(find_unused_parameters=True)],
         **cfg.train.pl_trainer,

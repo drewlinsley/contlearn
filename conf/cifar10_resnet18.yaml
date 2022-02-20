@@ -101,9 +101,9 @@ train:
 
   pl_trainer:
     fast_dev_run: False # Enable this for debug purposes
-    gpus: 1
+    gpus: 0
     precision: 32
-    max_steps: 30000
+    max_steps: 200
     # accumulate_grad_batches: 1
     # num_sanity_val_steps: 2
     gradient_clip_val: 10000000.0  # 10.
