@@ -117,7 +117,7 @@ class MyDataModule(pl.LightningDataModule):
         elif stage == "test":
             self.test_datasets = [
                 hydra.utils.instantiate(
-                    self.datasets[self.use_train_dataset].test,
+                    self.datasets[self.dataset_name].test,
                     cfg=self.cfg,
                     transform=transform,
                     _recursive_=False)
