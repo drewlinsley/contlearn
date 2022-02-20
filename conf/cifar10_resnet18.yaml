@@ -4,8 +4,8 @@ core:
   tags:
     - consulting
 
-#defaults:
-#  - override hydra/launcher: joblib
+defaults:
+ - override hydra/launcher: joblib
 
 data:
   datamodule:
@@ -90,8 +90,8 @@ train:
     gpus: 1
     precision: 32
     max_steps: 30000
-    accumulate_grad_batches: 1
-    num_sanity_val_steps: 2
+    # accumulate_grad_batches: 1
+    # num_sanity_val_steps: 2
     gradient_clip_val: 10000000.0  # 10.
 
   monitor_metric: 'val_loss'
