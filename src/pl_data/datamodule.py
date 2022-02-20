@@ -3,6 +3,7 @@ from typing import Optional, Sequence
 import hydra
 import pytorch_lightning as pl
 from omegaconf import DictConfig, ValueNode
+import torch
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
