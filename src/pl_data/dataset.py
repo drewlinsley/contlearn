@@ -65,7 +65,7 @@ class CIFAR10(Dataset):
         img = np.asarray(img)
         label = np.asarray(label)
         # Transpose shape from H,W,C to C,H,W
-        img = img.transpose(2, 0, 1)
+        img = img.transpose(2, 0, 1).astype(np.float32)
         # img = F.to_tensor(img)
         # label = F.to_tensor(label)
         return img, label
