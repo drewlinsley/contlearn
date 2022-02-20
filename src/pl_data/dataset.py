@@ -1,6 +1,7 @@
 from omegaconf import DictConfig, ValueNode
 import torch
 from torch.utils.data import Dataset
+import os
 from os import listdir
 from os.path import isfile, join
 from PIL import Image
@@ -85,6 +86,12 @@ class COR14(Dataset):
         self.path = path
         self.train = train
         self.transform = transform
+        self.maxval = 33000
+        self.minval = 0
+        self.denom = self.maxval - self.minval
+
+        # List all the files
+        print("Globbing files for COR14, this may take a while...")
         self.files = glob(os.path.join(self.path, "**", "**", "*.tif"))
         self.data_len = len(self.files)
 
@@ -93,8 +100,9 @@ class COR14(Dataset):
 
     def __getitem__(self, index: int):
         img = self.dataset[index]
-        img = io.imread(img)
+        img = io.imread(img, plugin='pil')
         img = img.transpose(2, 0, 1).astype(np.float32)
+        img = (img - self.minval) / self.denom  # Normalize to [0, 1]
         label = 0  # Set a fixed label for now. Dummy.
         return img, label
 

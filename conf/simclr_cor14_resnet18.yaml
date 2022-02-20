@@ -12,9 +12,9 @@ data:
     _target_: src.pl_data.datamodule.MyDataModule
     val_proportion: 0.15
     dataset_name: COR14  # Label for experiment
-    transform_recipe: ${dataset_name}
+    transform_recipe: SIMCLR_COR14
     datasets:
-      "${data.dataset_name}":
+      ${data.dataset_name}:
         train:
           _target_: src.pl_data.dataset.CIFAR10
           train: True
@@ -68,14 +68,15 @@ logging:
       log_freq: 10
 
   lr_monitor:
-    logging_interval: "step"
+    logging_interval: step
     log_momentum: False
 model:
   _target_: src.pl_modules.model.MyModel
   name: resnet18
   num_classes: 10
-  final_nl: log_softmax
-  loss: nll_loss
+  final_nl: False
+  self_supervised: True
+  loss: nt_xent_loss
 
 optim:
   optimizer:
@@ -86,14 +87,13 @@ optim:
     betas: [ 0.9, 0.999 ]
     eps: 1e-08
     weight_decay: 0.
+    exclude_bn_bias: True
 
-  use_lr_scheduler: False
+  use_lr_scheduler: True
   lr_scheduler:
-    _target_: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
-    T_0: 10
-    T_mult: 2
-    eta_min: 0 # min value for the lr
-    last_epoch: -1
+    _target_: torch.optim.lr_scheduler.LambdaLR
+    warmup_steps: (70000 // 256) * 10
+    total_steps: 7000000  # 70000 * 100
 
 train:
   # reproducibility
@@ -106,7 +106,7 @@ train:
     fast_dev_run: False # Enable this for debug purposes
     gpus: 1
     precision: 32
-    max_steps: 200
+    max_steps: ${optim.lr_scheduler.total_steps}
     # accumulate_grad_batches: 1
     # num_sanity_val_steps: 2
     gradient_clip_val: 10000000.0  # 10.

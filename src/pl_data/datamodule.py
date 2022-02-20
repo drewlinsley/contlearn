@@ -6,7 +6,7 @@ from omegaconf import DictConfig, ValueNode
 import torch
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
-from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
+from src.pl_data import normalizations
 from PIL import Image
 from importlib import import_module
 from src.pl_data import dataset
@@ -22,25 +22,58 @@ from typing import (
 T = TypeVar('T')
 
 
-def continuous_random_split(dataset: Dataset[T], lengths: Sequence[int],
-                 generator: Optional[Generator] = default_generator) -> List[Subset[T]]:
-    r"""
-    Randomly split a dataset into non-overlapping new datasets of given lengths.
-    Optionally fix the generator for reproducible results, e.g.:
-
-    >>> random_split(range(10), [3, 7], generator=torch.Generator().manual_seed(42))
-
-    Args:
-        dataset (Dataset): Dataset to be split
-        lengths (sequence): lengths of splits to be produced
-        generator (Generator): Generator used for the random permutation.
-    """
-    # Cannot verify that dataset is Sized
-    if sum(lengths) != len(dataset):
-        raise ValueError("Sum of input lengths does not equal the length of the input dataset!")
-    indices = torch.arange(sum(lengths)).tolist()
-    return [Subset(dataset, indices[offset - length : offset]) for offset, length in zip(_accumulate(lengths), lengths)]
-
+TRANSFORM_RECIPES = {
+    "CIFAR10": {
+        "train": transforms.Compose([
+                transforms.ToTensor(),
+                transforms.RandomCrop(32, padding=4),
+                transforms.RandomHorizontalFlip(),
+                normalizations.cifar10_normalization(),
+            ]),
+        "val": transforms.Compose([
+                transforms.ToTensor(),
+                normalizations.cifar10_normalization(),
+            ]),
+        "test": transforms.Compose([
+                transforms.ToTensor(),
+                normalizations.cifar10_normalization(),
+            ]),
+    },
+    "COR14": {
+        "train": transforms.Compose([
+                transforms.ToTensor(),
+                transforms.RandomCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomVerticalFlip(),
+                cor14_normalization(),
+            ]),
+        "val": transforms.Compose([
+                transforms.ToTensor(),
+                cor14_normalization(),
+            ]),
+        "test": transforms.Compose([
+                transforms.ToTensor(),
+                cor14_normalization(),
+            ]),
+    },
+    "SIMCLR_COR14": {
+        "train": SimCLRTrainDataTransform(
+            input_height=224,
+            gaussian_blur=True,
+            jitter_strength=1.,
+            normalize=cor14_normalization),  # noqa
+        "val": SimCLREvalDataTransform(
+            input_height=224,
+            gaussian_blur=False,
+            jitter_strength=0.,
+            normalize=cor14_normalization),  # noqa
+        "test": SimCLREvalDataTransform(
+            input_height=224,
+            gaussian_blur=False,
+            jitter_strength=0.,
+            normalize=cor14_normalization),  # noqa
+    },
+}
 
 
 class MyDataModule(pl.LightningDataModule):
@@ -52,6 +85,7 @@ class MyDataModule(pl.LightningDataModule):
         val_proportion: float,
         cfg: DictConfig,
         dataset_name: str,
+        transform_recipe: str,
     ):
         super().__init__()
         self.cfg = cfg
@@ -60,7 +94,7 @@ class MyDataModule(pl.LightningDataModule):
         self.val_proportion = val_proportion
         self.dataset_name = dataset_name
         self.datasets = datasets
-
+        self.transform_recipe = transform_recipe
 
         self.train_dataset: Optional[Dataset] = None
         self.val_dataset: Optional[Dataset] = None
@@ -163,3 +197,24 @@ class MyDataModule(pl.LightningDataModule):
             f"{self.batch_size})"
             f"{self.val_percentage}"
         )
+
+
+
+def continuous_random_split(dataset: Dataset[T], lengths: Sequence[int],
+                 generator: Optional[Generator] = default_generator) -> List[Subset[T]]:
+    r"""
+    Randomly split a dataset into non-overlapping new datasets of given lengths.
+    Optionally fix the generator for reproducible results, e.g.:
+
+    >>> random_split(range(10), [3, 7], generator=torch.Generator().manual_seed(42))
+
+    Args:
+        dataset (Dataset): Dataset to be split
+        lengths (sequence): lengths of splits to be produced
+        generator (Generator): Generator used for the random permutation.
+    """
+    # Cannot verify that dataset is Sized
+    if sum(lengths) != len(dataset):
+        raise ValueError("Sum of input lengths does not equal the length of the input dataset!")
+    indices = torch.arange(sum(lengths)).tolist()
+    return [Subset(dataset, indices[offset - length : offset]) for offset, length in zip(_accumulate(lengths), lengths)]

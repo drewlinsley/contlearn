@@ -132,12 +132,19 @@ def run(cfg: DictConfig) -> None:
         progress_bar_refresh_rate=cfg.logging.progress_bar_refresh_rate,
         #auto_select_gpus=True,
         # benchmark=True,
-        accelerator='dp',
+        accelerator=None,  # 'dp', "ddp" if args.gpus > 1 else None,
         #plugins=[DDPPlugin(find_unused_parameters=True)],
         **cfg.train.pl_trainer,
     )
 
-    hydra.utils.log.info(f"Starting training!")
+    num_samples = len(datamodule.train_dataset)
+    num_classes = cfg.model.num_classes
+    batch_size = cfg.data.datamodule.batch_size
+    hydra.utils.log.info("Starting training with {} samples, {} classes, and {} batch size".format(
+        num_samples,
+        num_classes,
+        batch_size))
+
     trainer.fit(model=model, datamodule=datamodule)
 
     hydra.utils.log.info(f"Starting testing!")

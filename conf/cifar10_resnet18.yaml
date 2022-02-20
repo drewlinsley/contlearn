@@ -12,6 +12,7 @@ data:
     _target_: src.pl_data.datamodule.MyDataModule
     val_proportion: 0.15
     dataset_name: CIFAR10  # Label for experiment
+    transform_recipe: ${dataset_name}
     datasets:
       CIFAR10:
         train:
@@ -73,6 +74,8 @@ model:
   _target_: src.pl_modules.model.MyModel
   name: resnet18
   num_classes: 10
+  final_nl: log_softmax
+  loss: nll_loss
 
 optim:
   optimizer:
@@ -82,7 +85,7 @@ optim:
     lr: 1e-3  # 0.001
     betas: [ 0.9, 0.999 ]
     eps: 1e-08
-    weight_decay: 0
+    weight_decay: 0.
 
   use_lr_scheduler: False
   lr_scheduler:

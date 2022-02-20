@@ -19,19 +19,28 @@ from captum.attr import visualization as viz
 from src.common.utils import iterate_elements_in_batches, render_images
 
 from src.pl_modules import resnets
+from src.pl_modules import losses
+
+from pl_bolts.optimizers.lr_scheduler import linear_warmup_decay
 
 
 class MyModel(pl.LightningModule):
-    def __init__(self, cfg: DictConfig, name, num_classes, *args, **kwargs) -> None:
+    def __init__(self, cfg: DictConfig, name, num_classes, final_nl, loss, self_supervised=False, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cfg = cfg
         self.save_hyperparameters(cfg)
         self.name = name
         # self.automatic_optimization = False
         self.num_classes = num_classes
-        self.loss = F.nll_loss  # Add this to the config
+        self.loss = getattr(losses, loss)  # Add this to the config
+        if final_nl:
+            self.final_nl = getattr(F, final_nl)
+        else:
+            self.final_nl = lambda x, dim: x
 
         if self.name == "resnet18":
+            self.net = resnets.resnet18(pretrained=False, num_classes=num_classes)
+        elif self.name == "simclr_resnet18":
             self.net = resnets.resnet18(pretrained=False, num_classes=num_classes)
         else:
             raise NotImplementedError("Could not find network {}.".format(self.net))
@@ -45,8 +54,12 @@ class MyModel(pl.LightningModule):
         return self.net(x)
 
     def step(self, x, y) -> Dict[str, torch.Tensor]:
-        logits = self(x)
-        loss = self.loss(F.log_softmax(logits, dim=-1), y)
+        if self.self_supervised:
+            z1, z2 = self.shared_step(x)
+            loss = self.loss(z1, z2)
+        else:
+            logits = self(x)
+            loss = self.loss(self.final_nl(logits, dim=-1), y)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -59,7 +72,7 @@ class MyModel(pl.LightningModule):
         return out
 
     def training_step_end(self, out):
-        self.train_accuracy(torch.softmax(out["logits"], dim=-1), out["y"])
+        self.train_accuracy(self.final_nl(out["logits"], dim=-1), out["y"])
         self.log_dict(
             {
                 "train_acc": self.train_accuracy,
@@ -77,7 +90,7 @@ class MyModel(pl.LightningModule):
         return out
     
     def validation_step_end(self, out):
-        self.val_accuracy(torch.softmax(out["logits"], dim=-1), out["y"])
+        self.val_accuracy(self.final_nl(out["logits"], dim=-1), out["y"])
         self.log_dict(
             {
                 "val_acc": self.val_accuracy,
@@ -97,7 +110,7 @@ class MyModel(pl.LightningModule):
         return out
 
     def test_step_end(self, out):
-        self.test_accuracy(torch.softmax(out["logits"], dim=-1), out["y"])
+        self.test_accuracy(self.final_nl(out["logits"], dim=-1), out["y"])
         self.log_dict(
             {
                 "test_acc": self.test_accuracy,
@@ -188,13 +201,49 @@ class MyModel(pl.LightningModule):
             - Tuple of dictionaries as described, with an optional 'frequency' key.
             - None - Fit will run without any optimizer.
         """
+        if exclude_bn_bias:
+            params = self.exclude_from_wt_decay(self.named_parameters(), weight_decay=self.cfg.optim.weight_decay)
+        else:
+            params = self.parameters()
+
         opt = hydra.utils.instantiate(
-            self.cfg.optim.optimizer, params=self.parameters()
+            self.cfg.optim.optimizer, params=params, weight_decay=weight_decay
         )
         
         if not self.cfg.optim.use_lr_scheduler:
             return opt
 
+        if torch.optim.lr_scheduler.warmup_steps:
+            # Right now this is specific to SimCLR
+            lr_scheduler = {
+                "scheduler": torch.optim.lr_scheduler.LambdaLR(
+                    opt,
+                    linear_warmup_decay(warmup_steps, total_steps, cosine=True),
+                ),
+                "interval": "step",
+                "frequency": 1,
+            }
+        else:
+            lr_scheduler = self.cfg.optim.lr_scheduler
         scheduler = hydra.utils.instantiate(self.cfg.optim.lr_scheduler, optimizer=opt)
         return [opt], [scheduler]
 
+    def exclude_from_wt_decay(self, named_params, weight_decay, skip_list=("bias", "bn")):
+        params = []
+        excluded_params = []
+
+        for name, param in named_params:
+            if not param.requires_grad:
+                continue
+            elif any(layer_name in name for layer_name in skip_list):
+                excluded_params.append(param)
+            else:
+                params.append(param)
+
+        return [
+            {"params": params, "weight_decay": weight_decay},
+            {
+                "params": excluded_params,
+                "weight_decay": 0.0,
+            },
+        ]
