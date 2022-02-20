@@ -56,9 +56,6 @@ class MyDataModule(pl.LightningDataModule):
         if stage is None or stage == "fit":
             plank_train = hydra.utils.instantiate(
                 self.dataset,
-                cfg=self.cfg,
-                transform=train_transform,
-                # _recursive_=False
             )
             train_length = int(len(plank_train) * (1 - self.val_percentage))
             val_length = len(plank_train) - train_length
