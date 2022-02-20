@@ -46,19 +46,12 @@ class MyModel(pl.LightningModule):
 
     def step(self, x, y) -> Dict[str, torch.Tensor]:
         logits = self(x)
-        if isinstance(logits, dict):
-            penalty = logits["penalty"]
-            logits = logits["logits"]
-            loss = self.loss(logits, y)
-            loss = loss + penalty
-        else:
-            loss = self.loss(logits, y)
+        loss = self.loss(F.log_softmax(logits, dim=-1), y)
         return {"logits": logits, "loss": loss, "y": y, "x": x}
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x, y = batch
         out = self.step(x, y)
-        out = F.log_softmax(out)
         # opt = self.optimizers()
         # opt.zero_grad()
         # self.manual_backward(out["loss"])
