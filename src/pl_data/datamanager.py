@@ -316,6 +316,7 @@ class GetData():
                     # cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
                     # _ = os.system(cmd)
 
+
                     if self.label_downsample and not np.all(np.asarray(self.label_downsample) == 1):
                         # label = resize(
                         #     label,
@@ -325,18 +326,20 @@ class GetData():
                         #     order=1).astype(dtype)
                         res_label_shape = np.asarray(label.shape) * self.label_downsample
                         res_label_shape = res_label_shape.astype(int)
+                        dtype = label.dtype
+                        label = label.astype(np.float32)
                         res_label = Parallel(n_jobs=-1)(
                             delayed(
                                 lambda x, y: resize(
                                     x,
                                     y,
-                                    anti_aliasing=True,
+                                    anti_aliasing=False,
                                     preserve_range=True,
                                     order=0))(lab, res_label_shape[1:]) for lab in tqdm(  # noqa
                                 label,
                                 "Resizing labels",
                                 total=len(label)))
-                        label = np.asarray(res_label)
+                        label = np.asarray(res_label).astype(dtype)
 
                     if self.image_downsample and not np.all(np.asarray(self.image_downsample) == 1):
                         res_volume = []
@@ -372,7 +375,7 @@ class GetData():
 
                     # Split volume/label into cubes then transpose
                     if self.image_transpose_xyz_zyx:
-                        volume = volume.transpose(3, 0, 1, 2)
+                        volume = volume.transpose(self.image_transpose_xyz_zyx)
 
                     # Match # z slices between volume and label
                     zslices = min(volume.shape[1], label.shape[0])
