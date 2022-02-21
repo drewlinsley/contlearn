@@ -436,7 +436,7 @@ class GetData():
                         imn = 32
                         plt.imshow(volume[imn, 0, 10], cmap="Greys_r")
                         plt.subplot(122)
-                        plt.imshow(label[imn, 10], cmap="Greys_r")
+                        plt.imshow(label[imn, 0, 10], cmap="Greys_r")
                         plt.savefig(fn)
                         plt.close(f)
                         path = os.path.join(os.getcwd(), fn)
