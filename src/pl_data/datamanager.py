@@ -418,7 +418,8 @@ class GetData():
 
                         # Now package up label/vol per idx
                         volumes, labels = [], []
-                        offsets = np.asarray(self.cube_size) / 2
+                        cube_size = np.asarray(self.cube_size)
+                        offsets = cube_size // 2
                         offsets = offsets.astype(int)
                         for idx in idxs:
                             z, y, x = idx
@@ -430,9 +431,9 @@ class GetData():
                                 z - offsets[0]: z + offsets[0],
                                 y - offsets[1]: y + offsets[1],
                                 x - offsets[2]: x + offsets[2]]
-                            
-                            volumes.append(vol)
-                            labels.append(lab)
+                            if np.all(np.asarray(vol.shape[1:]) == cube_size):
+                                volumes.append(vol)
+                                labels.append(lab)
                         import pdb;pdb.set_trace()
                         volume = np.asarray(volumes)
                         label = np.asarray(labels)
