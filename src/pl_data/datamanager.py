@@ -399,15 +399,6 @@ class GetData():
                     if self.create_subvolumes is not None:
                         dt = ndimage.distance_transform_edt(
                             (label > 0).astype(np.float32)).astype(np.float32)
-                        from matplotlib import pyplot as plt
-                        fn = "tmp.png"
-                        f = plt.figure(figsize=(10, 10))
-                        plt.imshow(dt[32])
-                        plt.savefig(fn)
-                        plt.close(f)
-                        path = os.path.join(os.getcwd(), fn)
-                        cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
-                        _ = os.system(cmd)
 
                         state = np.random.get_state()
                         np.random.seed(42)
@@ -434,7 +425,6 @@ class GetData():
                             if np.all(np.asarray(vol.shape[1:]) == cube_size):
                                 volumes.append(vol)
                                 labels.append(lab)
-                        import pdb;pdb.set_trace()
                         volume = np.asarray(volumes)
                         label = np.asarray(labels)
                         del volumes, labels
@@ -444,9 +434,9 @@ class GetData():
                         f = plt.figure(figsize=(10, 10))
                         plt.subplot(121)
                         imn = 32
-                        plt.imshow(volume[0, 0, imn], cmap="Greys_r")
+                        plt.imshow(volume[imn, 0, 10], cmap="Greys_r")
                         plt.subplot(122)
-                        plt.imshow(label[0, imn], cmap="Greys_r")
+                        plt.imshow(label[imn, 10], cmap="Greys_r")
                         plt.savefig(fn)
                         plt.close(f)
                         path = os.path.join(os.getcwd(), fn)
