@@ -11,6 +11,7 @@ from tqdm import tqdm
 from joblib import Parallel, delayed
 from src.pl_data.augmentation_functions import randomcrop
 from scipy import ndimage
+import skimage
 
 
 def draw_cube(start, label_size, shape, label, dtype):
@@ -398,6 +399,16 @@ class GetData():
                     if self.create_subvolumes is not None:
                         dt = ndimage.distance_transform_edt(
                             (label > 0).astype(np.float32)).astype(np.float32)
+                        from matplotlib import pyplot as plt
+                        fn = "tmp.png"
+                        f = plt.figure(figsize=(10, 10))
+                        plt.imshow(dt[32])
+                        plt.savefig(fn)
+                        plt.close(f)
+                        path = os.path.join(os.getcwd(), fn)
+                        cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
+                        _ = os.system(cmd)
+
                         state = np.random.get_state()
                         np.random.seed(42)
                         idxs = skimage.feature.peak_local_max(
