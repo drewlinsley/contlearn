@@ -426,7 +426,7 @@ class GetData():
                                 volumes.append(vol)
                                 labels.append(lab)
                         volume = np.asarray(volumes)
-                        label = np.asarray(labels).astype(np.uint8)
+                        label = np.asarray(labels).astype(np.uint8)[:, None]  # Need a singleton channel dim
                         del volumes, labels
 
                         from matplotlib import pyplot as plt
@@ -446,4 +446,6 @@ class GetData():
                         # Add dims for handling data on tpus
                         volume = volume[None]
                         label = label[None, None].astype(np.uint8)
+
+                    # # Outputs are N,C,D,H,W. Both volume and label.
                     return volume, label
