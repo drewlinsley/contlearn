@@ -413,13 +413,13 @@ class GetData():
                         np.random.seed(42)
                         idxs = feature.peak_local_max(
                             dt + np.random.random(dt.shape) * 1e-4,
-                            indices=True, min_distance=3, threshold_abs=0, threshold_rel=0)
+                            indices=True, min_distance=26, threshold_abs=0, threshold_rel=0)
                         np.random.set_state(state)
 
                         # Now package up label/vol per idx
                         volumes, labels = [], []
-                        import pdb;pdb.set_trace()
-                        offsets = np.asarray(cube_size) // 2
+                        offsets = np.asarray(self.cube_size) / 2
+                        offsets = offsets.astype(int)
                         for idx in idxs:
                             z, y, x = idx
                             vol = volume[:,
@@ -430,6 +430,7 @@ class GetData():
                                 z - offsets[0]: z + offsets[0],
                                 y - offsets[1]: y + offsets[1],
                                 x - offsets[2]: x + offsets[2]]
+                            
                             volumes.append(vol)
                             labels.append(lab)
                         import pdb;pdb.set_trace()
