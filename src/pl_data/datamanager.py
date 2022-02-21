@@ -10,6 +10,7 @@ import fastremap
 from tqdm import tqdm
 from joblib import Parallel, delayed
 from src.pl_data.augmentation_functions import randomcrop
+from scipy import ndimage
 
 
 def draw_cube(start, label_size, shape, label, dtype):
@@ -62,6 +63,7 @@ class GetData():
         self.bounding_box = cfg.bounding_box
         self.keep_labels = cfg.keep_labels
         self.source_volume_name = cfg.source_volume_name
+        self.create_subvolumes = cfg.create_subvolumes
         # self.volume_size = cfg.volume_size
 
     def load(self):
@@ -309,7 +311,11 @@ class GetData():
                     # from matplotlib import pyplot as plt
                     # fn = "tmp.png"
                     # f = plt.figure(figsize=(10, 10))
-                    # plt.imshow(volume[0, ..., 0].T, cmap="Greys_r")
+                    # plt.subplot(121)
+                    # imn = 32
+                    # plt.imshow(volume[0, imn], cmap="Greys_r")
+                    # plt.subplot(122)
+                    # plt.imshow(label[imn], cmap="Greys_r")
                     # plt.savefig(fn)
                     # plt.close(f)
                     # path = os.path.join(os.getcwd(), fn)
@@ -328,7 +334,7 @@ class GetData():
                         res_label_shape = res_label_shape.astype(int)
                         dtype = label.dtype
                         label = label.astype(np.float32)
-                        res_label = Parallel(n_jobs=-1)(
+                        res_label = Parallel(n_jobs=-1, prefer="threads")(
                             delayed(
                                 lambda x, y: resize(
                                     x,
@@ -343,7 +349,7 @@ class GetData():
 
                     if self.image_downsample and not np.all(np.asarray(self.image_downsample) == 1):
                         res_volume = []
-                        res_volume = Parallel(n_jobs=-1)(
+                        res_volume = Parallel(n_jobs=-1, prefer="threads")(
                             delayed(
                                 lambda x, y: resize(
                                     x,
@@ -388,7 +394,53 @@ class GetData():
                     volume = volume[..., :lh, :lw]
                     label = label[..., :vh, :vw]
 
-                    # Add dims for handling data on tpus
-                    volume = volume[None]
-                    label = label[None, None].astype(np.uint8)
+                    # Cut into subvolumes if requested
+                    if self.create_subvolumes is not None:
+                        dt = ndimage.distance_transform_edt(
+                            (label > 0).astype(np.float32)).astype(np.float32)
+                        state = np.random.get_state()
+                        np.random.seed(42)
+                        idxs = skimage.feature.peak_local_max(
+                            dt + np.random.random(dt.shape) * 1e-4,
+                            indices=True, min_distance=3, threshold_abs=0, threshold_rel=0)
+                        np.random.set_state(state)
+
+                        # Now package up label/vol per idx
+                        volumes, labels = [], []
+                        import pdb;pdb.set_trace()
+                        offsets = np.asarray(cube_size) // 2
+                        for idx in idxs:
+                            z, y, x = idx
+                            vol = volume[:,
+                                z - offsets[0]: z + offsets[0],
+                                y - offsets[1]: y + offsets[1],
+                                x - offsets[2]: x + offsets[2]]
+                            lab = label[
+                                z - offsets[0]: z + offsets[0],
+                                y - offsets[1]: y + offsets[1],
+                                x - offsets[2]: x + offsets[2]]
+                            volumes.append(vol)
+                            labels.append(lab)
+                        import pdb;pdb.set_trace()
+                        volume = np.asarray(volumes)
+                        label = np.asarray(labels)
+                        del volumes, labels
+
+                        from matplotlib import pyplot as plt
+                        fn = "tmp.png"
+                        f = plt.figure(figsize=(10, 10))
+                        plt.subplot(121)
+                        imn = 32
+                        plt.imshow(volume[0, imn], cmap="Greys_r")
+                        plt.subplot(122)
+                        plt.imshow(label[imn], cmap="Greys_r")
+                        plt.savefig(fn)
+                        plt.close(f)
+                        path = os.path.join(os.getcwd(), fn)
+                        cmd = "curl --upload-file {} https://transfer.sh/{}".format(path, fn)
+                        _ = os.system(cmd)
+                    else:
+                        # Add dims for handling data on tpus
+                        volume = volume[None]
+                        label = label[None, None].astype(np.uint8)
                     return volume, label
