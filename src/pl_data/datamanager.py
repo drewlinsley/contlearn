@@ -426,7 +426,7 @@ class GetData():
                                 volumes.append(vol)
                                 labels.append(lab)
                         volume = np.asarray(volumes)
-                        label = np.asarray(labels)
+                        label = np.asarray(labels).astype(np.uint8)
                         del volumes, labels
 
                         from matplotlib import pyplot as plt
