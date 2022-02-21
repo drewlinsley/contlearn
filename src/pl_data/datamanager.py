@@ -11,7 +11,7 @@ from tqdm import tqdm
 from joblib import Parallel, delayed
 from src.pl_data.augmentation_functions import randomcrop
 from scipy import ndimage
-import skimage
+from skimage import feature
 
 
 def draw_cube(start, label_size, shape, label, dtype):
@@ -411,7 +411,7 @@ class GetData():
 
                         state = np.random.get_state()
                         np.random.seed(42)
-                        idxs = skimage.feature.peak_local_max(
+                        idxs = feature.peak_local_max(
                             dt + np.random.random(dt.shape) * 1e-4,
                             indices=True, min_distance=3, threshold_abs=0, threshold_rel=0)
                         np.random.set_state(state)
