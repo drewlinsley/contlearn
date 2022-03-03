@@ -225,6 +225,10 @@ def pixel_contrast_brightness_3d(volume, label, params):
 
 def misalign_and_missing(volume, label, params):
     """Misalign and remove random slices."""
-    misalign_fun = augmentor.misalign.MisalignPlusMissing(**params)
+
+    misalign_fun = augmentor.augment.Blend([
+            augmentor.misalign.MisalignPlusMissing(random=random, **params),
+            augmentor.misalign.MisalignPlusMissing(random=False, **params)
+        ])
     out = misalign_fun({"volume": volume, "label": label})
     return out["volume"], out["label"]
