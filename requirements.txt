@@ -21,3 +21,4 @@ webknossos
 fastremap
 monai
 joblib
+git+https://github.com/seung-lab/Augmentor.git@master
