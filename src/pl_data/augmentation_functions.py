@@ -193,6 +193,7 @@ def random_selection(volume, label, params):
     sel = np.random.randint(bs)
     return volume[sel], label[sel]
 
+
 def warp(volume, label, params):
     """Warp a volume/label."""
     warp_fun = augmentor.warp.Warp(**params)
@@ -204,3 +205,19 @@ def warp(volume, label, params):
     return volume, label
 
 
+def pixel_contrast_brightness_2d(volume, label, params):
+    """Slice independent pixel augs."""
+    pixel_fun = augmentor.grayscale.MixedGrayscale2D(**params)
+    return pixel_fun(volume)
+
+
+def pixel_contrast_brightness_3d(volume, label, params):
+    """Slice independent pixel augs."""
+    pixel_fun = augmentor.grayscale.Grayscale3D(**params)
+    return pixel_fun(volume)
+
+
+def misalign_and_missing(volume, label, params):
+    """Misalign and remove random slices."""
+    misalign_fun = augmentor.misalign.MisalignPlusMissing(**params)
+    return misalign_fun(volume)
