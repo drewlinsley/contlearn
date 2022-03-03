@@ -67,6 +67,7 @@ data:
   bounding_box: [[1, 13800, 0], [3592, 1700, 800]]
   volume_size: False
   keep_labels: False
+  create_subvolumes: True
   annotation_path: https://webknossos.org/annotations/Explorational/616ed5ac010000a900d009d0
   image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_mag1_x2450_y4750_z2980.npy
   wkdataset: https://webknossos.org/datasets/Demo_Organization/110629_k0725

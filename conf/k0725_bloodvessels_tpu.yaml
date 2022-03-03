@@ -64,6 +64,7 @@ data:
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
   source_volume_name: False
+  create_subvolumes: True
   bounding_box: [[700, 12871, 2271], [1152, 1152, 240]]
   volume_size: False
   keep_labels: False

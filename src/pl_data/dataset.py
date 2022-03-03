@@ -136,7 +136,7 @@ class Volumetric(Dataset):
             {"randomcrop": self.shape},
             # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
             {"randomrotate": [(2, 3)]},  # Axes to rotate
-            {"randomflip": [1, 2, 3]},  # Axes to rotate
+            # {"randomflip": [1, 2, 3]},  # Axes to rotate
             {"normalize_volume": [0, 255]},  # Min/max
             {"cast_label": torch.int}
             # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
@@ -168,17 +168,6 @@ class Volumetric(Dataset):
             raise RuntimeError(
                 "The selected_label must be a dictionary or False.")
         self.ds["label"] = torch.as_tensor(self.ds["label"])  # noqa
-
-        # label_max = self.ds["label"].max()
-        # if label_max > 1:
-        #     self.ds["label"] = F.one_hot(
-        #         self.ds["label"].to(torch.int64),
-        #         int(label_max + 1)).to(
-        #         torch.uint8).permute(3, 0, 1, 2)
-        #     self.ds["label"] = self.ds["label"]
-        # else:
-        #     self.ds["label"] = self.ds["label"][None]  # Add singleton channel
-
         self.ds["volume"] = self.ds["volume"].float()
         self.ds["label"] = self.ds["label"].float()
         if self.len is None:
@@ -200,12 +189,6 @@ class Volumetric(Dataset):
             volume=volume,
             label=label,  # [:, None],
             augmentations=self.augmentations)
-        # # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
-        # if self.force_2d:
-        #     volume = volume.squeeze(1)
-        #     label = label.squeeze(1)
-        # else:
-        #     volume = volume[0][None]
         return volume, label  # .squeeze(1)
 
     def __repr__(self) -> str:
