@@ -9,6 +9,8 @@ from typing import List, Tuple, Any, Optional
 from torchvision.transforms import functional_pil as F_pil
 from torchvision.transforms import functional_tensor as F_t
 
+import augmentor
+
 
 def crop(img: Tensor, top: int, left: int, height: int, width: int) -> Tensor:
     """Crop the given image at specified location and output size.
@@ -190,3 +192,15 @@ def random_selection(volume, label, params):
     bs = len(volume)
     sel = np.random.randint(bs)
     return volume[sel], label[sel]
+
+def warp(volume, label, params):
+    """Warp a volume/label."""
+    warp_fun = augmentor.warp.Warp(**params)
+    vol_shape = volume.shape
+    combined = torch.cat((volume, label), 0)
+    combined = warp_fun(combined)
+    volume = combined[:vol_shape[0]]
+    label = combined[vol_shape[0]:]
+    return volume, label
+
+

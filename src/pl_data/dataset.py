@@ -195,6 +195,106 @@ class Volumetric(Dataset):
         return f"MyDataset({self.name}, {self.path})"
 
 
+class VolumetricWarp(Dataset):
+    def __init__(
+        self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs  # noqa
+    ):
+        super().__init__()
+        self.cfg = cfg
+        self.train = train
+        self.transform = transform
+        # if hasattr(self.cfg.train.pl_trainer, "tpu_cores") and self.cfg.train.pl_trainer.tpu_cores == 1:  # noqa
+        #     self.cache = True  # Push to CFG
+        # else:
+        #     self.cache = False  # Push to CFG
+        self.cache = False  # Push to CFG
+        self.repeat = True  # Push to CFG
+        self.shuffle = True  # Push to CFG
+        self.vol_size = [64, 128, 128, 2]
+        self.label_size = [64, 128, 128, 6]
+        self.vol_transpose = (3, 0, 1, 2)
+        self.label_transpose = (3, 0, 1, 2)
+        # self.batch_size = 1
+        tag = getattr(self.cfg.data.datamodule.datasets,[x for x in self.cfg.data.datamodule.datasets.keys()][0])  # noqa
+        train = "train" if self.train else "val"
+        self.len = tag.get(train).get("len")
+        self.selected_label = tag.get(train).get("selected_label")
+        self.trim_dims = tag.get(train).get("trim_dims")
+        self.force_2d = tag.get(train).get("force_2d")
+        self.shape = tag.get(train).get("shape")
+
+        assert self.len is not None, "self.len returned None"
+        assert self.selected_label is not None, "self.selected_label returned None"  # noqa
+        assert self.trim_dims is not None, "self.trim_dims returned None"
+        assert self.shape is not None, "Provide a shape in the dataset cfg."
+        self.shuffle_buffer = min(32, self.len)
+        # self.shuffle_buffer = min(64, self.len)
+        # self.len = None  # TESTING AUTO-COUNT
+        self.augmentations = [
+            # {"randomcrop": self.shape},
+            {"random_selection": None},
+            {"randomcrop": self.shape},
+            # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
+            {"randomrotate": [(2, 3)]},  # Axes to rotate
+            # {"randomflip": [1, 2, 3]},  # Axes to rotate
+            {"normalize_volume": [0, 255]},  # Min/max
+            {"warp": {"skip": 0.3, "do_twist": False, "rot_max": 15., "scale_max": 1.2}},  # Min/max
+            {"cast_label": torch.int}
+            # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
+        ]
+        print("Caching data")
+        # ds = read_gcs(path)
+
+        data = GetData(self.cfg.data)
+        volume, label = data.load()
+
+        # TODO: incorporate class weighting here
+        # noqa compute_class_weight(class_weight='balanced', classes=np.unique(l), y=l.ravel())
+        self.ds = {
+            "volume": torch.as_tensor(volume).to(torch.uint8),
+        }
+
+        # Remap labels if requested
+        if self.selected_label and type(dict(self.selected_label)) is dict:
+            self.selected_label = dict(self.selected_label)
+            self.ds["label"] = fastremap.remap(
+                label,
+                self.selected_label,
+                preserve_missing_labels=True,
+                in_place=True)
+
+        elif not self.selected_label:
+            self.ds["label"] = label
+        else:
+            raise RuntimeError(
+                "The selected_label must be a dictionary or False.")
+        self.ds["label"] = torch.as_tensor(self.ds["label"])  # noqa
+        self.ds["volume"] = self.ds["volume"].float()
+        self.ds["label"] = self.ds["label"].float()
+        if self.len is None:
+            print("Counting length of {}".format(train))
+            self.len = len([idx for idx, _ in enumerate(self.ds)])
+            print("Found length of {}".format(self.len))
+
+    def __len__(self) -> int:
+        return self.len
+
+    def __getitem__(self, index: int):
+        data = self.ds
+        volume = data["volume"]
+        # volume = self.norma(volume)
+        label = data["label"]
+
+        # Add augs here
+        volume, label = augment3d(
+            volume=volume,
+            label=label,  # [:, None],
+            augmentations=self.augmentations)
+        return volume, label  # .squeeze(1)
+
+    def __repr__(self) -> str:
+        return f"MyDataset({self.name}, {self.path})"
+
 class VolumetricTEST(Dataset):
     def __init__(
         self, path: ValueNode, train: bool, cfg: DictConfig, transform, **kwargs  # noqa
