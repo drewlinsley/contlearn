@@ -396,7 +396,7 @@ class GetData():
                     label = label[..., :vh, :vw]
 
                     # Cut into subvolumes if requested
-                    if self.create_subvolumes is not None:
+                    if self.create_subvolumes:
                         dt = ndimage.distance_transform_edt(
                             (label > 0).astype(np.float32)).astype(np.float32)
 
@@ -404,7 +404,7 @@ class GetData():
                         np.random.seed(42)
                         idxs = feature.peak_local_max(
                             dt + np.random.random(dt.shape) * 1e-4,
-                            indices=True, min_distance=26, threshold_abs=0, threshold_rel=0)
+                            indices=True, min_distance=18, threshold_abs=0, threshold_rel=0)
                         np.random.set_state(state)
 
                         # Now package up label/vol per idx

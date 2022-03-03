@@ -67,7 +67,7 @@ data:
   bounding_box: [[5700, 5321, 231], [1000, 1000, 50]]
   volume_size: [[0, 0, 0], [4740, 4740, 240]]
   keep_labels: {2: 1}  # remap everything else to 0
-  create_subvolumes: True
+  create_subvolumes: False
   annotation_path: https://webknossos.org/annotations/Explorational/61f9de020100004f017d7617
   image_path: gs://serrelab/connectomics/npy/synapse/110629_k0725_mag1_x5700_y5321_z231.npy
   wkdataset: https://webknossos.org/datasets/4fd6473e68256c0a/wong_8  # set to "???" if not using
