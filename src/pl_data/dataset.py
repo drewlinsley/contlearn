@@ -138,7 +138,7 @@ class Volumetric(Dataset):
             {"pixel_contrast_brightness_2d": {"contrast_factor": 0.5, "brightness_factor": 0.5, "prob": 1., "skip": 0.3}},
             {"misalign_and_missing": {"disp": (5, 30), "value": 1}},
             {"warp": {"skip": 0.3, "do_twist": False, "rot_max": 15., "scale_max": 1.2}},  # Min/max
-            {"to_tensor": None},
+            {"to_torch": None},
 
             {"randomcrop": self.shape},
             # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
@@ -246,7 +246,7 @@ class VolumetricWarp(Dataset):
             {"pixel_contrast_brightness_2d": {"contrast_factor": 0.5, "brightness_factor": 0.5, "prob": 1., "skip": 0.3}},
             {"misalign_and_missing": {"disp": (5, 30), "value": 1}},
             {"warp": {"skip": 0.3, "do_twist": False, "rot_max": 15., "scale_max": 1.2}},  # Min/max
-            {"to_tensor": None},
+            {"to_torch": None},
 
             {"randomcrop": self.shape},
             # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
