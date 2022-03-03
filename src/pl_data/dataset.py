@@ -235,14 +235,17 @@ class VolumetricWarp(Dataset):
         self.augmentations = [
             # {"randomcrop": self.shape},
             {"random_selection": None},
+
+            {"pixel_contrast_brightness_2d": {"contrast_factor": 0.5, "brightness_factor": 0.5, "prob": 1., "skip": 0.3}},
+            {"misalign_and_missing": {"disp": (5, 30), "value": 1, "random": True}},
+            {"warp": {"skip": 0.3, "do_twist": False, "rot_max": 15., "scale_max": 1.2}},  # Min/max
+
             {"randomcrop": self.shape},
             # {"randomrotate": [(1, 2), (1, 3), (2, 3)]},  # noqa Axes to rotate -- this only works for isotropic voxels
             {"randomrotate": [(2, 3)]},  # Axes to rotate
             # {"randomflip": [1, 2, 3]},  # Axes to rotate
             {"normalize_volume": [0, 255]},  # Min/max
-            {"pixel_contrast_brightness_2d": {"contrast_factor": 0.5, "brightness_factor": 0.5, "prob": 1., "skip": 0.3}},
-            {"misalign_and_missing": {"disp": (5, 30), "value": 1, "random": True}},
-            {"warp": {"skip": 0.3, "do_twist": False, "rot_max": 15., "scale_max": 1.2}},  # Min/max
+
             {"cast_label": torch.int}
             # {"normalize_volume_z": [150.4, 31.8]},  # Min/max
         ]
