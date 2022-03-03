@@ -198,26 +198,26 @@ def warp(volume, label, params):
     """Warp a volume/label."""
     warp_fun = augmentor.warp.Warp(**params)
     vol_shape = volume.shape
-    combined = torch.cat((volume, label), 0)
-    combined = warp_fun(combined)
-    volume = combined[:vol_shape[0]]
-    label = combined[vol_shape[0]:]
-    return volume, label
+    out = warp_fun({"volume": volume, "label": label})
+    return out["volume"], out["label"]
 
 
 def pixel_contrast_brightness_2d(volume, label, params):
     """Slice independent pixel augs."""
     pixel_fun = augmentor.grayscale.MixedGrayscale2D(**params)
-    return pixel_fun(volume)
+    out = pixel_fun({"volume": volume, "label": label})
+    return out["volume"], label
 
 
 def pixel_contrast_brightness_3d(volume, label, params):
     """Slice independent pixel augs."""
     pixel_fun = augmentor.grayscale.Grayscale3D(**params)
-    return pixel_fun(volume)
+    out = pixel_fun({"volume": volume, "label": label})
+    return out["volume"], label
 
 
 def misalign_and_missing(volume, label, params):
     """Misalign and remove random slices."""
     misalign_fun = augmentor.misalign.MisalignPlusMissing(**params)
-    return misalign_fun(volume)
+    out = misalign_fun({"volume": volume, "label": label})
+    return out["volume"], out["label"]
