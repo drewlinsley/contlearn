@@ -236,6 +236,7 @@ class VolumetricWarp(Dataset):
             # {"randomcrop": self.shape},
             {"random_selection": None},
 
+            {"to_numpy": None},
             {"pixel_contrast_brightness_2d": {"contrast_factor": 0.5, "brightness_factor": 0.5, "prob": 1., "skip": 0.3}},
             {"misalign_and_missing": {"disp": (5, 30), "value": 1, "random": True}},
             {"warp": {"skip": 0.3, "do_twist": False, "rot_max": 15., "scale_max": 1.2}},  # Min/max

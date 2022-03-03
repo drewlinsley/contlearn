@@ -187,6 +187,13 @@ def cast_label(volume, label, params):
     return volume, label
 
 
+def to_numpy(volume, label, params):
+    """Apply normalization to volume."""
+    volume = volume.numpy()
+    label = label.numpy()
+    return volume, label
+
+
 def random_selection(volume, label, params):
     """Apply normalization to volume."""
     bs = len(volume)
