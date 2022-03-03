@@ -80,7 +80,7 @@ data:
     datasets:
       Celltype_Prediction:
         train:
-          _target_: src.pl_data.dataset.Volumetric
+          _target_: src.pl_data.dataset.VolumetricWarp
           train: True
           path: "${data.image_path}"
           # path: gs://serrelab/connectomics/tfrecords/celltype/cell_type_10_64_15.tfrecords_train.tfrecords
@@ -92,7 +92,7 @@ data:
           selected_label: False  
           # ['AC', 'BC', 'Clear', 'Label', 'Muller', 'RGC']
         val:
-          _target_: src.pl_data.dataset.Volumetric
+          _target_: src.pl_data.dataset.VolumetricWarp
           train: False
           # path: gs://serrelab/connectomics/npy/celltype/cells_1.npz
           path: "${data.image_path}"
