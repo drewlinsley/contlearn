@@ -59,7 +59,7 @@ data:
   annotation_size: [3, 5, 5]  # z/y/x
   cube_size: [20, 128, 128]  # After transpose if requested. This is the cube size for the dataset  # noqa
   label_transpose_xyz_zyx: [2, 0, 1]
-  image_transpose_xyz_zyx: True
+  image_transpose_xyz_zyx: [3, 0, 1, 2]
   image_downsample: False
   label_downsample: False  # [1, 4.114, 4.114]
   image_layer_name: "images"  # Depreciated
