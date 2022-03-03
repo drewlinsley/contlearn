@@ -194,6 +194,13 @@ def to_numpy(volume, label, params):
     return volume, label
 
 
+def to_torch(volume, label, params):
+    """Apply normalization to volume."""
+    volume = torch.from_numpy(volume)
+    label = torch.from_numpy(label)
+    return volume, label
+
+
 def random_selection(volume, label, params):
     """Apply normalization to volume."""
     bs = len(volume)
