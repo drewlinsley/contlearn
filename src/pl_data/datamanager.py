@@ -272,9 +272,9 @@ class GetData():
                     # These annotations are volumetric, for semantic seg.
                     dataset = wk.Dataset(new_dataset_name, scale=list(self.scale))  # noqa
                     if self.source_volume_name:
-                        annotation_layer = annotation.save_volume_annotation(dataset, source_volume_name=self.source_volume_name)
+                        annotation_layer = annotation.export_volume_layer_to_dataset(dataset, volume_layer_name=self.source_volume_name)
                     else:
-                        annotation_layer = annotation.save_volume_annotation(dataset)  # noqa
+                        annotation_layer = annotation.export_volume_layer_to_dataset(dataset)  # noqa
 
                     if self.bounding_box:  # self.volume_size:
                         # Get the bbox annotation
