@@ -1,6 +1,6 @@
 # ZONE=us-central1-a  # europe-west4-a us-east1-d
 # ZONE=europe-west4-a  #  us-east1-d
-TPU=v3-8  # 8
+TPU=v3-8   # 8
 
 TPUNAME=$1
 CONFIG=$2
