@@ -12,7 +12,6 @@ from joblib import Parallel, delayed
 from src.pl_data.augmentation_functions import randomcrop
 from scipy import ndimage
 from skimage import feature
-from webknossos.client.context import webknossos_context
 
 
 def draw_cube(start, label_size, shape, label, dtype):
@@ -89,12 +88,11 @@ class GetData():
             assert self.image_layer_name is not None, "You must specify an image layer name. (images? color?)"  # noqa
             assert self.cube_size is not None, "You must specify an image cube size"  # noqa
             assert self.source_volume_name is not None, "You must specify a source_volume_name or set this to False"
-            with webknossos_context(  # wk.webknossos_context(
+            with wk.webknossos_context(
                     url="https://webknossos.org",
-                    token=self.token):  # ,
-                    # timeout=7200):
-                # annotation = wk.Annotation.download(self.annotation_path)
-                annotation = wk.annotation.annotation.open_annotation(self.annotation_path)
+                    token=self.token,
+                    timeout=7200):
+                annotation = wk.Annotation.download(self.annotation_path)
                 original_dataset_name = self.wkdataset.split("/")[-1]
                 original_dataset_org = self.wkdataset.split("/")[-2]
                 time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
