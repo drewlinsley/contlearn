@@ -92,7 +92,8 @@ class GetData():
                     url="https://webknossos.org",
                     token=self.token,
                     timeout=7200):
-                annotation = wk.Annotation.download(self.annotation_path)
+                # annotation = wk.Annotation.download(self.annotation_path)
+                annotation = wk.annotation.annotation.open_annotation(self.annotation_path)
                 original_dataset_name = self.wkdataset.split("/")[-1]
                 original_dataset_org = self.wkdataset.split("/")[-2]
                 time_str = strftime("%Y-%m-%d_%H-%M-%S", gmtime())
