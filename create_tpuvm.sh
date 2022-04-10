@@ -37,7 +37,7 @@ fi
 gcloud alpha compute tpus tpu-vm delete $TPUNAME --zone=$ZONE --quiet
 gcloud alpha compute tpus tpu-vm create $TPUNAME --zone=$ZONE --accelerator-type=$TPU --version=v2-alpha
 gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE \
-  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && git checkout gcp && sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 100 && cp netrc ../.netrc && pip install -r requirements.txt"
+  --command "git clone https://github.com/drewlinsley/contlearn.git && cd contlearn && git checkout gcp && sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 100 && cp netrc ../.netrc && pip install -r requirements.txt && pip install -U webknossos"
 
 gcloud alpha compute tpus tpu-vm ssh $TPUNAME --zone $ZONE
 
